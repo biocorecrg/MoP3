@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; Master of Pores 2  documentation</title>
+  <title>How to install &mdash; Master of Pores 2  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -36,8 +36,12 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Master of Pores</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -54,7 +58,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>&lt;no title&gt;</li>
+      <li>How to install</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -63,7 +67,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <p># Install</p>
+  <section id="how-to-install">
+<span id="home-page-install"></span><h1>How to install<a class="headerlink" href="#how-to-install" title="Permalink to this headline"></a></h1>
 <p>Please install nextflow <a class="reference external" href="https://www.nextflow.io/">**Nextflow**</a> and <cite>**Singularity** &lt;https://sylabs.io/&gt;`_or `**Docker** &lt;https://www.docker.com/&gt;</cite> before.</p>
 <p>Then download the repo:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone --depth 1 --recurse-submodules git@github.com:biocorecrg/MoP2.git</span>
@@ -77,7 +82,8 @@
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd MoP2; sh INSTALL.sh</span>
 </pre></div>
 </div>
-<p>## Testing</p>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd mop_preprocess</span>
 
 <span class="go">nextflow run mop_preprocess.nf -with-singularity -bg -profile local &gt; log</span>
@@ -87,6 +93,8 @@
 <p class="admonition-title">Tip</p>
 <p>You can replace <code class="docutils literal notranslate"><span class="pre">`-with-singularity`</span></code> with <code class="docutils literal notranslate"><span class="pre">`-with-docker`</span></code> if you want to use the docker engine.</p>
 </div>
+</section>
+</section>
 
 
            </div>
