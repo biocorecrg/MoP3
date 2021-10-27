@@ -40,7 +40,10 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Master of Pores</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">MOP_PREPROCESS</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MOP_PREPROCESS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#input-parameters">Input Parameters</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="mop_mod.html">MOP_MOD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_consensus.html">MOP_CONSENSUS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_tail.html">MOP_TAIL</a></li>
@@ -71,7 +74,121 @@
              
   <section id="mop-preprocess">
 <span id="home-page-moprepr"></span><h1>MOP_PREPROCESS<a class="headerlink" href="#mop-preprocess" title="Permalink to this headline"></a></h1>
-<p>Somthing about the module</p>
+<p>This module takes as input the raw fast5 reads - single or multi - and produces a number of outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module is able to perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a genome / transcriptome reference, feature counting, discovery of novel transcripts and it generates a final report of the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi sequence).</p>
+<section id="input-parameters">
+<h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Permalink to this headline"></a></h2>
+<div class="line-block">
+<div class="line">Parameter name  | Description |</div>
+<div class="line">————- | ————–|</div>
+</div>
+<p><a href="#id11"><span class="problematic" id="id12">|**fast5 files**|Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/&amp;ast&amp;ast/*.fast5]**|</span></a>
+<a href="#id13"><span class="problematic" id="id14">|**reference**|File in fasta format. **[Reference_file.fa]**|</span></a>
+<a href="#id15"><span class="problematic" id="id16">|**ref_type**|</span></a> Specify if the reference is a genome or a transcriptome. <strong>[genome / transcriptome]</strong> |
+<a href="#id17"><span class="problematic" id="id18">|**kit**|Kit used in library prep - required for basecalling.|</span></a>
+<a href="#id19"><span class="problematic" id="id20">|**flowcell**|Flowcell used in sequencing - required for basecalling. |
+|**annotation**|Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. **[Annotation_file.gtf]** |
+|**seq_type**|</span></a> Sequence type. <strong>[RNA / DNA]</strong> |
+<a href="#id21"><span class="problematic" id="id22">|**output**|Output folder name. **[/Path/to_output_folder]**|</span></a>
+<a href="#id23"><span class="problematic" id="id24">|**granularity**|indicates the number of input fast5 files analyzed in a single process. It is by default 4000 for single-sequence fast5 files and 1 for multi-sequence fast5 files. In case **GPU** option is turned on this value is not needed since every file will be analyzed sequentially.|</span></a>
+<a href="#id25"><span class="problematic" id="id26">|**basecaller**|Algorithm to perform the basecalling. guppy or albacore are supported. **[albacore / guppy]**|</span></a>
+<a href="#id27"><span class="problematic" id="id28">|**basecaller_opt**|</span></a> Command line options for basecaller program. Check available options in respective basecaller repository.|
+<a href="#id29"><span class="problematic" id="id30">|**GPU**|</span></a> Allow the pipeline to run with GPU. <strong>[OFF / ON]**|
+|**demultiplexing**| Demultiplexing algorithm to be used. **[OFF / deeplexicon / guppy / guppy-readucks]**|
+|**demultiplexing_opt**|Command line options for the demultiplexing software. |
+|**demulti_fast5**| If performing demultiplexing, also generate demultiplexed multifast5 files. **[OFF / ON]**|
+|**filter**| Program to filter fastq files. **[nanofilt / OFF]**|
+|**filter_opt**| Command line options of the filtering program. |
+|**mapper**| Mapping algorithm. **[minimap2 / graphmap / graphmap2]</strong> |
+<a href="#id31"><span class="problematic" id="id32">|**mapper_opt**|</span></a> Command line options of the mapping algorithm. |
+<a href="#id33"><span class="problematic" id="id34">|**map_type**|Spliced - recommended for genome mapping - or unspliced - recommended for transcriptome mapping. **[spliced / unspliced]**|</span></a>
+<a href="#id35"><span class="problematic" id="id36">|**counter**|</span></a> Generating gene counts (genome mapping) or transcript counts (transcriptome mapping). <a href="#id1"><span class="problematic" id="id2">**</span></a>[YES / “”]**|
+<a href="#id37"><span class="problematic" id="id38">|**counter_opt**|Command line options of the counter program: NanoCount for transcripts and Htseq-count for genes.|</span></a>
+<a href="#id39"><span class="problematic" id="id40">|**email**|</span></a> Users email for receving the final report when the pipeline is finished. <a href="#id3"><span class="problematic" id="id4">**</span></a>[user_email]**|</p>
+<p>You can change them by editing the <strong>params.config</strong> file or using the command line - please, see next section.</p>
+<p>## How to run the pipeline
+Before launching the pipeline, user should decide which containers to use - either docker or singularity <strong>[-with-docker / -with-singularity]</strong>.
+Then, to launch the pipeline, please use the following command:
+<code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">nextflow</span> <span class="pre">run</span> <span class="pre">nanopreprocess.nf</span> <span class="pre">-with-singularity</span> <span class="pre">&gt;</span> <span class="pre">log.txt</span>
+<span class="pre">`</span></code>
+&lt;br/&gt;</p>
+<ul class="simple">
+<li><p>Run the pipeline in the background:</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">nextflow</span> <span class="pre">run</span> <span class="pre">nanopreprocess.nf</span> <span class="pre">-with-singularity</span> <span class="pre">-bg</span> <span class="pre">&gt;</span> <span class="pre">log.txt</span>
+<span class="pre">`</span></code>
+&lt;br/&gt;</p>
+<ul class="simple">
+<li><p>Run the pipeline while changing <strong>params.config</strong> file:</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">nextflow</span> <span class="pre">run</span> <span class="pre">nanopreprocess.nf</span> <span class="pre">-with-singularity</span> <span class="pre">-bg</span> <span class="pre">--output</span> <span class="pre">test2</span> <span class="pre">&gt;</span> <span class="pre">log.txt</span>
+<span class="pre">`</span></code>
+&lt;br/&gt;</p>
+<ul class="simple">
+<li><p>Specify a directory for the working directory (temporary files location):</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">nextflow</span> <span class="pre">run</span> <span class="pre">nanopreprocess.nf</span> <span class="pre">-with-singularity</span> <span class="pre">-bg</span> <span class="pre">-w</span> <span class="pre">/path/working_directory</span> <span class="pre">&gt;</span> <span class="pre">log.txt</span>
+<span class="pre">`</span></code>
+&lt;br/&gt;</p>
+<ul class="simple">
+<li><p>Run the pipeline with GPU - <strong>CRG GPU cluster users</strong></p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">nextflow</span> <span class="pre">run</span> <span class="pre">nanopreprocess.nf</span> <span class="pre">-with-singularity</span> <span class="pre">-bg</span> <span class="pre">-w</span> <span class="pre">/path/working_directory</span> <span class="pre">-profile</span> <span class="pre">cluster</span> <span class="pre">&gt;</span> <span class="pre">log.txt</span>
+<span class="pre">`</span></code>
+&lt;br/&gt;</p>
+<ul class="simple">
+<li><p>Run the pipeline with GPU - <strong>local GPU</strong></p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">nextflow</span> <span class="pre">run</span> <span class="pre">nanopreprocess.nf</span> <span class="pre">-with-singularity</span> <span class="pre">-bg</span> <span class="pre">-w</span> <span class="pre">/path/working_directory</span> <span class="pre">-profile</span> <span class="pre">local</span> <span class="pre">&gt;</span> <span class="pre">log.txt</span>
+<span class="pre">`</span></code></p>
+<p>## Troubleshooting
+* Checking what has gone wrong:
+If there is an error, please see the log file (log.txt) for more details. Furthermore, if more information is needed, you can also find the working directory of the process in the file. Then, access that directory and check both the <cite>.command.log</cite> and <cite>.command.err</cite> files.
+&lt;br/&gt;</p>
+<ul class="simple">
+<li><p>Resume an execution:</p></li>
+</ul>
+<p>Once the error has been solved or if you change a specific parameter, you can resume the execution with the <strong>Netxtlow</strong> parameter <strong>-resume</strong> (only one dash!). If there was an error, the pipeline will resume from the process that had the error and proceed with the rest. If a parameter was changed, only processes affected by this parameter will be re-run.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">nextflow</span> <span class="pre">run</span> <span class="pre">nanopreprocess.nf</span> <span class="pre">-with-singularity</span> <span class="pre">-bg</span> <span class="pre">-resume</span> <span class="pre">&gt;</span> <span class="pre">log_resumed.txt</span>
+<span class="pre">`</span></code></p>
+<p>To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed process are found as <em>Cached</em>, resume worked!
+<a href="#id5"><span class="problematic" id="id6">``</span></a>`
+…</p>
+<p>[warm up] executor &gt; crg
+[e8/2e64bd] Cached process &gt; baseCalling (RNA081120181_1)
+[b2/21f680] Cached process &gt; QC (RNA081120181_1)
+[c8/3f5d17] Cached process &gt; mapping (RNA081120181_1)
+…</p>
+<p><a href="#id7"><span class="problematic" id="id8">``</span></a><a href="#id9"><span class="problematic" id="id10">`</span></a></p>
+<p><strong>IMPORTANT:</strong> To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, pipeline will re-start from the beginning.</p>
+<p>## Results:</p>
+<p>Several folders are created by the pipeline within the output directory specified by the <strong>output</strong> parameter and the input folder name is taken as sample name.</p>
+<ul class="simple">
+<li><p><strong>fast5_files</strong>: Contains the basecalled multifast5 files. Each batch contains 4000 sequences.</p></li>
+<li><p><strong>fastq_files</strong>: Contains one or, in case of demultiplexing, more fastq files.</p></li>
+<li><p><strong>QC_files</strong>: Contains each single QC produced by the pipeline.</p></li>
+<li><p><strong>alignment</strong>: Contains the bam file(s).</p></li>
+<li><p><strong>cram_files</strong>: Contains the cram file(s).</p></li>
+<li><p><strong>counts (OPTIONAL)</strong>: Contains read counts per gene / transcript if counting was performed.</p></li>
+<li><p><strong>assigned (OPTIONAL)</strong>: Contains assignment of each read to a given gene / transcript if counting was performed.</p></li>
+<li><p><strong>report</strong>: Contains the final multiqc report.</p></li>
+<li><p><strong>variants (OPTIONAL)</strong>: still experimental. It contains variant calling.</p></li>
+</ul>
+<hr class="docutils" />
+<p># NanoPreprocessSimple</p>
+<p>This is a light version of NanoPreprocess that does not perform the basecalling step. It allows to make the same analysis starting from basecalled reads in fastq format. You can also provide fast5 files if you need to demultiplex using DeepLexiCon.</p>
+<p>This module will allow to run the pipeline on multiple input samples by using this syntax in the params.file:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">fastq</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">=</span> <span class="pre">&quot;$baseDir/../../../org_data/**/*.fastq.gz&quot;</span>
+<span class="pre">`</span></code></p>
+<p>In this way it will produces a number of output files with the same sample name indicated by the two asterisks.</p>
+</section>
 </section>
 
 
