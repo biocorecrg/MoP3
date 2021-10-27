@@ -1,3 +1,3 @@
 GitHub Pages of [biocorecrg/MoP2](https://github.com/biocorecrg/MoP2.git)
 ===
-Sphinx html documentation of [83e3a690](https://github.com/biocorecrg/MoP2/tree/83e3a69021127132eab4e4fcacd9d7c55a2a7edc)
+Sphinx html documentation of [b341e7cb](https://github.com/biocorecrg/MoP2/tree/b341e7cb58310242d6e68935c3e2b37c1584fac2)
