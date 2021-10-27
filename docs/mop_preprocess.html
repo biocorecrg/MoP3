@@ -79,33 +79,6 @@
 <p>This module takes as input the raw fast5 reads - single or multi - and produces a number of outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module is able to perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a genome / transcriptome reference, feature counting, discovery of novel transcripts and it generates a final report of the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi sequence).</p>
 <section id="input-parameters">
 <h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Permalink to this headline"></a></h2>
-<div class="line-block">
-<div class="line">Parameter name  | Description |</div>
-<div class="line">————- | ————–|</div>
-</div>
-<p><a href="#id5"><span class="problematic" id="id6">|**kit**|Kit used in library prep - required for basecalling.|</span></a>
-<a href="#id7"><span class="problematic" id="id8">|**flowcell**|Flowcell used in sequencing - required for basecalling. |
-|**fast5 files**|Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/&amp;ast&amp;ast/*.fast5]**. If empty it will search for fastq files and skip basecalling|</span></a>
-<a href="#id9"><span class="problematic" id="id10">|**fastq files**|Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling**[/Path/&amp;ast&amp;ast/*.fastq]**. |
-|**reference**|File in fasta format. **[Reference_file.fa]**|</span></a>
-<a href="#id11"><span class="problematic" id="id12">|**ref_type**|</span></a> Specify if the reference is a genome or a transcriptome. <strong>[genome / transcriptome]</strong> |
-<a href="#id13"><span class="problematic" id="id14">|**annotation**|Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. **[Annotation_file.gtf]**. |
-|**pars_tools**|Parameters of tools. It is ha tab separated file with custom parameters for each tool **[NAME_tool_opt.tsv]**|</span></a>
-<a href="#id15"><span class="problematic" id="id16">|**output**|Output folder name. **[/Path/to_output_folder]**|</span></a>
-<a href="#id17"><span class="problematic" id="id18">|**qualityqc**|Quality threshold for QC. **[5]**|</span></a>
-<a href="#id19"><span class="problematic" id="id20">|**granularity**|indicates the number of input fast5 files analyzed in a single process.|</span></a>
-<a href="#id21"><span class="problematic" id="id22">|**basecalling**|Tool for basecalling **[guppy / NO ]**|</span></a>
-<a href="#id23"><span class="problematic" id="id24">|**GPU**|</span></a> Allow the pipeline to run with GPU. <strong>[OFF / ON]**|
-|**demultiplexing**| Tool for demultiplexing algorithm. **[deeplexicon / guppy / NO ]**|
-|**demulti_fast5**| If performing demultiplexing, also generate demultiplexed multifast5 files. **[YES / NO]**|
-|**filtering**| Tool for filtering fastq files. **[nanofilt / NO]**|
-|**mapping**| Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / NO ]</strong> |
-<a href="#id25"><span class="problematic" id="id26">|**counting**|</span></a> Tool for gene or transcripts counts <strong>[htseq / nanocount / NO””]**|
-|**discovery**| Tool for generating novel transcripts. **[bambu / isoquant / NO]</strong> |
-<a href="#id27"><span class="problematic" id="id28">|**cram_conv**|</span></a> Converting bam in cram. <strong>[YES / “”]**|
-|**subsampling_cram**| Subsampling BAM before CRAM conversion. **[YES / “”]**|
-|**saveSpace**| Remove intermediate files (**beta</strong>) <a href="#id1"><span class="problematic" id="id2">**</span></a>[YES / “”]**|
-<a href="#id29"><span class="problematic" id="id30">|**email**|</span></a> Users email for receving the final report when the pipeline is finished. <a href="#id3"><span class="problematic" id="id4">**</span></a>[user_email]**|</p>
 <p>You can change them by editing the <strong>params.config</strong> file or using the command line - please, see next section.</p>
 </section>
 <section id="how-to-run-the-pipeline">
