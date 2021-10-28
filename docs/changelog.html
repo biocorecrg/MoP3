@@ -78,44 +78,46 @@
 <span id="home-page-changelog"></span><h1>CHANGELOG<a class="headerlink" href="#changelog" title="Permalink to this headline"></a></h1>
 <section id="version-2-0">
 <h2>Version 2.0<a class="headerlink" href="#version-2-0" title="Permalink to this headline"></a></h2>
-<p>Completely rewritten using the powerful <a class="reference external" href="https://www.nextflow.io/docs/latest/dsl2.html">DSL2</a>.
-Subworkflows are stored in the independent repository <a class="reference external" href="https://github.com/biocorecrg/BioNextflow">BioNextflow</a>.</p>
-<ul>
+<ul class="simple">
+<li><p>Completely rewritten using the powerful <a class="reference external" href="https://www.nextflow.io/docs/latest/dsl2.html">DSL2</a>.</p></li>
+<li><p>Subworkflows are stored in the independent repository <a class="reference external" href="https://github.com/biocorecrg/BioNextflow">BioNextflow</a>.</p></li>
+<li><p>Global nextflow config is broken down to different profiles (cluster, cloud, local…)</p></li>
+<li><p>Added the new module <strong>mop_consensus</strong></p></li>
 <li><dl class="simple">
-<dt>mop_preprocess (formerly known as nanoPreprocess + nanoPreprocessSimple)</dt><dd><ul class="simple">
-<li><p>now can read multiple runs per time</p></li>
+<dt>mop_preprocess (formerly known as nanoPreprocess + nanoPreprocessSimple)</dt><dd><ul>
+<li><p>now can read multiple runs per time using the syntax <strong>“PATH/**/*.fast5”</strong></p></li>
 <li><p>can demultiplex fast5 using guppy too</p></li>
 <li><p>deeplexicon can be run on GPU too</p></li>
-<li><p>Parameters of each tool are stored in a tsv file. We have three different ones already pre-set for cDNA, DNA and dRNA (option –pars_tools)</p></li>
-<li><p>demultiplexing, filtering, mapping and counting can be switched off by setting “NO” as a parameter</p></li>
-<li><p>saveSpace can be set to “YES” to reduce the amount of disk space required. WARNING This will prevent the possibility to resume!</p></li>
-<li><p>Merged old NanoPreprocess and NanoPreprocessSimple in a mop_preprocess. Using fastq or fast5 will switch among the two executions.</p></li>
-<li><p>Added new process “discovery” with bambu / … for discovering and quantifying new transcripts.</p></li>
+<li><p>Parameters of each tool are stored in a tsv file. We have different ones already pre-set for cDNA, DNA and dRNA (option <strong>–pars_tools</strong>)</p></li>
+<li><p>Added new process <strong>discovery</strong> with bambu / isoquant for discovering and quantifying new transcripts.</p></li>
+<li><p>demultiplexing, filtering, mapping, counting and discovery can be switched off by setting “NO” as a parameter</p></li>
+<li><p>saveSpace can be set to “YES” to reduce the amount of disk space required. <strong>WARNING This will prevent the possibility to resume!</strong></p></li>
+<li><p>Merged old NanoPreprocess and NanoPreprocessSimple in <strong>mop_preprocess</strong>. Using fastq or fast5 will switch among the two executions.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><dl>
-<dt>mop_mod (formerly known as nanoMod)</dt><dd><ul class="simple">
-<li><p>now you can launch each analysis independently</p></li>
-<li><p>Fine tuning of parameter for each step in tools_opt.tsv</p></li>
-<li><p>4 workflows based on the following tools:</p></li>
-</ul>
-<blockquote>
-<div><ul class="simple">
+<li><dl class="simple">
+<dt>mop_mod (formerly known as nanoMod)</dt><dd><ul>
+<li><dl class="simple">
+<dt>Four workflows based on the following tools:</dt><dd><ul>
 <li><p>epinano</p></li>
 <li><p>nanopolish + nanocompore</p></li>
 <li><p>tombo model_sample_compare</p></li>
 <li><p>tombo level_sample_compare</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
+</li>
+<li><p>You can launch each analysis independently</p></li>
+<li><p>Fine tuning of parameters for each step in tools_opt.tsv</p></li>
+</ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>mop_tail (formerly known as nanoTail)</dt><dd><ul class="simple">
+<dt>mop_tail (formerly known as nanoTail)</dt><dd><ul>
 <li><p>now you can launch each analysis independently</p></li>
-<li><p>4 workflows: epinano, nanopolish + nanocompore, tombo model_sample_compare and tombo level_sample_compare</p></li>
 <li><p>Fine tuning of parameter for each step in tools_opt.tsv</p></li>
 </ul>
 </dd>
@@ -123,7 +125,7 @@ Subworkflows are stored in the independent repository <a class="reference extern
 </li>
 <li><p>mop_consensus (new module!!)</p></li>
 </ul>
-<p>This module will use the results from mop_mod using the tools from the 4 workflows (epinano, nanopolish, nanocompore and tombo model_sample_compare) to generate a consensus between them . It analyze each reference molecule independently and in parallel for each comparison.</p>
+<p>This module will use the results from mop_mod using the tools from the 4 workflows (epinano, nanopolish, nanocompore and tombo model_sample_compare) to generate a consensus between them. It analyzes for each comparison each reference molecule independently and in parallel.</p>
 </section>
 <section id="version-1-1">
 <h2>Version 1.1<a class="headerlink" href="#version-1-1" title="Permalink to this headline"></a></h2>
