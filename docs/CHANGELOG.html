@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; Master of Pores 2  documentation</title>
+  <title>CHANGELOG &mdash; Master of Pores 2  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -58,7 +58,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>&lt;no title&gt;</li>
+      <li>CHANGELOG</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -67,8 +67,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <p>## Version 2.0
-Completely rewritten using the powerful [DSL2](<a class="reference external" href="https://www.nextflow.io/docs/latest/dsl2.html">https://www.nextflow.io/docs/latest/dsl2.html</a>).
+  <section id="changelog">
+<span id="home-page-changelog"></span><h1>CHANGELOG<a class="headerlink" href="#changelog" title="Permalink to this headline"></a></h1>
+<section id="version-2-0">
+<h2>Version 2.0<a class="headerlink" href="#version-2-0" title="Permalink to this headline"></a></h2>
+<p>Completely rewritten using the powerful [DSL2](<a class="reference external" href="https://www.nextflow.io/docs/latest/dsl2.html">https://www.nextflow.io/docs/latest/dsl2.html</a>).
 Subworkflows are stored in the independent repository [BioNextflow](<a class="reference external" href="https://github.com/biocorecrg/BioNextflow">https://github.com/biocorecrg/BioNextflow</a>).</p>
 <ul>
 <li><p>mop_preprocess (formerly known as nanoPreprocess + nanoPreprocessSimple)
@@ -102,18 +105,26 @@ Subworkflows are stored in the independent repository [BioNextflow](<a class="re
 <li><p>mop_consensus (new module!!)
 This module will use the results from mop_mod using the tools from the 4 workflows (epinano, nanopolish, nanocompore and tombo model_sample_compare) to generate a consensus between them . It analyze each reference molecule independently and in parallel for each comparison.</p></li>
 </ul>
-<p>## Version 1.1
-* Added a new module called NanoPreprocessSimple that starts from fastq files instead of fast5 files. It allows the analysis of multiple files at a time.
-* Added support to vbz compressed fast5 <a class="reference external" href="https://github.com/nanoporetech/vbz_compression">https://github.com/nanoporetech/vbz_compression</a> in NanoPreprocess, NanoMod and NanoTail
-* NanoPreprocess now outputs also CRAM files and can do downsampling with the parameter –downsampling
-* NanoPreprocess allows performing variant calling using medaka (BETA)
-* NanoPreprocess allows performing demultiplexing with GUPPY
-* Added plots for Epinano output in NanoMod
-* Added a conversion of Tombo results in bed format in NanoMod
-* Added a INSTALL.sh file for automatically retrieve guppy 3.4.5 from <a class="reference external" href="https://mirror.oxfordnanoportal.com/">https://mirror.oxfordnanoportal.com/</a>, place it in NanoPreprocess/bin and making the required links
-* Added profiles for being used locally and on the CRG SGE cluster</p>
-<p>## Version 1.0
-This is the original version published in the paper [MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets](<a class="reference external" href="https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full">https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full</a>)</p>
+</section>
+<section id="version-1-1">
+<h2>Version 1.1<a class="headerlink" href="#version-1-1" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Added a new module called NanoPreprocessSimple that starts from fastq files instead of fast5 files. It allows the analysis of multiple files at a time.</p></li>
+<li><p>Added support to vbz compressed fast5 <a class="reference external" href="https://github.com/nanoporetech/vbz_compression">https://github.com/nanoporetech/vbz_compression</a> in NanoPreprocess, NanoMod and NanoTail</p></li>
+<li><p>NanoPreprocess now outputs also CRAM files and can do downsampling with the parameter –downsampling</p></li>
+<li><p>NanoPreprocess allows performing variant calling using medaka (BETA)</p></li>
+<li><p>NanoPreprocess allows performing demultiplexing with GUPPY</p></li>
+<li><p>Added plots for Epinano output in NanoMod</p></li>
+<li><p>Added a conversion of Tombo results in bed format in NanoMod</p></li>
+<li><p>Added a INSTALL.sh file for automatically retrieve guppy 3.4.5 from <a class="reference external" href="https://mirror.oxfordnanoportal.com/">https://mirror.oxfordnanoportal.com/</a>, place it in NanoPreprocess/bin and making the required links</p></li>
+<li><p>Added profiles for being used locally and on the CRG SGE cluster</p></li>
+</ul>
+</section>
+<section id="version-1-0">
+<h2>Version 1.0<a class="headerlink" href="#version-1-0" title="Permalink to this headline"></a></h2>
+<p>This is the original version published in the paper [MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets](<a class="reference external" href="https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full">https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full</a>)</p>
+</section>
+</section>
 
 
            </div>
