@@ -91,73 +91,70 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><strong>–kit</strong></p></td>
-<td><p>kit used in library prep, required for basecalling</p></td>
+<tr class="row-even"><td><p><strong>conffile</strong></p></td>
+<td><p>Configuration file produced by the Nanopore instrument. It can be omitted but in that case the user must specify either the guppy parameters “–kit” and “–flowcell” or the custom model via <strong>[NAME_tool_opt.tsv]</strong> file</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>flowcell</strong></p></td>
-<td><p>Flowcell used in sequencing, required for basecalling.</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>fast5 files</strong></p></td>
+<tr class="row-odd"><td><p><strong>fast5 files</strong></p></td>
 <td><p>Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. <strong>[/Path/**/*.fast5]</strong>. If empty it will search for fastq files and skip basecalling</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>fastq files</strong></p></td>
+<tr class="row-even"><td><p><strong>fastq files</strong></p></td>
 <td><p>Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling <strong>[/Path/**/*.fastq]</strong>.</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>reference</strong></p></td>
+<tr class="row-odd"><td><p><strong>reference</strong></p></td>
 <td><p>File in fasta format. <strong>[Reference_file.fa]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>ref_type</strong></p></td>
+<tr class="row-even"><td><p><strong>ref_type</strong></p></td>
 <td><p>Specify if the reference is a genome or a transcriptome. <strong>[genome / transcriptome]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>annotation</strong></p></td>
+<tr class="row-odd"><td><p><strong>annotation</strong></p></td>
 <td><p>Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. <strong>[Annotation_file.gtf]</strong>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>pars_tools</strong></p></td>
+<tr class="row-even"><td><p><strong>pars_tools</strong></p></td>
 <td><p>Parameters of tools. It is ha tab separated file with custom parameters for each tool <strong>[NAME_tool_opt.tsv]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>output</strong></p></td>
+<tr class="row-odd"><td><p><strong>output</strong></p></td>
 <td><p>Output folder name. <strong>[/Path/to_output_folder]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>qualityqc</strong></p></td>
+<tr class="row-even"><td><p><strong>qualityqc</strong></p></td>
 <td><p>Quality threshold for QC. <strong>[5]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>granularity</strong></p></td>
+<tr class="row-odd"><td><p><strong>granularity</strong></p></td>
 <td><p>indicates the number of input fast5 files analyzed in a single process.</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>basecalling</strong></p></td>
+<tr class="row-even"><td><p><strong>basecalling</strong></p></td>
 <td><p>Tool for basecalling <strong>[guppy / NO ]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>GPU</strong></p></td>
+<tr class="row-odd"><td><p><strong>GPU</strong></p></td>
 <td><p>Allow the pipeline to run with GPU. <strong>[OFF / ON]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>demultiplexing</strong></p></td>
+<tr class="row-even"><td><p><strong>demultiplexing</strong></p></td>
 <td><p>Tool for demultiplexing algorithm. <strong>[deeplexicon / guppy / NO ]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>demulti_fast5</strong></p></td>
+<tr class="row-odd"><td><p><strong>demulti_fast5</strong></p></td>
 <td><p>If performing demultiplexing generate demultiplexed multifast5 files too. <strong>[YES / NO]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>filtering</strong></p></td>
+<tr class="row-even"><td><p><strong>filtering</strong></p></td>
 <td><p>Tool for filtering fastq files. <strong>[nanofilt / NO]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>mapping</strong></p></td>
+<tr class="row-odd"><td><p><strong>mapping</strong></p></td>
 <td><p>Tool for mapping reads. <strong>[minimap2 / graphmap / graphmap2 / NO ]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>counting</strong></p></td>
+<tr class="row-even"><td><p><strong>counting</strong></p></td>
 <td><p>Tool for gene or transcripts counts <strong>[htseq / nanocount / NO””]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>discovery</strong></p></td>
+<tr class="row-odd"><td><p><strong>discovery</strong></p></td>
 <td><p>Tool for generating novel transcripts. <strong>[bambu / isoquant / NO]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>cram_conv</strong></p></td>
+<tr class="row-even"><td><p><strong>cram_conv</strong></p></td>
 <td><p>Converting bam in cram. <strong>[YES / “”]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>subsampling_cram</strong></p></td>
+<tr class="row-odd"><td><p><strong>subsampling_cram</strong></p></td>
 <td><p>Subsampling BAM before CRAM conversion. <strong>[YES / “”]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>saveSpace</strong></p></td>
+<tr class="row-even"><td><p><strong>saveSpace</strong></p></td>
 <td><p>Remove intermediate files (<strong>beta</strong>) <strong>[YES / “”]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>email</strong></p></td>
+<tr class="row-odd"><td><p><strong>email</strong></p></td>
 <td><p>Users email for receving the final report when the pipeline is finished. <strong>[user_email]</strong></p></td>
 </tr>
 </tbody>
