@@ -78,11 +78,15 @@ if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
 config_report = file("$baseDir/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
 logo = file("$baseDir/../img/logo_small.png")
+Channel.fromPath( "$baseDir/deeplexicon/*.h5").set{deepmodels}
 
+
+Channel
+    .from( config_report, logo )
+    .collect().set{multiqc_info}
 
 
 def gpu				    = params.GPU
-
 def tools = [:]
 tools["basecalling"] = params.basecalling
 tools["demultiplexing"] = params.demultiplexing
@@ -152,7 +156,8 @@ include { INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addP
 include { GET_VERSION as SAMTOOLS_VERSION; CAT as SAMTOOLS_CAT } from "${subworkflowsDir}/misc/samtools"
 include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" addParams(LABEL: 'big_cpus_ignore')
 include { GET_VERSION as NANOPLOT_VER } from "${subworkflowsDir}/qc/nanoplot" 
-include { GET_VERSION as NANOCOUNT_VER ; COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
+include { GET_VERSION as NANOCOUNT_VER } from "${subworkflowsDir}/read_count/nanocount"
+include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(LABEL: 'big_mem', EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
 include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(CONTAINER:"biocorecrg/htseq:30e9e9c", EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts, LABEL:'big_cpus')
 include { GET_VERSION as HTSEQ_VER } from "${subworkflowsDir}/read_count/htseq" addParams(CONTAINER:"biocorecrg/htseq:30e9e9c")
 
@@ -163,9 +168,9 @@ include { GET_VERSION as ISOQUANT_VER } from "${subworkflowsDir}/assembly/isoqua
 include { ASSEMBLE as ISOQUANT_ASSEMBLE } from "${subworkflowsDir}/assembly/isoquant" addParams(EXTRAPARS: progPars["discovery--isoquant"], OUTPUT:outputAssembly, LABEL:'big_mem_cpus')
 
 
-include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
+include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report.getName()}", OUTPUT:outputMultiQC)
 include { concatenateFastQFiles} from "${local_modules}" addParams(OUTPUT:outputFastq)
-include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_cpus')
+include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_mem_cpus')
 include { bam2stats; countStats; joinCountStats; joinAlnStats} from "${local_modules}" 
 include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as fast5CleanFile} from "${local_modules}"
 include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
@@ -212,7 +217,7 @@ workflow flow2 {
 		// IF DEMULTIPLEXING IS DEEPLEXICON	
     	if(params.demultiplexing == "deeplexicon") {
 			outbc = GUPPY_BASECALL(fast5_4_analysis)
-			demux = DEMULTIPLEX_DEEPLEXICON(fast5_4_analysis)
+			demux = DEMULTIPLEX_DEEPLEXICON(deepmodels, fast5_4_analysis)
 			fast5_res = outbc.basecalled_fast5
 		
 			// Optional demultiplex fast5 		
@@ -277,7 +282,7 @@ workflow preprocess_flow {
 	main:	
 	// Perform MinIONQC on basecalling stats
 	basecall_qc = MinIONQC(basecalled_stats.groupTuple())	
-	multiqc_data = Channel.from(logo).mix(basecall_qc.QC_folder.map{it[1]})
+	multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
 
 	// Perform mapping on fastq files
 	if (params.mapping == "NO") {
@@ -355,7 +360,7 @@ workflow preprocess_flow {
 	}
 	// OPTIONAL Perform COUNTING / ASSIGNMENT
 	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
-		read_counts = NANOCOUNT(sorted_alns)
+		read_counts = NANOCOUNT(sorted_alns.join(aln_indexes))
 		assignments = AssignReads(sorted_alns, "nanocount")
 		stat_counts = countStats(assignments)
 		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
@@ -502,7 +507,7 @@ workflow preprocess_simple {
 
 	// Perform MULTIQC report
 	fastqc_files.map{it[1]}.set{qcs}
-	all_res = qcs.mix(stats_counts, stats_aln, Channel.from(logo))
+	all_res = qcs.mix(multiqc_info,stats_counts, stats_aln)
 	MULTIQC(all_res.collect())
 	
 }
@@ -567,11 +572,11 @@ workflow preprocess_simple {
  		
  	}
 
-	all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(NANOQ_VER()).mix(NANOFILT_VER())
-	.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
-	.mix(MINIMAP2_VER()).mix(BWA_VER()).mix(FASTQC_VER())
-	.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
-	.collectFile(name: 'tool_version.txt', newLine: false, storeDir:outputMultiQC)
+	//all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(NANOQ_VER()).mix(NANOFILT_VER())
+	//.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
+	//.mix(MINIMAP2_VER()).mix(BWA_VER()).mix(FASTQC_VER())
+	//.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
+	//.collectFile(name: 'tool_version.txt', newLine: false, storeDir:outputMultiQC)
  	
  
  }
