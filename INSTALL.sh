@@ -17,6 +17,6 @@ fi
 rm ont-guppy_${GUPPY_VER}_linux64.tar.gz
 
 echo 'copying custom models'
-cp custom_models/* mop_preprocess/bin/ont-guppy/data/
+for i in custom_models/*.gz; do zcat $i > mop_preprocess/bin/ont-guppy/data/`basename $i .gz`; done
 
 
