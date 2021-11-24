@@ -15,3 +15,8 @@ if [ ! -e "mop_preprocess/bin/ont-guppy/lib/libz.so" ] ; then
         cd ../../../../
 fi
 rm ont-guppy_${GUPPY_VER}_linux64.tar.gz
+
+echo 'copying custom models'
+cp custom_models/* mop_preprocess/bin/ont-guppy/data/
+
+
