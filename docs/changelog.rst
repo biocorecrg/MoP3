@@ -7,6 +7,11 @@ CHANGELOG
 .. autosummary::
    :toctree: generated
 
+Version 3.0
+================
+* mop_preprocess
+   * We added a custom model for m6A basecalling. It is automatically installed when running INSTALL.sh. For using it you need to indicated ``--pars_tools "drna_tool_splice_m6A_opt.tsv" ``
+
 Version 2.0
 ================
 
