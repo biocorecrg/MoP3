@@ -1,4 +1,4 @@
-# MoP3- DSL2 version of Master of Pores
+# MoP3 - Master of Pores 3 
 [![Docker Build Status](https://img.shields.io/docker/automated/biocorecrg/nanopore.svg)](https://cloud.docker.com/u/biocorecrg/repository/docker/biocorecrg/nanopore/builds)
 [![mop2-CI](https://github.com/biocorecrg/MoP3/actions/workflows/build.yml/badge.svg)](https://github.com/biocorecrg/MoP3/actions/workflows/build.yml)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Nextflow version](https://img.shields.io/badge/Nextflow-21.04.1-brightgreen)](https://www.nextflow.io/)
