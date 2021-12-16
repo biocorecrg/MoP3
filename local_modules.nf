@@ -320,6 +320,24 @@ process checkRef {
 }
 
 // MOP_MOD and MOP_TAIL
+process splitReference {
+    label (params.LABEL)
+    container 'biocorecrg/mopmod:0.6.2'
+    tag "Splitting of ${ reference }"
+
+    input:
+    path(reference)
+
+    output:
+    path("*.pieces")
+
+    script:
+    """
+    faSplit about ${reference} 20000000 pieces
+    """
+}
+
+
 
 process indexReference {
     label (params.LABEL)
