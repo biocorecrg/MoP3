@@ -71,7 +71,7 @@ include { getParameters; mapIDPairs } from "${local_modules}"
 // Create a channel for tool options
 progPars = getParameters(params.pars_tools)
 
-include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_mem_cpus', OUTPUT: outputEpinanoFlow, EXTRAPARS: progPars["epinano--epinano"])
+include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf" addParams(LABEL: 'big_mem_cpus', OUTPUT: outputEpinanoFlow, EXTRAPARS: progPars["epinano--epinano"])
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
 include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
 include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_resquiggling--tombo"])
@@ -280,17 +280,20 @@ workflow epinano_flow {
 		comparisons
 		
 	main:	
-	indexes = indexReference(reference)
+	splittedRefs = splitReference(reference)
+        splittedRefs.view()
+        //indexes = indexReference(reference)
 	
-	variants = callVariants(bams.combine(reference.combine(indexes)))
-	per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(variants).per_site_vars
-	per_site_vars.combine(per_site_vars).map {
-		[ it[0], it[2], it[1], it[3] ]
-	}.join(comparisons, by:[0,1]).set{per_site_for_plots}
+        
+	//variants = callVariants(bams.combine(reference.combine(indexes)))
+	//per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(variants).per_site_vars
+	//per_site_vars.combine(per_site_vars).map {
+	//	[ it[0], it[2], it[1], it[3] ]
+	//}.join(comparisons, by:[0,1]).set{per_site_for_plots}
 
-	makeEpinanoPlots_ins(per_site_for_plots, "ins")
-	makeEpinanoPlots_mis(per_site_for_plots, "mis")
-	makeEpinanoPlots_del(per_site_for_plots, "del")
+	//makeEpinanoPlots_ins(per_site_for_plots, "ins")
+	//makeEpinanoPlots_mis(per_site_for_plots, "mis")
+	//makeEpinanoPlots_del(per_site_for_plots, "del")
 }
 
 
