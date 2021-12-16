@@ -48,7 +48,7 @@ nextflow run mop_preprocess.nf -with-singularity -bg -profile local > log
 ```
 
 ## Documentation
-The documentation is available at [https://biocorecrg.github.io/MOP2/docs/](https://biocorecrg.github.io/MOP2/docs/)
+The documentation is available at [https://biocorecrg.github.io/MoP3/docs/](https://biocorecrg.github.io/MoP3/docs/)
 
 ## Contact
 Please open an [issue](https://github.com/biocorecrg/MOP2/issues) if you encounter any issues/troubles. 
