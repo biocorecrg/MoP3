@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u'Master of Pores 2'
+project = u'Master of Pores 3'
 copyright = u'2019, CRG'
 author = u'Luca Cozzuto'
 author = u'Anna Delgado'
