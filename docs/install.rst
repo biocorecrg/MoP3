@@ -16,7 +16,7 @@ Then download the repo:
   git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MOP2.git
 
 
-You can use **INSTALL.sh** to download the **guppy 3.4.5** or you can replace it with the version you prefer. 
+You can use **INSTALL.sh** to download the **guppy 3.4.5** or you can download the version you prefer by adding an extra parameter. 
 
 .. note::
   
@@ -25,9 +25,15 @@ You can use **INSTALL.sh** to download the **guppy 3.4.5** or you can replace it
 
 .. code-block:: console
   
-  cd MoP2; sh INSTALL.sh
+  cd MoP2; bash INSTALL.sh 
 
+or
 
+.. code-block:: console
+
+  cd MoP2; bash INSTALL.sh 4.4.2
+ 
+ 
 Testing
 ============
 
