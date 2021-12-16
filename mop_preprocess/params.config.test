@@ -14,7 +14,7 @@ params {
 
     basecalling         = "guppy"
     GPU                 = "OFF"
-    demultiplexing      = "NO"
+    demultiplexing      = "deeplexicon"
     demulti_fast5       = "YES" 
 
     filtering           = "nanoq"
@@ -28,5 +28,5 @@ params {
 
     saveSpace           = "NO"
 
-    email               = ""
+    email               = "lucacozzuto@crg.es"
 }
