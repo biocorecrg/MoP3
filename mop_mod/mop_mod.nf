@@ -71,7 +71,8 @@ include { getParameters; mapIDPairs } from "${local_modules}"
 // Create a channel for tool options
 progPars = getParameters(params.pars_tools)
 
-include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf" addParams(LABEL: 'big_mem_cpus', OUTPUT: outputEpinanoFlow, EXTRAPARS: progPars["epinano--epinano"])
+include { calcVarFrequencies as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["epinano--epinano"])
+include { joinEpinanoRes }  from "${local_modules}" addParams(OUTPUT: outputEpinanoFlow)
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
 include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
 include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_resquiggling--tombo"])
@@ -83,7 +84,7 @@ include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modifica
 include { GET_VERSION as NANOCOMPORE_VER } from "${subworkflowsDir}/chem_modification/nanocompore" 
 include { GET_VERSION as TOMBO_VER } from "${subworkflowsDir}/chem_modification/tombo.nf"
 
-include { wigToBigWig; getChromInfo; indexReference; callVariants; mean_per_pos; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
+include { wigToBigWig; getChromInfo; splitReference; splitBams; indexReference; callVariants; mean_per_pos; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
 include {  mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus} addParams(OUTPUT: outputTomboFlow) from "${local_modules}"
 include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } addParams(OUTPUT: outputEpinanoFlow) from "${local_modules}"
 
@@ -280,20 +281,35 @@ workflow epinano_flow {
 		comparisons
 		
 	main:	
-	splittedRefs = splitReference(reference)
-        splittedRefs.view()
-        //indexes = indexReference(reference)
+	splittedRefs = splitReference(reference).flatten()
+    splittedRefs.combine(bams).map{
+        def seqname = it[0].baseName
+        ["${it[1]}---${seqname}", it[2], it[0]]
+    }.set{data2SplitBam}
+
+    splittedBams = splitBams(data2SplitBam)
+   splittedBams.map{
+		def ids = it[0].split("---")
+		["${ids[1]}", it[1], it[2]]
+	}.set{reshaped_split_bams}
+		
+    split_indexes = indexReference(splittedRefs)
+	reshaped_split_bams.combine(split_indexes, by:0).set{
+		data_for_epinano
+	}
+    per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(data_for_epinano)
+	per_site_vars.view()
 	
-        
-	//variants = callVariants(bams.combine(reference.combine(indexes)))
-	//per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(variants).per_site_vars
+ 
+	//per_site_vars = CALC_VAR_FREQUENCIES(bams)
 	//per_site_vars.combine(per_site_vars).map {
 	//	[ it[0], it[2], it[1], it[3] ]
 	//}.join(comparisons, by:[0,1]).set{per_site_for_plots}
-
-	//makeEpinanoPlots_ins(per_site_for_plots, "ins")
-	//makeEpinanoPlots_mis(per_site_for_plots, "mis")
-	//makeEpinanoPlots_del(per_site_for_plots, "del")
+    if (params.epinano_plots == "YES") {
+		makeEpinanoPlots_ins(per_site_for_plots, "ins")
+		makeEpinanoPlots_mis(per_site_for_plots, "mis")
+		makeEpinanoPlots_del(per_site_for_plots, "del")
+	}
 }
 
 
