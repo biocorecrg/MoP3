@@ -33,11 +33,11 @@ def process_dicts(files, output_file):
     concat_table = pa.concat_tables(list_tables) 
     
     #Create partitioned data:
-    pq.write_to_dataset(concat_table, root_path='dataset_name', partition_cols=['contig'])
+    pq.write_to_dataset(concat_table, root_path='./dataset_name', partition_cols=['contig'])
 
     #Create schema:
     #schema = pa.schema([(("position", pa.int32()), ("reference_kmer", pa.string()), ("read_name", pa.int32()), ("median", pa.float64()), ("coverage", pa.int32())])
-    dataset = ds.dataset("/no_backup_isis/enovoa/users/andelgado/testing_MoP/dataset_name", format="parquet", partitioning="hive")
+    dataset = ds.dataset("./dataset_name", format="parquet", partitioning="hive")
     #print(dataset.to_table().to_pandas().head(3))
 
     #Extract all contigs:
@@ -72,6 +72,7 @@ def main():
     
     #Read, parse and merge data from individual eventalign files:
     process_dicts(a.input, a.output)
-    
+    os.system("rm -fr dataset_name")
+ 
 if __name__=='__main__': 
     main()
