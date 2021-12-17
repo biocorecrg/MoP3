@@ -47,6 +47,14 @@ cd mop_preprocess
 nextflow run mop_preprocess.nf -with-singularity -bg -profile local > log
 ```
 
+## Upgrading
+To upgrade the tool you can type:
+
+```
+git pull
+git submodule update --init --recursive
+```
+
 ## Documentation
 The documentation is available at [https://biocorecrg.github.io/MoP3/docs/](https://biocorecrg.github.io/MoP3/docs/)
 
