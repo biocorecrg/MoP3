@@ -382,6 +382,7 @@ process joinEpinanoRes {
     label (params.LABEL)
     container 'biocorecrg/mopmod:0.6.2'
     tag "joining on ${id}"
+    publishDir(params.OUTPUT, mode:'copy') 
 
     input:
     tuple val(id), path(epinanores)
@@ -393,12 +394,12 @@ process joinEpinanoRes {
     
     script:
 	"""
-      if [ -f "*.plus_strand.per.site.csv.gz" ]; then
-			zcat *.plus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.plus_strand.per.site.csv.gz
-	  fi
-	  if [-f "*.minus_strand.per.site.csv.gz" ]; then
-			zcat *.minus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.minus_strand.per.site.csv.gz
-	  fi	
+	if compgen -G "*.plus_strand.per.site.csv.gz" > /dev/null; then
+		zcat *.plus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.plus_strand.per.site.csv.gz
+	fi
+	if compgen -G "*.minus_strand.per.site.csv.gz" > /dev/null; then
+		zcat *.minus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.minus_strand.per.site.csv.gz
+	fi	
 	"""
 }
 

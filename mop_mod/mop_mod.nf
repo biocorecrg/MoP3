@@ -287,25 +287,26 @@ workflow epinano_flow {
         ["${it[1]}---${seqname}", it[2], it[0]]
     }.set{data2SplitBam}
 
-    splittedBams = splitBams(data2SplitBam)
+   splittedBams = splitBams(data2SplitBam)
    splittedBams.map{
 		def ids = it[0].split("---")
-		["${ids[1]}", it[1], it[2]]
+		[ids[1], ids[0], it[1], it[2]]
 	}.set{reshaped_split_bams}
 		
     split_indexes = indexReference(splittedRefs)
-	reshaped_split_bams.combine(split_indexes, by:0).set{
-		data_for_epinano
-	}
+    
+	reshaped_split_bams.combine(split_indexes, by:0).map{
+		[it[1], it[2], it[3], it[4], it[5], it[6]]
+	}.set{data_for_epinano}
     per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(data_for_epinano)
-	per_site_vars.view()
+	epi_joined_res = joinEpinanoRes(per_site_vars.groupTuple()).plusepi
+	epi_joined_res.view()
 	
- 
-	//per_site_vars = CALC_VAR_FREQUENCIES(bams)
-	//per_site_vars.combine(per_site_vars).map {
-	//	[ it[0], it[2], it[1], it[3] ]
-	//}.join(comparisons, by:[0,1]).set{per_site_for_plots}
     if (params.epinano_plots == "YES") {
+		epi_joined_res.combine(epi_joined_res).map {
+			[ it[0], it[2], it[1], it[3] ]
+		}.join(comparisons, by:[0,1]).set{per_site_for_plots}
+
 		makeEpinanoPlots_ins(per_site_for_plots, "ins")
 		makeEpinanoPlots_mis(per_site_for_plots, "mis")
 		makeEpinanoPlots_del(per_site_for_plots, "del")
