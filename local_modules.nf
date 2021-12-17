@@ -441,6 +441,7 @@ process concat_mean_per_pos {
     container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
     tag "${idsample}" 
+    publishDir(params.OUTPUT, mode:'copy') 
 	
     input:
     tuple val(idsample), path(event_align) 
