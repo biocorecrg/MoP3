@@ -127,7 +127,7 @@ def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
-include { RNA2DNA; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+include { RNA2DNA; extracting_demultiplexed_fast5_deeplexicon; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
 
 def guppypars = parseFinalSummary(params.conffile)
 
@@ -221,7 +221,7 @@ workflow flow2 {
 			fast5_res = outbc.basecalled_fast5
 		
 			// Optional demultiplex fast5 		
-			if (params.demulti_fast5 == "ON" ) {
+			if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(demux)				
 				fast5_res = extracting_demultiplexed_fast5_deeplexicon(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
