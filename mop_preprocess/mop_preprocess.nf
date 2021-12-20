@@ -118,10 +118,10 @@ if (params.ref_type == "genome") {
 		if( !annotation.exists() ) exit 1, "Missing annotation file: ${params.annotation}!"
 	}
 }
-
+def demulti_fast5_opt = "OFF"
 if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
 	demulti_fast5_opt = "ON"
-} 
+}
 
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
