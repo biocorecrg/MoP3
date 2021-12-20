@@ -81,6 +81,7 @@ logo = file("$baseDir/../img/logo_small.png")
 Channel.fromPath( "$baseDir/deeplexicon/*.h5").set{deepmodels}
 
 
+
 Channel
     .from( config_report, logo )
     .collect().set{multiqc_info}
@@ -124,7 +125,7 @@ if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
 }
 
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
-def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
+def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : '')
 def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
 def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
 
@@ -222,7 +223,8 @@ workflow flow2 {
 		// IF DEMULTIPLEXING IS DEEPLEXICON	
     	if(params.demultiplexing == "deeplexicon") {
 			outbc = GUPPY_BASECALL(fast5_4_analysis)
-			demux = DEMULTIPLEX_DEEPLEXICON(deepmodels, fast5_4_analysis)
+
+                        demux = DEMULTIPLEX_DEEPLEXICON(deepmodels, fast5_4_analysis)
 			fast5_res = outbc.basecalled_fast5
 		
 			// Optional demultiplex fast5 		
