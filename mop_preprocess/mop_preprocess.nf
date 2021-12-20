@@ -118,10 +118,14 @@ if (params.ref_type == "genome") {
 		if( !annotation.exists() ) exit 1, "Missing annotation file: ${params.annotation}!"
 	}
 }
- 
+
+if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
+	demulti_fast5_opt = "ON"
+} 
+
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
-def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
+def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
 
 
 if (params.saveSpace == "YES") outmode = "move"
@@ -222,7 +226,7 @@ workflow flow2 {
 			fast5_res = outbc.basecalled_fast5
 		
 			// Optional demultiplex fast5 		
-			if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
+			if (demulti_fast5_opt == "ON") {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(demux)				
 				fast5_res = extracting_demultiplexed_fast5_deeplexicon(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
@@ -242,7 +246,7 @@ workflow flow2 {
 			fast5_res = outbc.basecalled_fast5
 
 			// Optional demultiplex fast5 		
-			if (params.demulti_fast5 == "ON" ) {
+			if (demulti_fast5_opt == "ON" ) {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(outbc.basecalling_stats)								
 				fast5_res = extracting_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
