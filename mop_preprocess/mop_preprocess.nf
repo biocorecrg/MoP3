@@ -232,7 +232,6 @@ workflow flow2 {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(demux)				
 				
-				alldemux.groupTuple().view()
 				//data_for_demux = alldemux.groupTuple().join(basecalledbc.transpose().groupTuple())
 				prep_demux = preparing_demultiplexing_fast5_deeplexicon(alldemux.groupTuple()).transpose()
 				data_for_demux = prep_demux.combine(basecalledbc.transpose().groupTuple(),  by: 0)
