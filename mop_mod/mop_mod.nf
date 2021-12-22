@@ -76,8 +76,8 @@ include { joinEpinanoRes }  from "${local_modules}" addParams(OUTPUT: outputEpin
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
 include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_mem_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
 include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_resquiggling--tombo"])
-include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_msc--tombo"], OUTPUT: outputTomboFlow)
-include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_lsc--tombo"], OUTPUT: outputTomboFlow)
+include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["tombo_msc--tombo"], OUTPUT: outputTomboFlow)
+include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["tombo_lsc--tombo"], OUTPUT: outputTomboFlow)
 
 include { GET_VERSION as EPINANO_VER } from "${subworkflowsDir}/chem_modification/epinano" 
 include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modification/nanopolish" 
@@ -203,14 +203,14 @@ workflow tombo_common_flow {
 	
 	main:
 	fast5_files.map{
-		["${it[0]}---${it[1].simpleName}", it[1]]
+		["${it[0]}___${it[1].simpleName}", it[1]]
 	}.set{fast5_reshaped}
 	
 	single_fast5_folders = multiToSingleFast5(fast5_reshaped)
 	resquiggle = TOMBO_RESQUIGGLE_RNA(single_fast5_folders, ref_file)
 	
 	resquiggle.join(single_fast5_folders).map{
-		def ids = it[0].split("---")
+		def ids = it[0].split("___")
 		["${ids[0]}", it[1], it[2]]
 	}.groupTuple().map{
 		[it[0], [it[1], it[2]]]
