@@ -120,6 +120,11 @@ if (params.ref_type == "genome") {
 	}
 }
 def demulti_fast5_opt = "OFF"
+
+if (params.demultiplexing == "NO") {
+        demulti_fast5_opt = "OFF"
+}
+
 if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
 	demulti_fast5_opt = "ON"
 }

@@ -60,6 +60,8 @@ model_folder = file("$baseDir/models/")
 if( !model_folder.exists() ) exit 1, "Missing folders with EpiNano's models!"
 joinScript = file("$baseDir/bin/join.r")
 
+rscript = file("${baseDir}/bin/epinano_scatterplot.R")
+
 def flows = [:]
 flows["nanomod"] = params.epinano
 flows["nanocompore"] = params.nanocompore
@@ -302,16 +304,15 @@ workflow epinano_flow {
 	
     per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(data_for_epinano)
 	epi_joined_res = joinEpinanoRes(per_site_vars.groupTuple()).plusepi
-	epi_joined_res.view()
 	
     if (params.epinano_plots == "YES") {
 		epi_joined_res.combine(epi_joined_res).map {
 			[ it[0], it[2], it[1], it[3] ]
 		}.join(comparisons, by:[0,1]).set{per_site_for_plots}
 
-		makeEpinanoPlots_ins(per_site_for_plots, "ins")
-		makeEpinanoPlots_mis(per_site_for_plots, "mis")
-		makeEpinanoPlots_del(per_site_for_plots, "del")
+		makeEpinanoPlots_ins(rscript, per_site_for_plots, "ins")
+		makeEpinanoPlots_mis(rscript, per_site_for_plots, "mis")
+		makeEpinanoPlots_del(rscript, per_site_for_plots, "del")
 	}
 }
 
