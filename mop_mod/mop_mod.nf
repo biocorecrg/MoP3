@@ -74,7 +74,7 @@ progPars = getParameters(params.pars_tools)
 include { calcVarFrequencies as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["epinano--epinano"])
 include { joinEpinanoRes }  from "${local_modules}" addParams(OUTPUT: outputEpinanoFlow)
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
-include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
+include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_mem_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
 include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_resquiggling--tombo"])
 include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_msc--tombo"], OUTPUT: outputTomboFlow)
 include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_lsc--tombo"], OUTPUT: outputTomboFlow)
@@ -285,12 +285,12 @@ workflow epinano_flow {
 	splittedRefs = splitReference(reference).flatten()
     splittedRefs.combine(bams).map{
         def seqname = it[0].baseName
-        ["${it[1]}---${seqname}", it[2], it[0]]
+        ["${it[1]}___${seqname}", it[2], it[0]]
     }.set{data2SplitBam}
 
    splittedBams = splitBams(data2SplitBam)
    splittedBams.map{
-		def ids = it[0].split("---")
+		def ids = it[0].split("___")
 		[ids[1], ids[0], it[1], it[2]]
 	}.set{reshaped_split_bams}
 		
@@ -299,6 +299,7 @@ workflow epinano_flow {
 	reshaped_split_bams.combine(split_indexes, by:0).map{
 		[it[1], it[2], it[3], it[4], it[5], it[6]]
 	}.set{data_for_epinano}
+	
     per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(data_for_epinano)
 	epi_joined_res = joinEpinanoRes(per_site_vars.groupTuple()).plusepi
 	epi_joined_res.view()
