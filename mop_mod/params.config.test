@@ -2,9 +2,9 @@ params {
     input_path         = "$baseDir/../mop_preprocess/toy_output/"
     comparison         = "$baseDir/comparison.tsv"
 
-    reference           = "$baseDir/../../MoP2_old/anno/Danio_rerio.GRCz11.cds.all.fa.gz"
-
-    output             = "$baseDir/output_toy"
+    reference           = "$baseDir/../anno/yeast_rRNA_ref.fa.gz"
+    
+    output             = "$baseDir/output_mod"
     coverage           = 5
 
     pars_tools         = "$baseDir/tools_opt.tsv"
@@ -18,6 +18,6 @@ params {
     // epinano plots
     epinano_plots = "YES"
 
-    email              = "luca@cozzuto.crg.es"
+    email              = ""
 }
 
