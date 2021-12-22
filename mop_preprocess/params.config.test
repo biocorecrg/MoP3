@@ -14,8 +14,8 @@ params {
 
     basecalling         = "guppy"
     GPU                 = "OFF"
-    demultiplexing      = "deeplexicon"
-    demulti_fast5       = "YES" 
+    demultiplexing      = "NO"
+    demulti_fast5       = "NO" 
 
     filtering           = "nanoq"
 
