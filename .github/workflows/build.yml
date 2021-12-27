@@ -18,10 +18,11 @@ jobs:
         run: env | sort
 
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           fetch-depth: 1
           submodules: true
+          TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Setup Java
         uses: actions/setup-java@v1
@@ -29,12 +30,9 @@ jobs:
           java-version: ${{ matrix.java_version }}
           architecture: x64
 
-      - name: MOP2
-        env:
-          TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: 
+      - name: MOP3
+      run: | 
           curl -fsSL get.nextflow.io | bash
-          git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
           # Install Master Of Pores 3
           git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
           cd MoP3
