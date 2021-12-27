@@ -32,8 +32,9 @@ jobs:
       - name: MOP2
         env:
           TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          run: git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+        run: 
           curl -fsSL get.nextflow.io | bash
+          git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
           # Install Master Of Pores 3
           git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
           cd MoP3
