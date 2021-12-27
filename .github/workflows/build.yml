@@ -1,10 +1,10 @@
-name: mop3-CI
+name: mop2-CI
 # This workflow is triggered on pushes to the repository.
 on: [push]
 
 jobs:
   build:
-    name: mop3 ci
+    name: mop2 ci
     # This job runs on Linux
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -23,13 +23,14 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      - name: Setup Java        
-      - uses: actions/checkout@v1  
-      with:
-      repository: biocorecrg/MoP3
-      token: ${{ secrets.ACCESS_TOKEN }}
- 
-      - name: MOP3
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java_version }}
+          architecture: x64
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: MOP2
         run: |
           curl -fsSL get.nextflow.io | bash
           # Install Master Of Pores 3
@@ -42,6 +43,5 @@ jobs:
           ../../nextflow run mop_mod.nf -with-docker -profile local
           cd ../mop_tail
            ../../nextflow run mop_tail.nf -with-docker -profile local
-
         env:
           NXF_ANSI_LOG: false
