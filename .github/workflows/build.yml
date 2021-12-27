@@ -36,7 +36,7 @@ jobs:
           # Install Master Of Pores 3
           #git clone --depth 1 --recurse-submodules git//${{ secrets.GIT_TOKEN }}:x-oauth-basic@github.com/biocorecrg/MoP3.git
           #git config --global url."https://${{ secrets.ACCESS_TOKEN }}@github".insteadOf https://github
-          git clone --depth 1 --recurse-submodules https://USERNAME:TOKEN@github.com/biocorecrg/MoP3.git
+          git clone --depth 1 --recurse-submodules https://${{ secrets.ACCESS_TOKEN }}@github.com/biocorecrg/MoP3.git
           #git clone --depth 1 --recurse-submodules git@github.com:biocorecrg/MoP3.git
           curl -fsSL get.nextflow.io | bash
           cd MoP3
