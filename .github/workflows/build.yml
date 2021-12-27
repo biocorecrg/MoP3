@@ -20,16 +20,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          github_token: ${{ secrets.token }}
-          repository: biocorecrg/MoP3
-          fetch-depth: 1
-          submodules: true
+         token: ${{ secrets.GH_PAT }} # `GH_PAT` is a secret that contains your PAT
+         repository: biocorecrg/MoP3
+         fetch-depth: 1
+         submodules: true
 
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java_version }}
-          architecture: x64
+ #     - name: Setup Java
+ #       uses: actions/setup-java@v1
+ #       with:
+ #         java-version: ${{ matrix.java_version }}
+ #         architecture: x64
 
       - name: MOP3
         run: |
