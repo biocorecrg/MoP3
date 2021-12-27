@@ -20,7 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-         token: ${{ secrets.GH_PAT }} # `GH_PAT` is a secret that contains your PAT
+         token: ${{ github.token }} # `GH_PAT` is a secret that contains your PAT
          repository: biocorecrg/MoP3
          fetch-depth: 1
          submodules: true
