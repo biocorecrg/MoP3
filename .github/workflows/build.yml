@@ -18,8 +18,9 @@ jobs:
         run: env | sort
 
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
+          persist-credentials: false
           fetch-depth: 1
           submodules: true
 
@@ -33,8 +34,8 @@ jobs:
         run: |
           curl -fsSL get.nextflow.io | bash
           # Install Master Of Pores 3
-          git clone --depth 1 --recurse-submodules https://${{ secrets.GIT_TOKEN }}:x-oauth-basic@github.com/biocorecrg/MoP3.git
-          #git clone --depth 1 --recurse-submodules https://{TOKEN}/github.com/biocorecrg/MoP3.git
+          #git clone --depth 1 --recurse-submodules https://${{ secrets.GIT_TOKEN }}:x-oauth-basic@github.com/biocorecrg/MoP3.git
+          git clone --depth 1 --recurse-submodules https://{TOKEN}/github.com/biocorecrg/MoP3.git
           cd MoP3
           bash INSTALL.sh
           cd mop_preprocess 
