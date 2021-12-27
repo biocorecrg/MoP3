@@ -33,6 +33,7 @@ jobs:
         run: |
           curl -fsSL get.nextflow.io | bash
           # Install Master Of Pores 3
+          git config --global url."https://${{ secrets.ACESS_TOKEN }}@github".insteadOf https://github
           git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
           cd MoP3
           bash INSTALL.sh
