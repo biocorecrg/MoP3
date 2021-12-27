@@ -36,7 +36,7 @@ jobs:
           curl -fsSL get.nextflow.io | bash
           # Install Master Of Pores 3
           #git clone --depth 1 --recurse-submodules https://${{ secrets.GIT_TOKEN }}:x-oauth-basic@github.com/biocorecrg/MoP3.git
-          git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
+          git clone --depth 1 --recurse-submodules git@github.com:biocorecrg/MoP3.git
           cd MoP3
           bash INSTALL.sh
           cd mop_preprocess 
