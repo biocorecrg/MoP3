@@ -2,7 +2,7 @@ on: [push]
 
 jobs:
   build:
-    name: MoP2-DOC
+    name: MoP3-DOC
     runs-on: ubuntu-latest
     steps:
     - uses: seanzhengw/sphinx-pages@master
