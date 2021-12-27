@@ -80,19 +80,19 @@ workflow {
 	comparisons.flatten().unique().set{unique_samples}
 
 	unique_samples.map {
- 	  	 [it, file("${params.input_path}/epinano_flow/${it}.tsv.per.site.var.csv.gz")]
+ 	  	 [it, file("${params.input_path}/epinano_flow/${it}.plus_strand.per.site.csv.gz")]
 	}.transpose().set{epinano}
 
 	unique_samples.map {
- 	  	 [it, file("${params.input_path}/nanopolish-compore_flow/${it}_processed_perpos_median.tsv.gz")]
+ 	  	 [it, file("${params.input_path}/nanopolish-compore_flow/${it}.tsv.gz")]
 	}.transpose().set{nanopolish}
 	
 	comparisons.map{
-		["${it[0]}---${it[1]}", file("${params.input_path}/tombo_flow/${it[0]}---${it[1]}_lsc.plus_Tombo_Output.tsv")]
+		["${it[0]}---${it[1]}", file("${params.input_path}/tombo_flow/${it[0]}---${it[1]}_lsc.plus_Tombo_Output.tsv.gz")]
 	}.transpose().set{tombo}
 
 	comparisons.map{
-		["${it[0]}---${it[1]}", file("${params.input_path}/nanopolish-compore_flow/**/${it[0]}_vs_${it[1]}nanocompore_results.tsv")]
+		["${it[0]}---${it[1]}", file("${params.input_path}/nanopolish-compore_flow/**/${it[0]}_vs_${it[1]}nanocompore_results.tsv.gz")]
 	}.transpose().set{nanocomp}
 
 	epinano_combs = mapIDPairs(comparisons, epinano).map{
@@ -115,7 +115,7 @@ workflow {
 	}.set{transcript_coords}
 		
 	data_to_process = epinano_combs.join(nanopolish_combs).join(tombo).join(nanocomp)
-
+	//data_to_process.view()
 	nanoConsensus(nanoConScript, nanoScript, ref_file, data_to_process.combine(transcript_coords))
 }
 

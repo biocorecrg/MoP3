@@ -29,7 +29,7 @@ epinano_processing <- function(sample_file, ivt_file, initial_position, final_po
   sample <- subset(sample, pos<=final_position)
   sample$reference <- paste(sample$X.Ref, sample$pos, sep='_')
   sample$Difference <- as.numeric(sample$mis)+as.numeric(sample$ins)+as.numeric(sample$del)
-  sample <- sample[,c(1,2,12,11)]
+  sample <- sample[,c(1,2,13,12)]
   colnames(sample) <- c('Reference', 'Position', 'Difference_sample', 'Merge')
   
   ivt <- read_csv_file(ivt_file)
@@ -38,7 +38,7 @@ epinano_processing <- function(sample_file, ivt_file, initial_position, final_po
   ivt <- subset(ivt, pos<=final_position)
   ivt$reference <- paste(ivt$X.Ref, ivt$pos, sep='_')
   ivt$Difference <- as.numeric(ivt$mis)+as.numeric(ivt$ins)+as.numeric(ivt$del)
-  ivt <- ivt[,c(1,2,12,11)]
+  ivt <- ivt[,c(1,2,13,12)]
   colnames(ivt) <- c('Reference', 'Position', 'Difference_IVT', 'Merge')
   
   if (nrow(sample)!=0 && nrow(ivt)!=0) {
@@ -87,17 +87,16 @@ nanopolish_processing <- function(sample_file, ivt_file, initial_position, final
   sample <- read_tab_file(sample_file)
   
   #Add sample information:
-  sample$read_name <- 'Nanopolish'
+  sample$feature <- 'Nanopolish'
   sample <- subset(sample, coverage>Coverage)
-  colnames(sample)<- c("contig_wt","position","reference_kmer_wt", "feature_wt", "event_level_median_wt", 'coverage')
+  colnames(sample)<- c("contig_wt","position","reference_kmer_wt", "event_level_median_wt", "coverage", "feature_wt")
   sample<- subset(sample, contig_wt == chr)
   sample$reference <- paste(sample$contig_wt, sample$position, sep='_')
   
   #Import KO: 
   raw_data_ivt <-read_tab_file(ivt_file)
-  raw_data_ivt$read_name <- 'IVT'
   raw_data_ivt <- subset(raw_data_ivt, coverage>Coverage)
-  colnames(raw_data_ivt)<- c("contig_ko","position","reference_kmer_ko", "feature", "event_level_median_ko", 'coverage')
+  colnames(raw_data_ivt)<- c("contig_ko","position","reference_kmer_ko", "event_level_median_ko", 'coverage')
   raw_data_ivt <- subset(raw_data_ivt, contig_ko == chr)
   raw_data_ivt$reference <- paste(raw_data_ivt$contig_ko, raw_data_ivt$position, sep='_')
   
@@ -366,7 +365,6 @@ overlapping_GRobjects <- function(GRange_object_1, GRange_object_2, length_objec
     
     intersect_object <- GRanges()
   }
-  
   
   return(intersect_object)
   
@@ -924,7 +922,7 @@ analysis_significant_positions <- function (list_significant, list_plotting, fas
     write(paste('-Positions identified by Epinano-Tombo-Nanocompore:', length_intersect_134, sep = " "), file = paste("NanoConsensus_", args$Output_name,".log", sep=""), append = T)
     
     methods_name <-  c('Epinano', 'Tombo', 'Nanocompore')
-    draw_triple_venn_diagram(n1, n3, n4, length_intersect_13, length_intersect_14, length_intersect_34, length_intersect_134, methods_name, output_name)
+    #draw_triple_venn_diagram(n1, n3, n4, length_intersect_13, length_intersect_14, length_intersect_34, length_intersect_134, methods_name, output_name)
     
     #Extract kmers supported by two or more softwares: 
     supported_kmers <- reduce(c(intersect_13,intersect_14,intersect_34,intersect_134))
@@ -981,6 +979,12 @@ analysis_significant_positions <- function (list_significant, list_plotting, fas
     #Extract kmers supported by two or more softwares: 
     supported_kmers <- reduce(c(intersect_12,intersect_14,intersect_24,intersect_124))
 
+  } else if (n1 == 0 & n2 == 0 & n3 == 0 & n4 == 0 ) {
+    #If 0 positions have been considered as significant, exit the program:
+    print("No significant positions were found - Program will exit here.")
+    write("No significant positions were found - Program will exit here.", file = paste("NanoConsensus_", args$Output_name,".log", sep=""), append = T)
+    quit("no")
+
   } else if (n1 == 0 & n2 == 0) {
     #Overlappings: checking which software has identified less significant positions and then it uses it as query
     intersect_34 <- overlapping_GRobjects(grTombo, grNanocompore, n3, n4)
@@ -990,7 +994,7 @@ analysis_significant_positions <- function (list_significant, list_plotting, fas
     write(paste('-Positions identified by Tombo-Nanocompore:', length_intersect_34, sep = " "), file = paste("NanoConsensus_", args$Output_name,".log", sep=""), append = T)
     
     methods_name <-  c('Tombo', 'Nanocompore')
-    draw_pairwise_venn_diagram(n3, n4, length_intersect_34, methods_name, output_name)
+    #draw_pairwise_venn_diagram(n3, n4, length_intersect_34, methods_name, output_name)
     
     #Extract kmers supported by two or more softwares: 
     supported_kmers <- reduce(intersect_34)
@@ -1004,7 +1008,7 @@ analysis_significant_positions <- function (list_significant, list_plotting, fas
     write(paste('-Positions identified by Epinano-Nanopolish:', length_intersect_12, sep = " "), file = paste("NanoConsensus_", args$Output_name,".log", sep=""), append = T)
     
     methods_name <-  c('Epinano', 'Nanopolish')
-    draw_pairwise_venn_diagram(n1, n2, length_intersect_12, methods_name, output_name)
+    #draw_pairwise_venn_diagram(n1, n2, length_intersect_12, methods_name, output_name)
     
     #Extract kmers supported by two or more softwares: 
     supported_kmers <- reduce(intersect_12)
@@ -1018,7 +1022,7 @@ analysis_significant_positions <- function (list_significant, list_plotting, fas
     write(paste('-Positions identified by Epinano-Nanocompore:', length_intersect_14, sep = " "), file = paste("NanoConsensus_", args$Output_name,".log", sep=""), append = T)
     
     methods_name <-  c('Epinano', 'Nanocompore')
-    draw_pairwise_venn_diagram(n1, n4, length_intersect_14, methods_name, output_name)
+    #draw_pairwise_venn_diagram(n1, n4, length_intersect_14, methods_name, output_name)
     
     #Extract kmers supported by two or more softwares: 
     supported_kmers <- reduce(intersect_14)
@@ -1032,7 +1036,7 @@ analysis_significant_positions <- function (list_significant, list_plotting, fas
     write(paste('-Positions identified by Nanopolish-Nanocompore:', length_intersect_24, sep = " "), file = paste("NanoConsensus_", args$Output_name,".log", sep=""), append = T)
     
     methods_name <-  c('Nanopolish', 'Nanocompore')
-    draw_pairwise_venn_diagram(n2, n4, length_intersect_24, methods_name, output_name)
+    #draw_pairwise_venn_diagram(n2, n4, length_intersect_24, methods_name, output_name)
     
     #Extract kmers supported by two or more softwares: 
     supported_kmers <- reduce(intersect_24)
