@@ -38,7 +38,7 @@ jobs:
           #git config --global url."https://${{ secrets.ACCESS_TOKEN }}@github".insteadOf https://github
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git clone --depth 1 --recurse-submodules https://github.com:biocorecrg/MoP3.git
+          git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
           curl -fsSL get.nextflow.io | bash
           cd MoP3
           bash INSTALL.sh
