@@ -20,7 +20,9 @@ else
 fi
 
 tar -zvxf ont-guppy_${GUPPY_VER}_linux64.tar.gz
+for i in custom_models/*.gz; do zcat $i > ont-guppy/data/`basename $i .gz`; done
 mv ont-guppy mop_preprocess/bin/
+
 cd mop_preprocess/bin
 ln -s ont-guppy/bin/guppy_* .
 ln -s ont-guppy/lib/* .
