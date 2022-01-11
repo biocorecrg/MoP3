@@ -1,6 +1,6 @@
 name: mop3-CI
 # When this workflow is triggered
-on: [push, pull_request]]
+on: [push, pull_request]
 
 jobs:
   build:
