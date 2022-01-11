@@ -25,12 +25,6 @@ jobs:
          fetch-depth: 1
          submodules: true
 
- #     - name: Setup Java
- #       uses: actions/setup-java@v1
- #       with:
- #         java-version: ${{ matrix.java_version }}
- #         architecture: x64
-
       - name: MOP3
         run: |
           curl -fsSL get.nextflow.io | bash
