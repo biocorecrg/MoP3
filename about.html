@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>About Master of Pores &#8212; MoP3  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="canonical" href="https://biocorecrg.github.io/MoP3/about.html" />
+    <link rel="author" title="About these documents" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How to install" href="install.html" />
+    <link rel="prev" title="Welcome to the documentation of Master Of Pores" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="about-master-of-pores">
+<span id="home-page-about"></span><h1>About Master of Pores<a class="headerlink" href="#about-master-of-pores" title="Permalink to this headline">¶</a></h1>
+<p>Master of Pores is a pipeline written in Nextflow DSL2 for the analysis of Nanopore data. It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.</p>
+<dl class="simple">
+<dt>The pipeline will be composed by four modules:</dt><dd><ul class="simple">
+<li><p>mop_preprocess: preprocessing (TRANSLATED)</p></li>
+<li><p>mop_mod: detecting chemical modifications. It reads the output directly from mop_preprocess (ONGOING)</p></li>
+<li><p>mop_tail: estimating polyA tail size. It reads the output directly from mop_preprocess (TRANSLATED)</p></li>
+<li><p>mop_consensus: it generates a consensus from the predictions from mop_mod. It reads the output directly from mop_mod (ONGOING)</p></li>
+</ul>
+</dd>
+</dl>
+<p>The name is inspired by Metallica’s <a class="reference external" href="https://www.youtube.com/watch?v=S7blkui3nQc">Master Of Puppets</a></p>
+<a class="reference internal image-reference" href="_images/master_red.jpg"><img alt="_images/master_red.jpg" src="_images/master_red.jpg" style="width: 400px;" /></a>
+<p>This is a joint project between <a class="reference external" href="https://biocore.crg.eu/">CRG bioinformatics core</a> and <a class="reference external" href="https://public-docs.crg.es/enovoa/public/website/index.html">Epitranscriptomics and RNA Dynamics research group</a>.</p>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<p>If you use this tool, please cite our paper:</p>
+<p><a class="reference external" href="https://doi.org/10.3389/fgene.2020.00211](https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full">“MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets”</a> Luca Cozzuto, Huanle Liu, Leszek P. Pryszcz, Toni Hermoso Pulido, Anna Delgado-Tejedor, Julia Ponomarenko, Eva Maria Novoa. Front. Genet., 17 March 2020.</p>
+</section>
+</section>
+
+
+          </div>
+          
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/about.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
