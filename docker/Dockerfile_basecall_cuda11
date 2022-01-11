@@ -1,11 +1,8 @@
-#This will do biocorecrg/mopbasecall:0.2
-FROM nvidia/cuda:10.1-base-ubuntu18.04 
+#This will do biocorecrg/mopbasecallc11:0.1 
+FROM nvidia/cuda:11.5.1-base-ubuntu20.04
 
 MAINTAINER Leszek Pryszcz <l.p.pryszcz+docker@gmail.com>
 MAINTAINER Luca Cozzuto <lucacozzuto@gmail.com>
-
-ARG GUPPY_VERSION=3.1.5
-ARG ALBACORE_VERSION=2.1.7
 
 # Install Python3 & pip, curl
 RUN apt update && apt install -y python3-setuptools curl
@@ -26,7 +23,7 @@ RUN apt update && apt install -y p7zip-full libidn11 libgssapi-krb5-2
 RUN apt-get clean && apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
 RUN locale-gen en_US.UTF-8
 
-ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/cuda-10.1/compat/
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/cuda-11.5/compat/
 ENV PYTHONPATH $PATH 
 WORKDIR /
 

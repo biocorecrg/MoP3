@@ -64,7 +64,7 @@ if (params.help) exit 1
 if (params.resume) exit 1, "Are you making the classical --resume typo? Be careful!!!! ;)"
 
 // check multi5 and GPU usage. GPU maybe can be removed as param if there is a way to detect it
-if (params.GPU != "ON" && params.GPU != "OFF") exit 1, "Please specify ON or OFF in GPU processors are available"
+if (params.GPU != "cuda11" && params.GPU != "cuda10" && params.GPU != "OFF" && params.GPU != "ON") exit 1, "Please specify cuda11, cuda10, ON or OFF if GPU processors are available. ON is legacy for cuda10"
 
 // include functions, outdirs from other files
 evaluate(new File("../outdirs.nf"))
@@ -87,7 +87,9 @@ Channel
     .collect().set{multiqc_info}
 
 
-def gpu				    = params.GPU
+def gpu = (params.GPU != 'OFF' ? 'ON' : 'OFF')
+def cuda_cont = (params.GPU == 'cuda11' ? 'biocorecrg/mopbasecallc11:0.1' : 'biocorecrg/mopbasecall:0.2')
+
 def tools = [:]
 tools["basecalling"] = params.basecalling
 tools["demultiplexing"] = params.demultiplexing
@@ -120,17 +122,12 @@ if (params.ref_type == "genome") {
 	}
 }
 def demulti_fast5_opt = "OFF"
-
-if (params.demultiplexing == "NO") {
-        demulti_fast5_opt = "OFF"
-}
-
 if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
 	demulti_fast5_opt = "ON"
 }
 
-def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
-def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : '')
+def guppy_basecall_label = (params.GPU != 'OFF' ? 'basecall_gpus' : 'big_cpus')
+def deeplexi_basecall_label = (params.GPU != 'OFF' ? 'demulti_gpus' : '')
 def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
 def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
 
@@ -149,8 +146,8 @@ if (workflow.profile == "awsbatch") guppypars = guppypars + " --data_path /nextf
 progPars = getParameters(params.pars_tools)
 def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
 
-include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
-include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
+include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
+include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU: gpu)
 include { GET_VERSION as NANOFILT_VER; FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
 include { GET_VERSION as NANOQ_VER; FILTER as NANOQ_FILTER} from "${subworkflowsDir}/trimming/nanoq" addParams(EXTRAPARS: progPars["filtering--nanoq"])
 include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"], LABEL:'big_mem_cpus')
