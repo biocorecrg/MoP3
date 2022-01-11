@@ -48,7 +48,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # a list of builtin themes.
 #
 # https://www.sphinx-doc.org/en/master/usage/theming.html#builtin-themes
-html_theme = 'bizstyle'
+# https://sphinx-themes.org/
+html_theme = 'sphinx_rtd_theme'
 
 #html_theme_options = {
 #    'nosidebar': True,
