@@ -1,12 +1,12 @@
 name: mop3-CI
-# This workflow is triggered on pushes to the repository.
-on: [push]
+# When this workflow is triggered
+on: [push, pull_request]
 
 jobs:
   build:
     name: mop3 ci
     # This job runs on Linux
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -20,34 +20,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-         token: ${{ github.token }} 
+         token: ${{ github.token }}
          repository: biocorecrg/MoP3
          fetch-depth: 1
          submodules: true
 
- #     - name: Setup Java
- #       uses: actions/setup-java@v1
- #       with:
- #         java-version: ${{ matrix.java_version }}
- #         architecture: x64
-
       - name: MOP3
         run: |
-          # Install Master Of Pores 3
-          #git clone --depth 1 --recurse-submodules git//${{ secrets.GIT_TOKEN }}:x-oauth-basic@github.com/biocorecrg/MoP3.git
-          #git config --global url."https://${{ secrets.ACCESS_TOKEN }}@github".insteadOf https://github
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git clone --depth 1 --recurse-submodules https://${{ secrets.ACCESS_TOKEN }}@github.com/biocorecrg/MoP3.git
           curl -fsSL get.nextflow.io | bash
-          cd MoP3
           bash INSTALL.sh
-          cd mop_preprocess 
-          ../../nextflow run mop_preprocess.nf -with-docker -profile local
+          cd mop_preprocess
+          ../nextflow run mop_preprocess.nf -with-docker -profile local
           cd ../mop_mod
-          ../../nextflow run mop_mod.nf -with-docker -profile local
+          ../nextflow run mop_mod.nf -with-docker -profile local
           cd ../mop_tail
-           ../../nextflow run mop_tail.nf -with-docker -profile local
+           ../nextflow run mop_tail.nf -with-docker -profile local
 
         env:
           NXF_ANSI_LOG: false
