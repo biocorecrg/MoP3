@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: ['11']
+        java_version: [11]
 
     steps:
       - name: Environment
@@ -29,7 +29,9 @@ jobs:
         uses: actions/setup-java@v2
         with:
          java-version: ${{ matrix.java_version }}
-
+         distribution: 'adopt'
+         architecture: x64
+        
       - name: MOP3
         run: |
           curl -fsSL get.nextflow.io | bash
