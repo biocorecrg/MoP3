@@ -344,7 +344,7 @@ process checkRef {
 process splitReference {
     label (params.LABEL)
     container 'biocorecrg/mopmod:0.6.2'
-    tag "Splitting of ${ reference }"
+    tag "Splitting of ${ reference } in pieces of maximum 20,000,000 bases"
 
     input:
     path(reference)
@@ -416,10 +416,10 @@ process joinEpinanoRes {
     script:
 	"""
 	if compgen -G "*.plus_strand.per.site.csv.gz" > /dev/null; then
-		zcat *pieces*.plus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.plus_strand.per.site.csv.gz
+		zcat *.plus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.plus_strand.per.site.csv.gz
 	fi
 	if compgen -G "*.minus_strand.per.site.csv.gz" > /dev/null; then
-		zcat *pieces*.minus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.minus_strand.per.site.csv.gz
+		zcat *.minus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.minus_strand.per.site.csv.gz
 	fi	
 	"""
 }
@@ -507,7 +507,6 @@ process makeEpinanoPlots {
     tag {"${sampleIDA}--${sampleIDB} ${mode}"}  
 	
     input:
-    path(rscript)
     tuple val(sampleIDA), val(sampleIDB), path(per_site_varA), path(per_site_varB) 
     val(mode)
     
@@ -516,7 +515,7 @@ process makeEpinanoPlots {
        
     script:
 	"""
-	Rscript --vanilla ${rscript} ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
+	Rscript --vanilla ${baseDir}/bin/epinano_scatterplot.R ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
 	"""
 }
 
@@ -547,7 +546,6 @@ process multiToSingleFast5 {
 process bedGraphToWig {
     container 'biocorecrg/mopmod:0.6'
     tag "${idsample}"  
-    errorStrategy 'ignore'
 	
     input:
     path(chromsizes)
@@ -819,10 +817,10 @@ def parseFinalSummary(final_summary_file) {
 				}  
 			}	
 		} else {
-			log.info '***No configuration file found!!. You must specify kit and flowcell in the parameters!!***\n'
+			log.info '***No configuration file found!!. You must specify kit and flowcell in the parameters or a custom model!!***\n'
 			} 
 		} else {
-			log.info '***No configuration file given!!. You must specify kit and flowcell in the parameters!!***\n'
+			log.info '***No configuration file given!!. You must specify kit and flowcell in the parameters or a custom model!!***\n'
 		}
 	return(outstring)
 }
