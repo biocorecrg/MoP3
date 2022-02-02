@@ -42,7 +42,7 @@ Input Parameters
    * - **basecalling**
      - Tool for basecalling **[guppy / NO ]**
    * - **GPU**
-     -  Allow the pipeline to run with GPU. **[OFF / ON]**
+     -  Allow the pipeline to run with GPU. You can choose cuda10 for Guppy < 3.4.3 and cuda11 for higher versions. **[cuda10 / cuda11 /  OFF / ON (legacy for cuda10) ]**
    * - **demultiplexing**
      -  Tool for demultiplexing algorithm. **[deeplexicon / guppy / NO ]**
    * - **demulti_fast5**
@@ -156,6 +156,13 @@ Several folders are created by the pipeline within the output directory specifie
 * **report**: Contains the final multiqc report. 
 * **assembly**: It contains assembled transcripts.
 
+.. note::
+   Newer version of guppy automatically separate the reads depending on the quality. You need to disable this via custom options for being used in MoP3. This is also to avoid losing interesting signals since the modified bases have often low qualities. 
+   
+.. tip::
+   You can pass via parameter a custom NAME_tool_opt.tsv file with custom guppy options to disable the qscorefiltering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv
+   
+   
 
 
 
