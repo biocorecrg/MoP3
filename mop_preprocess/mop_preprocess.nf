@@ -73,8 +73,12 @@ def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
 joinScript = file("$baseDir/bin/join.r")
 
 // check input files
-reference = file(params.reference)
-if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
+if (params.mapping != "NO") {
+	reference = file(params.reference)
+	if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
+} else {
+	reference = ""
+}
 config_report = file("$baseDir/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
 logo = file("$baseDir/../img/logo_small.png")
