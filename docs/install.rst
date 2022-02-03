@@ -13,7 +13,7 @@ Then download the repo:
 
 .. code-block:: console
 
-  git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MOP2.git
+   git clone --depth 1 --recurse-submodules git@github.com:biocorecrg/MoP3.git
 
 
 You can use **INSTALL.sh** to download the **guppy 3.4.5** or you can download the version you prefer by adding an extra parameter. 
