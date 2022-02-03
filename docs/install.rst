@@ -8,6 +8,13 @@ How to install
    :toctree: generated
 
 Please install nextflow `Nextflow <https://www.nextflow.io/>`_ and `Singularity <https://sylabs.io/>`_ or `Docker <https://www.docker.com/>`_ before.
+For Nextflow just type:
+
+.. code-block:: console
+
+   curl -s https://get.nextflow.io | bash
+
+
 
 Then download the repo:
 
