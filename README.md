@@ -31,7 +31,7 @@ Please install nextflow and singularity or docker before.
 Then download the repo:
 
 ```
-git clone --depth 1 --recurse-submodules git@github.com:biocorecrg/MoP3.git
+git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
 ```
 
 You can use INSTALL.sh to download the version 3.4.5 of guppy or you can replace it with the version you prefer. Please consider that the support of VBZ compression of fast5 started with version 3.4.X. 
