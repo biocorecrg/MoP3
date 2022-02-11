@@ -21,7 +21,7 @@ It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.
 <br/>
 
 
-![MOP2](https://github.com/biocorecrg/MOP2/blob/main/img/goku3.png?raw=true)
+![MO32](https://github.com/biocorecrg/MoP3/blob/main/img/goku3.png?raw=true)
 
 Inspired by Metallica's [Master Of Puppets](https://www.youtube.com/watch?v=S7blkui3nQc)
 
