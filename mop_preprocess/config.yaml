@@ -1,4 +1,4 @@
-title: "MoP2 - pipeline"
+title: "MoP3 - pipeline"
 subtitle: ""
 intro_text: False
 
@@ -7,7 +7,7 @@ report_header_info:
 
 custom_logo: 'logo_small.png'
 custom_logo_url: 'https://github.com/biocorecrg/MoP2'
-custom_logo_title: 'Master of Pores 2'
+custom_logo_title: 'Master of Pores 3'
 
 extra_fn_clean_trim: 
    - '_QC'
