@@ -8,7 +8,7 @@ params {
     output             = "$baseDir/outputPoly"
 
     tailfindr          = "YES"
-    tailfindr_mode     = "custom"
+    tailfindr_mode     = "standard"
 
     nanopolish         = "YES"
  
