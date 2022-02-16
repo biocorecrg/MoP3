@@ -35,6 +35,8 @@ Contents:
    mop_mod
    mop_consensus
    mop_tail
+   reporting
+   awsbatch
    benchmark
    changelog
    
