@@ -1,15 +1,15 @@
 .. _home-page-index:
 
 *******************
-Welcome to the documentation of Master Of Pores
+Welcome to the documentation of Master Of Pores 3
 *******************
 
 
 .. autosummary::
    :toctree: generated
 
-.. image:: ../img/master_red.jpg
-  :width: 400  
+.. image:: ../img/goku3.png
+  :width: 600  
 
 Master of Pores is a pipeline written in Nextflow DSL2 for the analysis of Nanopore data. It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.
 
