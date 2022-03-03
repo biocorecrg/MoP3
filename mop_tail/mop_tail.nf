@@ -63,7 +63,7 @@ include { getParameters; checkRef } from "${local_modules}"
 progPars = getParameters(params.pars_tools)
 
 
-def tailFindrCont = (params.tailfindr_mode != 'custom' ? 'biocorecrg/moptail:1.3' : 'biocorecrg/moptail:nano3p')
+def tailFindrCont = (params.tailfindr_mode != 'custom' ? 'biocorecrg/moptail:1.3' : 'biocorecrg/moptail:nano3p_2')
 
 include { GET_VERSION as TAILFINDR_VER; ESTIMATE_TAIL as TAILFINDR_ESTIMATE_TAIL } from "${subworkflowsDir}/chem_modification/tailfindr" addParams(CONTAINER:tailFindrCont, LABEL: 'big_cpus_retry', EXTRAPARS: progPars["tailfindr--tailfindr"])
 

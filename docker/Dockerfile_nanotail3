@@ -1,4 +1,4 @@
-#This will do biocorecrg/moptail:nano3p
+#This will do biocorecrg/moptail:nano3p_2
 FROM biocorecrg/centos-perlbrew-pyenv3-java:centos7
 
 # File Author / Maintainer
@@ -52,6 +52,7 @@ RUN Rscript -e "BiocManager::install(c('foreach', 'doParallel', 'doSNOW', 'rboke
 
 RUN Rscript -e "BiocManager::install(c('Rsamtools'))"
 RUN Rscript -e "BiocManager::install(c('tidyr'))"
+RUN echo "force upgrade"
 RUN Rscript -e "devtools::install_github(\"adnaniazi/tailfindr\", ref=\"nano3p-seq\", dependencies=FALSE, INSTALL_opts=c(\"--no-docs\", \"--no-help\"))"
 
 # Installing vennDiagram
