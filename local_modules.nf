@@ -87,14 +87,13 @@ process extracting_demultiplexed_fast5_guppy {
     script:
     """
       if [ -f "summaries_" ]; then
-	  ln -s summaries_ final_summary.stats
-	  else 
-		  head -n 1 summaries_1 > final_summary.stats
-	      for i in summaries_*; do grep -v "filename" \$i | awk -F"\t" -v id=${idfile}  '{OFS="\t"; \$19 = id"---"\$19; print \$0}'  >> final_summary.stats; done
+	  	ln -s summaries_ summaries_1
 	  fi
+	  head -n 1 summaries_1 > final_summary.stats
+	  for i in summaries_*; do grep -v "filename" \$i | awk -F"\t" -v id=${idfile}  '{OFS="\t"; \$19 = id"---"\$19; print \$0}'  >> final_summary.stats; done
 
-		demux_fast5 -c vbz -t ${task.cpus} --input ./ --save_path ./ --summary_file final_summary.stats 
-		rm -fr barcode_arrangement
+	  demux_fast5 -c vbz -t ${task.cpus} --input ./ --save_path ./ --summary_file final_summary.stats 
+	  rm -fr barcode_arrangement
     """
 }
 

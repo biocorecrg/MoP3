@@ -1,6 +1,7 @@
 #step	tool	extrapars
-basecalling	guppy	"--kit"
+basecalling	guppy	""
 demultiplexing	guppy	"--barcode_kits EXP-NBD104"
+demultiplexing	deeplexicon	"-f multi -m resnet20-final.h5"
 filtering	nanofilt	""
 filtering	nanoq	""
 mapping	graphmap	""
