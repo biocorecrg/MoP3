@@ -35,6 +35,7 @@ granularity		  		  : ${params.granularity}
 
 ref_type                  : ${params.ref_type}
 pars_tools		  		  : ${params.pars_tools}
+barcode_names		  	  : ${params.barcode_names}
 
 output                    : ${params.output}
 
@@ -269,14 +270,19 @@ workflow flow2 {
 		}
 		reshapedDemufq = demufq.transpose().map{
 			[it[1].name.replace(".fastq.gz", ""), it[1] ]
-		}		
+		}
+		
+		reshapedDemufq.view()
+		
  		// Optional fastq filtering	
 		if (params.filtering == "nanofilt") {
  			nanofilt = NANOFILT_FILTER(reshapedDemufq)
  			reshapedDemufq = nanofilt
 		} else if (params.filtering == "nanoq") {
-			nanofilt = NANOQ_FILTER(outbc.basecalled_fastq)
-			basecalled_fastq = reshapeSamples(nanofilt.out)
+			//nanofilt = NANOQ_FILTER(outbc.basecalled_fastq)
+			//basecalled_fastq = reshapeSamples(nanofilt.out)
+ 			nanofilt = NANOQ_FILTER(reshapedDemufq)
+// 			reshapedDemufq = nanofilt
 		}
 	emit:
     	basecalled_fast5 =  fast5_res
