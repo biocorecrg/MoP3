@@ -63,7 +63,7 @@ include { getParameters; checkRef } from "${local_modules}"
 progPars = getParameters(params.pars_tools)
 
 
-def tailFindrCont = (params.tailfindr_mode != 'nano3p' ? 'biocorecrg/moptail:1.3' : 'biocorecrg/moptail:nano3p_4')
+def tailFindrCont = (params.tailfindr_mode != 'nano3p' ? 'biocorecrg/moptail:1.3' : 'biocorecrg/moptail:nano3p_5')
 
 if (params.tailfindr_mode == 'nano3p') {
     println "tailfindr is in nano3p mode"
