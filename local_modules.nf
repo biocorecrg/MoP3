@@ -779,6 +779,7 @@ process nanoConsensus {
     path(nanoConScript)
     path(nanoScripts)
     path(reference)
+    val(extraparams)
     tuple val(sampleIDs), path(Epi_Sample), path(Epi_IVT), path(NP_Sample), path(NP_IVT), path(Tombo), path(Nanocomp), val(chrName), val(chrStart), val(chrEnd)
     
     output:
@@ -796,7 +797,7 @@ process nanoConsensus {
 	 -ini_pos ${chrStart} -fin_pos ${chrEnd} \
 	 -output ${sampleIDs} \
 	 -fasta ${reference} \
-	 --nanocomp_stat GMM_logit_pvalue 
+	 --nanocomp_stat GMM_logit_pvalue ${extraparams} 
 	"""
 }
 
