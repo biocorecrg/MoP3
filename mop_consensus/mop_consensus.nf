@@ -28,6 +28,7 @@ input_path               : ${params.input_path}
 output                   : ${params.output}
 comparison               : ${params.comparison}
 padsize                  : ${params.padsize}
+extraparams              : ${params.extraparams}
 
 ******* reference has to be the genome **********
 reference                : ${params.reference}
@@ -116,7 +117,7 @@ workflow {
 		
 	data_to_process = epinano_combs.join(nanopolish_combs).join(tombo).join(nanocomp)
 	//data_to_process.view()
-	nanoConsensus(nanoConScript, nanoScript, ref_file, data_to_process.combine(transcript_coords))
+	nanoConsensus(nanoConScript, nanoScript, ref_file, "${params.extraparams}", data_to_process.combine(transcript_coords))
 }
 
 
