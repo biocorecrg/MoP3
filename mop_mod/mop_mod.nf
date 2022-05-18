@@ -117,7 +117,6 @@ if( !compfile.exists() ) exit 1, "Missing comparison file: ${compfile}. Specify 
         }
     }.set {comparisons}
 
-comparisons.view()
 
 
 workflow {	
