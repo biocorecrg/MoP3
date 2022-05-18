@@ -8,7 +8,7 @@ nextflow.enable.dsl=2
  */
 
 // Pipeline version
-version = '2.0'
+version = '3.0'
 
 params.help            = false
 params.resume          = false
@@ -20,7 +20,7 @@ log.info """
 ╩ ╩╚═╝╩    ╩ ╩└─┘─┴┘
                                                                                        
 ====================================================
-BIOCORE@CRG Master of Pores 2. Detection of RNA modification - N F  ~  version ${version}
+BIOCORE@CRG Master of Pores 3. Detection of RNA modification - N F  ~  version ${version}
 ====================================================
 
 *****************   Input files    *******************
@@ -107,6 +107,9 @@ if( !compfile.exists() ) exit 1, "Missing comparison file: ${compfile}. Specify 
     .from(compfile.readLines())
     .map { line ->
         list = line.split("\t")
+        if (list.length <2) {
+			error "ERROR!!! Comparison file has to be tab separated\n" 
+	    }   
         if (list[0]!= "") {
             def sampleID = list[0]
             def ctrlID = list[1]
@@ -114,14 +117,15 @@ if( !compfile.exists() ) exit 1, "Missing comparison file: ${compfile}. Specify 
         }
     }.set {comparisons}
 
+comparisons.view()
+
 
 workflow {	
 	comparisons.flatten().unique().set{unique_samples}
-	
-	unique_samples.map {
+        unique_samples.map {
  	  	 [it, file("${params.input_path}/alignment/${it}_s.bam")]
 	}.transpose().set{bams}
-	unique_samples.map {
+        unique_samples.map {
  	  	 [it, file("${params.input_path}/alignment/${it}_s.bam.bai")]
 	}.transpose().set{bais}
 	unique_samples.map {
@@ -137,7 +141,6 @@ workflow {
 	unique_samples.map {
     [it, file("${params.input_path}/fast5_files/${it}/*.fast5")]
 	}.transpose().set{fast5_files}
-
 	ref_file = checkRef(reference)
 
 	if (params.epinano == "YES") {
@@ -148,7 +151,7 @@ workflow {
 	}
 
 	if (params.tombo_lsc == "YES" || params.tombo_msc == "YES") {
-		tombo_data = tombo_common_flow(fast5_files, ref_file, comparisons)
+	    tombo_data = tombo_common_flow(fast5_files, ref_file, comparisons)
 	    chromSizes = getChromInfo(ref_file)
 
 		if (params.tombo_msc == "YES") {
@@ -345,7 +348,7 @@ else {
     workflow.onComplete {
 
     def msg = """\
-        Pipeline BIOCORE@CRG Master of Pore 2 modification module's execution summary
+        Pipeline BIOCORE@CRG Master of Pore 3 modification module's execution summary
         ---------------------------
         Completed at: ${workflow.complete}
         Duration    : ${workflow.duration}
