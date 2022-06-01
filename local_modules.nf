@@ -245,7 +245,8 @@ process countStats {
 process joinAlnStats {
     label (params.LABEL)
     tag "joining aln stats"
- 
+    shell '/bin/bash' 
+
     input:
     file "alnqc_*" 
 
