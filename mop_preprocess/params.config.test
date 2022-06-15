@@ -7,7 +7,7 @@ params {
     annotation          = ""
     ref_type            = "transcriptome"
 
-    pars_tools          = "$baseDir/tool_opts/cdna_tool_opt.tsv"
+    pars_tools          = "$baseDir/tool_opts/drna_tool_splice_opt"
     barcodes            = ""
 
     output              = "$baseDir/output"
@@ -16,8 +16,8 @@ params {
 
     basecalling         = "guppy"
     GPU                 = "OFF"
-    demultiplexing      = "guppy"
-    demulti_fast5       = "YES" 
+    demultiplexing      = ""
+    demulti_fast5       = "NO" 
 
     filtering           = "nanofilt"
 
