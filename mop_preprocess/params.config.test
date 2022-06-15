@@ -16,7 +16,7 @@ params {
 
     basecalling         = "guppy"
     GPU                 = "OFF"
-    demultiplexing      = ""
+    demultiplexing      = "NO"
     demulti_fast5       = "NO" 
 
     filtering           = "nanofilt"
