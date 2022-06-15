@@ -7,17 +7,19 @@ params {
     annotation          = ""
     ref_type            = "transcriptome"
 
-    pars_tools          = "drna_tool_splice_opt.tsv" 
+    pars_tools          = "$baseDir/tool_opts/cdna_tool_opt.tsv"
+    barcodes            = ""
+
     output              = "$baseDir/output"
     qualityqc           = 5
     granularity         = 1
 
     basecalling         = "guppy"
     GPU                 = "OFF"
-    demultiplexing      = "NO"
-    demulti_fast5       = "NO" 
+    demultiplexing      = "guppy"
+    demulti_fast5       = "YES" 
 
-    filtering           = "nanoq"
+    filtering           = "nanofilt"
 
     mapping             = "graphmap"
     counting            = "nanocount"

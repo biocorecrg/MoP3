@@ -35,7 +35,7 @@ granularity		  		  : ${params.granularity}
 
 ref_type                  : ${params.ref_type}
 pars_tools		  		  : ${params.pars_tools}
-barcode_names		  	  : ${params.barcode_names}
+barcodes			  	  : ${params.barcodes}
 
 output                    : ${params.output}
 
@@ -147,9 +147,21 @@ def guppypars = parseFinalSummary(params.conffile)
 
 // Create a channel for tool options
 if (workflow.profile == "awsbatch") guppypars = guppypars + " --data_path /nextflow-bin/ont-guppy/data"
-
 progPars = getParameters(params.pars_tools)
 def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
+
+// Create a channel for excluded ids
+if (params.barcodes != "") {
+	barcodes_to_include = file(params.barcodes)
+	if( !barcodes_to_include.exists() ) exit 1, "Missing barcodes_to_include file: ${params.barcodes}!"
+	Channel.from(barcodes_to_include.readLines())
+    .map { line ->
+    	[ line ]
+	}.set{ barcodes_to_include}
+} else {
+	barcodes_to_include = Channel.empty()
+}
+
 
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
 include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU: gpu)
@@ -226,6 +238,7 @@ workflow flow1 {
 workflow flow2 {		
     take: 
     	fast5_4_analysis
+    	barcodes_to_include
     main:
 		// IF DEMULTIPLEXING IS DEEPLEXICON	
     	if(params.demultiplexing == "deeplexicon") {
@@ -268,12 +281,25 @@ workflow flow2 {
 				fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
 			}
 		}
-		reshapedDemufq = demufq.transpose().map{
+		reshapedPrefiltDemufq = demufq.transpose().map{
 			[it[1].name.replace(".fastq.gz", ""), it[1] ]
 		}
 		
-		reshapedDemufq.view()
-		
+		if (params.barcodes != "") {	
+			reshapedPrefiltDemufq.map{
+				def id_raw = it[0].split("---")
+				def id_raw2 = id_raw[1].split("\\.")
+				def ori_id = "${id_raw[0]}---${id_raw2[1]}"
+				[ori_id, it]
+			}.join(barcodes_to_include).map{
+				it[1]
+			}.set{reshapedDemufq}
+		} else {
+			reshapedDemufq = reshapedPrefiltDemufq
+		}
+				
+ 		basecalled_stats = reshapeSamples(outbc.basecalling_stats)
+
  		// Optional fastq filtering	
 		if (params.filtering == "nanofilt") {
  			nanofilt = NANOFILT_FILTER(reshapedDemufq)
@@ -288,7 +314,7 @@ workflow flow2 {
     	basecalled_fast5 =  fast5_res
     	//basecalled_fastq = basecalled_fastq_res
     	basecalled_fastq = reshapedDemufq
-    	basecalled_stats = reshapeSamples(outbc.basecalling_stats)
+    	basecalled_stats = basecalled_stats
     		
 }
 
@@ -422,7 +448,7 @@ workflow preprocess_flow {
 		}.collect().map{
 			["assembly", it]
 		}.join(ixd_4_bambu).set{data_to_isoquant}
-		data_to_isoquant.view()
+		//data_to_isoquant.view()
 	
 		bambu_out = ISOQUANT_ASSEMBLE(reference, annotation, data_to_isoquant)
 	} else if (params.discovery == "NO") {
@@ -566,11 +592,11 @@ workflow preprocess_simple {
 
 		//GET_WORKFLOWS(params.flowcell, params.kit).view()
 		if (params.basecalling == "guppy" && params.demultiplexing == "NO" ) outf = flow1(fast5_4_analysis)
-		else outf = flow2(fast5_4_analysis)
+		else outf = flow2(fast5_4_analysis, barcodes_to_include)
+		
 		def bc_fast5 = outf.basecalled_fast5
 		def bc_fastq = outf.basecalled_fastq
 		def basecalled_stats = outf.basecalled_stats
-
 		preprocess_flow(bc_fast5, bc_fastq, basecalled_stats)
 		
  	} else if(params.fast5 == "" && params.fastq != "") {
