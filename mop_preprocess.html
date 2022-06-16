@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
@@ -81,10 +82,10 @@
            <div itemprop="articleBody">
              
   <section id="mop-preprocess">
-<span id="home-page-moprepr"></span><h1>MOP_PREPROCESS<a class="headerlink" href="#mop-preprocess" title="Permalink to this headline"></a></h1>
+<span id="home-page-moprepr"></span><h1>MOP_PREPROCESS<a class="headerlink" href="#mop-preprocess" title="Permalink to this heading"></a></h1>
 <p>This module takes as input the raw fast5 reads - single or multi - and produces a number of outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module is able to perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a genome / transcriptome reference, feature counting, discovery of novel transcripts and it generates a final report of the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi sequence).</p>
 <section id="input-parameters">
-<h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Permalink to this headline"></a></h2>
+<h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Permalink to this heading"></a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 25%" />
@@ -117,49 +118,52 @@
 <tr class="row-even"><td><p><strong>pars_tools</strong></p></td>
 <td><p>Parameters of tools. It is ha tab separated file with custom parameters for each tool <strong>[NAME_tool_opt.tsv]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>output</strong></p></td>
+<tr class="row-odd"><td><p><strong>barcodes</strong></p></td>
+<td><p>File containing a list of ids (combinations of sample names and barcode ids) to be kept after the demulitplexing.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>output</strong></p></td>
 <td><p>Output folder name. <strong>[/Path/to_output_folder]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>qualityqc</strong></p></td>
+<tr class="row-odd"><td><p><strong>qualityqc</strong></p></td>
 <td><p>Quality threshold for QC. <strong>[5]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>granularity</strong></p></td>
+<tr class="row-even"><td><p><strong>granularity</strong></p></td>
 <td><p>indicates the number of input fast5 files analyzed in a single process.</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>basecalling</strong></p></td>
+<tr class="row-odd"><td><p><strong>basecalling</strong></p></td>
 <td><p>Tool for basecalling <strong>[guppy / NO ]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>GPU</strong></p></td>
+<tr class="row-even"><td><p><strong>GPU</strong></p></td>
 <td><p>Allow the pipeline to run with GPU. You can choose cuda10 for Guppy &lt; 3.4.3 and cuda11 for higher versions. <strong>[cuda10 / cuda11 /  OFF / ON (legacy for cuda10) ]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>demultiplexing</strong></p></td>
+<tr class="row-odd"><td><p><strong>demultiplexing</strong></p></td>
 <td><p>Tool for demultiplexing algorithm. <strong>[deeplexicon / guppy / NO ]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>demulti_fast5</strong></p></td>
+<tr class="row-even"><td><p><strong>demulti_fast5</strong></p></td>
 <td><p>If performing demultiplexing generate demultiplexed multifast5 files too. <strong>[YES / NO]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>filtering</strong></p></td>
+<tr class="row-odd"><td><p><strong>filtering</strong></p></td>
 <td><p>Tool for filtering fastq files. <strong>[nanofilt / NO]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>mapping</strong></p></td>
+<tr class="row-even"><td><p><strong>mapping</strong></p></td>
 <td><p>Tool for mapping reads. <strong>[minimap2 / graphmap / graphmap2 / bwa / NO ]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>counting</strong></p></td>
+<tr class="row-odd"><td><p><strong>counting</strong></p></td>
 <td><p>Tool for gene or transcripts counts <strong>[htseq / nanocount / NO””]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>discovery</strong></p></td>
+<tr class="row-even"><td><p><strong>discovery</strong></p></td>
 <td><p>Tool for generating novel transcripts. <strong>[bambu / isoquant / NO]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>cram_conv</strong></p></td>
+<tr class="row-odd"><td><p><strong>cram_conv</strong></p></td>
 <td><p>Converting bam in cram. <strong>[YES / “”]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>subsampling_cram</strong></p></td>
+<tr class="row-even"><td><p><strong>subsampling_cram</strong></p></td>
 <td><p>Subsampling BAM before CRAM conversion. <strong>[YES / “”]</strong></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>saveSpace</strong></p></td>
+<tr class="row-odd"><td><p><strong>saveSpace</strong></p></td>
 <td><p>Remove intermediate files (<strong>beta</strong>) <strong>[YES / “”]</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>email</strong></p></td>
+<tr class="row-even"><td><p><strong>email</strong></p></td>
 <td><p>Users email for receving the final report when the pipeline is finished. <strong>[user_email]</strong></p></td>
 </tr>
 </tbody>
@@ -167,7 +171,7 @@
 <p>You can change them by editing the <strong>params.config</strong> file or using the command line - please, see next section.</p>
 </section>
 <section id="how-to-run-the-pipeline">
-<h2>How to run the pipeline<a class="headerlink" href="#how-to-run-the-pipeline" title="Permalink to this headline"></a></h2>
+<h2>How to run the pipeline<a class="headerlink" href="#how-to-run-the-pipeline" title="Permalink to this heading"></a></h2>
 <p>Before launching the pipeline, user should decide which containers to use - either docker or singularity <strong>[-with-docker / -with-singularity]</strong>.</p>
 <p>Then, to launch the pipeline, please use the following command:
 .. code-block:: console</p>
@@ -219,7 +223,7 @@
 </div>
 </section>
 <section id="results">
-<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline"></a></h2>
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
 <p>Several folders are created by the pipeline within the output directory specified by the <strong>output</strong> parameter:</p>
 <ul class="simple">
 <li><p><strong>fast5_files</strong>: Contains the basecalled multifast5 files. Each batch contains 4000 sequences.</p></li>

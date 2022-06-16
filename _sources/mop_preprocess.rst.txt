@@ -33,6 +33,8 @@ Input Parameters
      - Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. **[Annotation_file.gtf]**. 
    * - **pars_tools**
      - Parameters of tools. It is ha tab separated file with custom parameters for each tool **[NAME_tool_opt.tsv]**
+   * - **barcodes**
+     - File containing a list of ids (combinations of sample names and barcode ids) to be kept after the demulitplexing.
    * - **output**
      - Output folder name. **[/Path/to_output_folder]**
    * - **qualityqc**
