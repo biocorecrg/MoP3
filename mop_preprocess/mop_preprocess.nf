@@ -93,7 +93,7 @@ Channel
 
 
 def gpu = (params.GPU != 'OFF' ? 'ON' : 'OFF')
-def cuda_cont = (params.GPU == 'cuda11' ? 'biocorecrg/mopbasecallc11:0.1' : 'biocorecrg/mopbasecall:0.2')
+def cuda_cont = (params.GPU == 'cuda11' ? 'biocorecrg/mopbasecallc11:0.3' : 'biocorecrg/mopbasecall:0.3')
 
 def tools = [:]
 tools["basecalling"] = params.basecalling
@@ -136,8 +136,12 @@ def deeplexi_basecall_label = (params.GPU != 'OFF' ? 'demulti_gpus' : '')
 def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
 def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
 
+
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
+
+// Check the outmode with guppy and read-ducks!
+
 
 include { RNA2DNA; preparing_demultiplexing_fast5_deeplexicon; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
 include { extracting_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUTF5: outputFast5, OUTPUTST: outputQual, LABEL: 'big_cpus')
@@ -164,6 +168,7 @@ if (params.barcodes != "") {
 
 
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
+include { DEMULTIPLEX as READUCKS_DEMULTIPLEX } from "${subworkflowsDir}/demultiplexing/readucks" addParams(EXTRAPARS: progPars["demultiplexing--readucks"], LABEL: 'big_cpus', OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU: gpu)
 include { GET_VERSION as NANOFILT_VER; FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
 include { GET_VERSION as NANOQ_VER; FILTER as NANOQ_FILTER} from "${subworkflowsDir}/trimming/nanoq" addParams(EXTRAPARS: progPars["filtering--nanoq"])
@@ -266,11 +271,19 @@ workflow flow2 {
 		// Demultiplex fastq	
 			demufq = extracting_demultiplexed_fastq(demux.join(outbc.basecalled_fastq))
 
-		} else if (params.demultiplexing == "guppy") {
+		} else if (params.demultiplexing == "guppy" || params.demultiplexing == "readucks") {
 			// IF DEMULTIPLEXING IS GUPPY	
 			outbc = GUPPY_BASECALL_DEMULTI (fast5_4_analysis)
 			demufq = outbc.basecalled_fastq
 			fast5_res = outbc.basecalled_fast5
+
+			// In case of readucks demultiplexing  		
+			if (params.demultiplexing == "readucks" ) {
+				read_demufq = READUCKS_DEMULTIPLEX(demufq)
+				demufq = read_demufq
+				//read_demufq.view()
+			}
+			
 
 			// Optional demultiplex fast5 		
 			if (demulti_fast5_opt == "ON" ) {
@@ -280,7 +293,9 @@ workflow flow2 {
 				// OPTIONAL CLEANING FASTQ5 FILES
 				fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
 			}
-		}
+		} 
+		
+		
 		reshapedPrefiltDemufq = demufq.transpose().map{
 			[it[1].name.replace(".fastq.gz", ""), it[1] ]
 		}
