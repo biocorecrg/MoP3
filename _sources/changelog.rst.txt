@@ -12,7 +12,7 @@ Version 3.0
 * mop_preprocess
    * We replaced fastQC with the faster and less memory intensive C++ version named `falco <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7845152/>`__
    * We added a new parameter: **analysis_type**. If set to modDNA it will run guppy and align directly to a reference (using embedded minimap). In this way the information of chemical modifications is correclty stored in the BAM file as MM and MN tags https://samtools.github.io/hts-specs/SAMtags.pdf. Alignment is stored as output as normal.
-   * We added a new aligner "Winnowmap" https://www.nature.com/articles/s41592-022-01457-8. It is based on minimap2 but is designed to improve the mapping in the DNA repeats. 
+   * We added a new aligner `Winnowmap <https://www.nature.com/articles/s41592-022-01457-8>`__. It is based on minimap2 but is designed to improve the mapping in the DNA repeats. 
    * We added a custom model for m6A RNA basecalling. It is automatically installed when running INSTALL.sh. For using it you need to indicated ``--pars_tools "drna_tool_splice_m6A_opt.tsv" ``
    * We add support to cuda11 for guppy version > 4.4.1. Please note that at certain point Guppy started to separate fastq files in PASS and FAIL, for avoiding this we need to add an extra parameter **--disable_qscore_filtering** in *_opt.tsv files. We added two more: **drna_tool_splice_m6A_guppy6_opt.tsv** and **drna_tool_unsplice_guppy6_opt.tsv**. 
    * Added readucks for improving demultiplexing with guppy (optional). 
