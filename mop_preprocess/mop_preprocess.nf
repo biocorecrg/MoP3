@@ -289,7 +289,12 @@ workflow flow2 {
 			if (demulti_fast5_opt == "ON" ) {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(outbc.basecalling_stats)								
-				fast5_res = extracting_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+				if (params.demultiplexing == "readucks" ) {
+					fast5_res = extracting_demultiplexed_fast5_readucks(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+				}
+				else {
+					fast5_res = extracting_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+				}
 				// OPTIONAL CLEANING FASTQ5 FILES
 				fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
 			}
