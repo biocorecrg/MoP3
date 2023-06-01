@@ -85,53 +85,58 @@ epinano_processing <- function(sample_file, ivt_file, initial_position, final_po
 nanopolish_processing <- function(sample_file, ivt_file, initial_position, final_position, MZS_thr, chr, exclude_SNP, Coverage) {
   #Import data:
   sample <- read_csv_file(sample_file)
+  if (nrow(sample)>0) {  
+    #Add sample information:
+    sample$feature <- 'Nanopolish'
+    sample <- subset(sample, coverage>Coverage)
+    colnames(sample)<- c("contig_wt","position","reference_kmer_wt", "event_level_median_wt", "coverage", "feature_wt")
+    sample<- subset(sample, contig_wt == chr)
+    sample$reference <- paste(sample$contig_wt, sample$position, sep='_')
   
-  #Add sample information:
-  sample$feature <- 'Nanopolish'
-  sample <- subset(sample, coverage>Coverage)
-  colnames(sample)<- c("contig_wt","position","reference_kmer_wt", "event_level_median_wt", "coverage", "feature_wt")
-  sample<- subset(sample, contig_wt == chr)
-  sample$reference <- paste(sample$contig_wt, sample$position, sep='_')
+    #Import KO: 
+    raw_data_ivt <- read_csv_file(ivt_file)
+    raw_data_ivt <- subset(raw_data_ivt, coverage>Coverage)
+    colnames(raw_data_ivt)<- c("contig_ko","position","reference_kmer_ko", "event_level_median_ko", 'coverage')
+    raw_data_ivt <- subset(raw_data_ivt, contig_ko == chr)
+    raw_data_ivt$reference <- paste(raw_data_ivt$contig_ko, raw_data_ivt$position, sep='_')
   
-  #Import KO: 
-  raw_data_ivt <- read_csv_file(ivt_file)
-  raw_data_ivt <- subset(raw_data_ivt, coverage>Coverage)
-  colnames(raw_data_ivt)<- c("contig_ko","position","reference_kmer_ko", "event_level_median_ko", 'coverage')
-  raw_data_ivt <- subset(raw_data_ivt, contig_ko == chr)
-  raw_data_ivt$reference <- paste(raw_data_ivt$contig_ko, raw_data_ivt$position, sep='_')
-  
-  #Join tables, calculate differences between means/medians:
-  plotting_data <- join(sample, raw_data_ivt, by="reference", type='inner')
-  plotting_data$diff <- abs(plotting_data$event_level_median_ko-plotting_data$event_level_median_wt)
-  plotting_positions <- data.frame(plotting_data$reference, plotting_data$position, plotting_data$diff, plotting_data$feature_wt)
-  colnames(plotting_positions) <- c('Reference', 'Position', 'Difference', 'Feature')
+    #Join tables, calculate differences between means/medians:
+    plotting_data <- join(sample, raw_data_ivt, by="reference", type='inner')
+    plotting_data$diff <- abs(plotting_data$event_level_median_ko-plotting_data$event_level_median_wt)
+    plotting_positions <- data.frame(plotting_data$reference, plotting_data$position, plotting_data$diff, plotting_data$feature_wt)
+    colnames(plotting_positions) <- c('Reference', 'Position', 'Difference', 'Feature')
 
-  plotting_positions <- subset(plotting_positions, Position>=initial_position)
-  plotting_positions <- subset(plotting_positions, Position<=final_position)
+    plotting_positions <- subset(plotting_positions, Position>=initial_position)
+    plotting_positions <- subset(plotting_positions, Position<=final_position)
   
-  #Exclude SNPs and 10 positions before and after (21mer):
-  if (length(exclude_SNP)!=0) {
-    excluded_positions <- c()
+    #Exclude SNPs and 10 positions before and after (21mer):
+    if (length(exclude_SNP)!=0) {
+      excluded_positions <- c()
     
-    for (single_position in exclude_SNP){
-      excluded_positions <- c(excluded_positions, seq(single_position-10,single_position+10))
-    }
+      for (single_position in exclude_SNP){
+        excluded_positions <- c(excluded_positions, seq(single_position-10,single_position+10))
+      }
     
-    plotting_positions <- subset(plotting_positions, !Position %in% unique(excluded_positions))
-  } 
+      plotting_positions <- subset(plotting_positions, !Position %in% unique(excluded_positions))
+    } 
   
-  #Calculate the threshold:
-  threshold <- median(plotting_positions$Difference, na.rm = TRUE)
+    #Calculate the threshold:
+    threshold <- median(plotting_positions$Difference, na.rm = TRUE)
 
-  #Calculate fold change:
-  plotting_positions$Score <- plotting_positions$Difference/threshold
-  plotting_positions$Modified_ZScore <- (plotting_positions$Score-median(plotting_positions$Score, na.rm = TRUE))/sd(plotting_positions$Score, na.rm = TRUE)
+    #Calculate fold change:
+    plotting_positions$Score <- plotting_positions$Difference/threshold
+    plotting_positions$Modified_ZScore <- (plotting_positions$Score-median(plotting_positions$Score, na.rm = TRUE))/sd(plotting_positions$Score, na.rm = TRUE)
   
-  #Format data for plotting:
-  plotting_positions <- plotting_positions[,c(1,2,5,4,6)]
+    #Format data for plotting:
+    plotting_positions <- plotting_positions[,c(1,2,5,4,6)]
   
-  #Extract significant positions:
-  significant_positions <- subset(plotting_positions, Modified_ZScore>MZS_thr)
+    #Extract significant positions:
+    significant_positions <- subset(plotting_positions, Modified_ZScore>MZS_thr)
+
+  } else {
+    plotting_positions <- data.frame(Reference= character(), Position=integer(), Difference=double(), Feature=character())
+    significant_positions <- data.frame(Reference= character(), Position=integer(), Difference=double(), Feature=character())
+  }
   
   return(list(plotting_positions,significant_positions))
   
@@ -874,7 +879,7 @@ kmer_analysis <- function (all_ranges, fasta_file, output_name, tracks, annotati
     bedgraph_tracks(all_ranges[,c(1,2,3,8,9,10,11,16)], output_name, color_beds, c('Epinano', 'Nanopolish', 'Tombo', 'Nanocompore', 'NanoConsensus'))
   }
   
-  #If annotation file is provided, calculate distance to the nearest + annotated site: 
+  #If annotation file is provided, calculate distance to the nearest + annotated site:
   if (sup_kmers && length(annotation)!=0){
     all_ranges <- nearest_distance_mod(all_ranges, annotation)
   }
