@@ -152,7 +152,10 @@ workflow {
 	if (params.tombo_lsc == "YES" || params.tombo_msc == "YES") {
 	    tombo_data = tombo_common_flow(fast5_files, ref_file, comparisons)
 	    chromSizes = getChromInfo(ref_file)
-
+            wiggle_msc = Channel.empty()
+            stat_msc   = Channel.empty()
+            stat_lsc   = Channel.empty()
+            wiggle_lsc = Channel.empty()
 		if (params.tombo_msc == "YES") {
 			tombo_msc_flow(tombo_data, ref_file)
 			
