@@ -289,7 +289,7 @@ workflow epinano_flow {
 		comparisons
 		
 	main:	
-	splittedRefs = splitReference(reference).flatten()
+	splittedRefs = splitReference(reference, type).flatten()
     splittedRefs.combine(bams).map{
         def seqname = it[0].baseName
         ["${it[1]}___${seqname}", it[2], it[0]]
