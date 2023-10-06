@@ -52,8 +52,7 @@ nextflow run mop_preprocess.nf -with-singularity -bg -profile local > log
 To upgrade the tool you can type:
 
 ```
-git pull
-git submodule update --init --recursive
+git pull --recurse-submodules
 ```
 
 ## Documentation
