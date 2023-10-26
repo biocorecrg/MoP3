@@ -1,13 +1,13 @@
 params {
-    conffile            = "final_summary_01.txt"
-    fast5               = "$baseDir/../data/**/*.fast5"
+    conffile            = ""
+    fast5               = "$baseDir/test_dem/**/*.fast5"
     fastq               = ""
 
     reference           = "$baseDir/../anno/yeast_rRNA_ref.fa.gz"
     annotation          = ""
     ref_type            = "transcriptome"
 
-    pars_tools          = "$baseDir/tool_opts/drna_tool_splice_opt.tsv"
+    pars_tools          = "$baseDir/tool_opts/cdna_tool_readucks_opt.tsv"
     barcodes            = ""
 
     output              = "$baseDir/output"
@@ -15,13 +15,13 @@ params {
     granularity         = 1
 
     basecalling         = "guppy"
-    GPU                 = "OFF"
-    demultiplexing      = "NO"
-    demulti_fast5       = "NO" 
+    GPU                 = "ON"
+    demultiplexing      = "readucks"
+    demulti_fast5       = "NO"
 
     filtering           = "nanofilt"
 
-    mapping             = "graphmap"
+    mapping             = "minimap2"
     counting            = "nanocount"
     discovery           = "NO"
 
