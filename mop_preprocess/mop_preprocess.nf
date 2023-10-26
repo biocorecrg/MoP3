@@ -290,7 +290,9 @@ workflow flow2 {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(outbc.basecalling_stats)								
 				if (params.demultiplexing == "readucks" ) {
-					fast5_res = extracting_demultiplexed_fast5_readucks(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+					println "################################################################"
+					println "WARNING FAST5 DEMULTIPLEXING NOT IMPLEMENTED WHEN USING READUCKS"
+					println "################################################################"
 				}
 				else {
 					fast5_res = extracting_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
