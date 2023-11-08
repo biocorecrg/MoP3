@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CHANGELOG &mdash; MoP3  documentation</title>
@@ -12,11 +12,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -29,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> MoP3
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MoP3
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -70,8 +74,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>CHANGELOG</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CHANGELOG</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/changelog.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -82,19 +86,18 @@
            <div itemprop="articleBody">
              
   <section id="changelog">
-<span id="home-page-changelog"></span><h1>CHANGELOG<a class="headerlink" href="#changelog" title="Permalink to this heading"></a></h1>
+<span id="home-page-changelog"></span><h1>CHANGELOG<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
 <section id="version-3-0">
-<h2>Version 3.0<a class="headerlink" href="#version-3-0" title="Permalink to this heading"></a></h2>
+<h2>Version 3.0<a class="headerlink" href="#version-3-0" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><dl class="simple">
 <dt>mop_preprocess</dt><dd><ul>
-<li><p>We replaced fastQC with the faster and less memory intensive C++ version named <a class="reference external" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7845152/">falco</a></p></li>
-<li><p>We added a new parameter: <strong>analysis_type</strong>. If set to modDNA it will run guppy and align directly to a reference (using embedded minimap). In this way the information of chemical modifications is correclty stored in the BAM file as MM and MN tags <a class="reference external" href="https://samtools.github.io/hts-specs/SAMtags.pdf">https://samtools.github.io/hts-specs/SAMtags.pdf</a>. Alignment is stored as output as normal.</p></li>
-<li><p>We added a new aligner <a class="reference external" href="https://www.nature.com/articles/s41592-022-01457-8">Winnowmap</a>. It is based on minimap2 but is designed to improve the mapping in the DNA repeats.</p></li>
-<li><p>We added a custom model for m6A RNA basecalling. It is automatically installed when running INSTALL.sh. For using it you need to indicated <a href="#id1"><span class="problematic" id="id2">``</span></a>–pars_tools “drna_tool_splice_m6A_opt.tsv” ``</p></li>
+<li><p>We added a custom model for m6A basecalling. It is automatically installed when running INSTALL.sh. For using it you need to indicated <a href="#id1"><span class="problematic" id="id2">``</span></a>–pars_tools “drna_tool_splice_m6A_opt.tsv” ``</p></li>
 <li><p>We add support to cuda11 for guppy version &gt; 4.4.1. Please note that at certain point Guppy started to separate fastq files in PASS and FAIL, for avoiding this we need to add an extra parameter <strong>–disable_qscore_filtering</strong> in <em>_opt.tsv files. We added two more: **drna_tool_splice_m6A_guppy6_opt.tsv*</em> and <strong>drna_tool_unsplice_guppy6_opt.tsv</strong>.</p></li>
-<li><p>Added readucks for improving demultiplexing with guppy (optional).</p></li>
+<li><p>Added readucks for improving demultiplexing with guppy (optional). <strong>Fast5 won’t be demultiplexed when using readucks!</strong></p></li>
 <li><p>new parameter “barcodes” where you can specify a file with barcodes to be kept. Example in <strong>keep_barcodes.txt</strong></p></li>
+<li><p>Added a new model for direct RNA basecalling</p></li>
+<li><p>Added seq_tagger as a new dRNAseq demultiplexing method. It uses GPU.</p></li>
 </ul>
 </dd>
 </dl>
@@ -109,7 +112,7 @@
 </ul>
 </section>
 <section id="version-2-0">
-<h2>Version 2.0<a class="headerlink" href="#version-2-0" title="Permalink to this heading"></a></h2>
+<h2>Version 2.0<a class="headerlink" href="#version-2-0" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Completely rewritten using the powerful <a class="reference external" href="https://www.nextflow.io/docs/latest/dsl2.html">DSL2</a>.</p></li>
 <li><p>Subworkflows are stored in the independent repository <a class="reference external" href="https://github.com/biocorecrg/BioNextflow">BioNextflow</a>.</p></li>
@@ -151,7 +154,7 @@
 </ul>
 </section>
 <section id="version-1-1">
-<h2>Version 1.1<a class="headerlink" href="#version-1-1" title="Permalink to this heading"></a></h2>
+<h2>Version 1.1<a class="headerlink" href="#version-1-1" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Added a new module called NanoPreprocessSimple that starts from fastq files instead of fast5 files. It allows the analysis of multiple files at a time.</p></li>
 <li><p>Added support to vbz compressed fast5 <a class="reference external" href="https://github.com/nanoporetech/vbz_compression">https://github.com/nanoporetech/vbz_compression</a> in NanoPreprocess, NanoMod and NanoTail</p></li>
@@ -165,7 +168,7 @@
 </ul>
 </section>
 <section id="version-1-0">
-<h2>Version 1.0<a class="headerlink" href="#version-1-0" title="Permalink to this heading"></a></h2>
+<h2>Version 1.0<a class="headerlink" href="#version-1-0" title="Link to this heading"></a></h2>
 <p>This is the original version published in the paper <a class="reference external" href="https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full">MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets</a></p>
 </section>
 </section>
