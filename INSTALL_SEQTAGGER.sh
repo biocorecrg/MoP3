@@ -14,7 +14,7 @@ if [ x"$2" == x ]; then
         exit
 fi
 
-wget $1:$2@https://public-docs.crg.es/biocore/projects/mop3/SeqTagger.tar.gz
+wget --user $1 --password $2 https://public-docs.crg.es/biocore/projects/mop3/SeqTagger.tar.gz
 tar -zvxf SeqTagger.tar.gz
 mv SeqTagger/* mop_preprocess/bin/
 rm SeqTagger.tar.gz
