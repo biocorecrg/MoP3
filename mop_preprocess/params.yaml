@@ -1,0 +1,42 @@
+# Parameters
+
+# Needed for fast5 input
+fast5: "$projectDir/../data/**/*.fast5"
+## This can be empty but then you need to add specify kit and flowcell via command line inside pars_tools
+conffile: "final_summary_01.txt"
+## Can be wither guppy or dorado
+basecalling: "guppy"
+## Can be OFF / cuda10 / cuda11 
+GPU: "OFF"
+demultiplexing: "NO"
+demulti_fast5: "NO"
+### Number of fast5 basecalled per parallel job
+granularity: 1
+
+# Needed for fastq input
+fastq: ""
+
+# Common
+reference: "$projectDir/../anno/yeast_rRNA_ref.fa.gz"
+## Can be transcriptome / genome
+ref_type: "transcriptome"
+annotation: ""
+## command line options
+pars_tools: "drna_tool_splice_opt.tsv" 
+## Cut off quality for QC
+qualityqc: 5
+## Can be nanoq / nanofilt
+filtering: "nanoq"
+## Can be graphmap / graphmap2 / minimap2 / bwa
+mapping: "graphmap"
+## Can be nanocount for transcriptome / htseq for genome
+counting: "nanocount"
+## Can be NO / bambu / isoquant
+discovery: "NO"
+## Convert bam to cram
+cram_conv: "YES"
+subsampling_cram: 50
+saveSpace: "NO"
+hook: ""
+email: ""
+output: "${projectDir}/outfolder"
