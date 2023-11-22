@@ -84,6 +84,7 @@ config_report = file("$baseDir/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
 logo = file("$baseDir/../img/logo_small.png")
 Channel.fromPath( "$baseDir/deeplexicon/*.h5").set{deepmodels}
+Channel.fromPath( "$baseDir/seqtagger_models").set{seqtagger_models}
 
 
 
@@ -143,9 +144,9 @@ else outmode = "copy"
 // Check the outmode with guppy and read-ducks!
 
 
-include { RNA2DNA; preparing_demultiplexing_fast5_deeplexicon; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
-include { extracting_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUTF5: outputFast5, OUTPUTST: outputQual, LABEL: 'big_cpus')
-include { extracting_demultiplexed_fast5_guppy } from "${local_modules}" addParams(OUTPUT: outputFast5, LABEL: 'big_cpus')
+include { RNA2DNA; preparing_demultiplexing_fast5_seqtagger; preparing_demultiplexing_fast5_deeplexicon; extract_seqtagger_fastq; extract_deeplexicon_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+include { extract_demultiplexed_fast5 as extract_demultiplexed_fast5_seqtagger;  extract_demultiplexed_fast5 as extract_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUTF5: outputFast5, OUTPUTST: outputQual, LABEL: 'big_cpus')
+include { extract_demultiplexed_fast5_guppy } from "${local_modules}" addParams(OUTPUT: outputFast5, LABEL: 'big_cpus')
 
 def guppypars = parseFinalSummary(params.conffile)
 
@@ -169,6 +170,8 @@ if (params.barcodes != "") {
 
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as READUCKS_DEMULTIPLEX } from "${subworkflowsDir}/demultiplexing/readucks" addParams(EXTRAPARS: progPars["demultiplexing--readucks"], LABEL: 'big_cpus', OUTPUT: output_bc, OUTPUTMODE: outmode)
+include { DEMULTIPLEX as SEQTAGGER_DEMULTIPLEX } from "${subworkflowsDir}/demultiplexing/seq_tagger" addParams(EXTRAPARS: progPars["demultiplexing--seqtagger"], LABEL: 'demulti_gpus', OUTPUT: output_bc)
+
 include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU: gpu)
 include { GET_VERSION as NANOFILT_VER; FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
 include { GET_VERSION as NANOQ_VER; FILTER as NANOQ_FILTER} from "${subworkflowsDir}/trimming/nanoq" addParams(EXTRAPARS: progPars["filtering--nanoq"])
@@ -207,7 +210,7 @@ include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
 include { bam2Cram } from "${local_modules}" addParams(OUTPUT:outputCRAM, LABEL: 'big_cpus_ignore')
 
 /*
-* Simple flow of basecalling
+* Simple flow of basecalling and filtering
 */
 workflow flow1 {
     take: 
@@ -217,15 +220,14 @@ workflow flow1 {
         basecalled_fastq = outbc.basecalled_fastq
 
         // Optional fastq filtering 
-        if (params.filtering == "nanofilt") {
+        switch(params.filtering) {                      
+          case "nanofilt": 
             basecalled_fastq = NANOFILT_FILTER(outbc.basecalled_fastq)
-            //basecalled_fastq = reshapeSamples(nanofilt.out)
-        } else if (params.filtering == "nanoq") {
+            break; 
+          case "nanoq": 
             basecalled_fastq = NANOQ_FILTER(outbc.basecalled_fastq)
-            //basecalled_fastq = reshapeSamples(nanofilt.out)
-        }
-        
-        //bc_fastq = reshapeSamples(basecalled_fastq)
+            break; 
+        }   
         bc_fast5 = reshapeSamples(outbc.basecalled_fast5)
         bc_stats = reshapeSamples(outbc.basecalling_stats)
 
@@ -237,13 +239,14 @@ workflow flow1 {
 }
 
 /*
-*  Basecalling and Demultiplexing
+*  Flow of basecalling and demultiplexing, followed by filter and QC
 */
 
-workflow flow2 {        
+workflow flow2 {
     take: 
         fast5_4_analysis
         barcodes_to_include
+        
     main:
         // IF DEMULTIPLEXING IS DEEPLEXICON 
         if(params.demultiplexing == "deeplexicon") {
@@ -257,11 +260,9 @@ workflow flow2 {
                 basecalledbc = reshapeSamples(outbc.basecalled_fast5)
                 alldemux = reshapeSamples(demux)                
                 
-                //data_for_demux = alldemux.groupTuple().join(basecalledbc.transpose().groupTuple())
                 prep_demux = preparing_demultiplexing_fast5_deeplexicon(alldemux.groupTuple()).transpose()
-                data_for_demux = prep_demux.combine(basecalledbc.transpose().groupTuple(),  by: 0)
-                
-                extracting_demultiplexed_fast5_deeplexicon(data_for_demux)
+                data_for_demux = prep_demux.combine(basecalledbc.transpose().groupTuple(),  by: 0)              
+                extract_demultiplexed_fast5_deeplexicon(data_for_demux)
                 
                 // OPTIONAL CLEANING FASTQ5 FILES
                 if (params.saveSpace == "YES") {
@@ -269,7 +270,7 @@ workflow flow2 {
                 }
             }
         // Demultiplex fastq    
-            demufq = extracting_demultiplexed_fastq(demux.join(outbc.basecalled_fastq))
+            demufq = extract_deeplexicon_fastq(demux.join(outbc.basecalled_fastq))
 
         } else if (params.demultiplexing == "guppy" || params.demultiplexing == "readucks") {
             // IF DEMULTIPLEXING IS GUPPY   
@@ -281,7 +282,6 @@ workflow flow2 {
             if (params.demultiplexing == "readucks" ) {
                 read_demufq = READUCKS_DEMULTIPLEX(demufq)
                 demufq = read_demufq
-                //read_demufq.view()
             }
             
 
@@ -289,22 +289,38 @@ workflow flow2 {
             if (demulti_fast5_opt == "ON" ) {
                 basecalledbc = reshapeSamples(outbc.basecalled_fast5)
                 alldemux = reshapeSamples(outbc.basecalling_stats)                              
-                if (params.demultiplexing == "readucks" ) {
+                if (params.demultiplexing == "readucks" || params.demultiplexing == "seqtagger") {
                     println "################################################################"
                     println "WARNING FAST5 DEMULTIPLEXING NOT IMPLEMENTED WHEN USING READUCKS"
                     println "################################################################"
-                }
-                else {
-                    fast5_res = extracting_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+                } else {
+                    fast5_res = extract_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
                 }
                 // OPTIONAL CLEANING FASTQ5 FILES
                 fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
             }
-        } 
-        
+        } else if (params.demultiplexing == "seqtagger" ) {
+            outbc = GUPPY_BASECALL(fast5_4_analysis)
+            fast5_res = outbc.basecalled_fast5
+
+            demux = SEQTAGGER_DEMULTIPLEX(fast5_4_analysis, seqtagger_models)
+            demufq = extract_seqtagger_fastq(demux.join(outbc.basecalled_fastq))
+
+            // Optional demultiplex fast5       
+            if (demulti_fast5_opt == "ON") {
+
+                basecalledbc = reshapeSamples(outbc.basecalled_fast5)
+                alldemux = reshapeSamples(demux)                
+                prep_demux = preparing_demultiplexing_fast5_seqtagger(alldemux.groupTuple()).transpose()
+                data_for_demux = prep_demux.combine(basecalledbc.transpose().groupTuple(),  by: 0)
+                extract_demultiplexed_fast5_seqtagger(data_for_demux)
+                
+            }
+
+        }
         
         reshapedPrefiltDemufq = demufq.transpose().map{
-            [it[1].name.replace(".fastq.gz", ""), it[1] ]
+            [it[1].name.replace(".fastq.gz", "").replace(".fq.gz", ""), it[1] ]
         }
         
         if (params.barcodes != "") {    
@@ -684,7 +700,7 @@ else {
         """
         .stripIndent()
 
-        sendMail(to: params.email, subject: "Master of Pore 2 execution", body: msg, attach: "${outputMultiQC}/multiqc_report.html")
+        sendMail(to: params.email, subject: "Master of Pore 3 execution", body: msg, attach: "${outputMultiQC}/multiqc_report.html")
     }
 }
 
