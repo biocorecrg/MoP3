@@ -6,7 +6,7 @@ params.saveSpace = "NO"
 
 // MODULES 
 // MOP_PREPROCESS
-process extracting_demultiplexed_fastq {
+process extract_deeplexicon_fastq {
     label (params.LABEL)
     tag "${ idfile }"
 			
@@ -21,6 +21,46 @@ process extracting_demultiplexed_fastq {
 	"""
 		extract_sequence_from_fastq.py ${demux} ${fastq}
 		for i in *.fastq; do gzip \$i; done
+	"""
+}
+
+process extract_seqtagger_fastq {
+
+    tag { idfile }
+    label (params.LABEL)
+
+   // container params.CONTAINER
+             
+ 	input:
+	tuple val(idfile), path(demux), path(fastq) 
+	
+	
+	output:
+	tuple val(idfile), path ("*.fq.gz")
+
+	script:
+	"""
+		fastq_split_by_barcode.py -b 50 -i ${demux} -f ${fastq} -o ${idfile}
+	"""
+	
+}
+
+process preparing_demultiplexing_fast5_seqtagger {
+
+    label (params.LABEL)
+    tag "${ idfile }"
+		
+	input:
+	tuple val(idfile), path("demux_*")
+
+	output:
+	tuple val(idfile), path("*.list")
+
+	
+	script:
+	"""
+	zcat demux_* | grep -v read_id >> dem.files
+	awk '{if (\$5>=50) { print \$1 > "bc_"\$3".list" }}' dem.files
 	"""
 }
 
@@ -43,7 +83,7 @@ process preparing_demultiplexing_fast5_deeplexicon {
 	"""
 }
 
-process extracting_demultiplexed_fast5_deeplexicon {
+process extract_demultiplexed_fast5 {
     label (params.LABEL)
 	container 'lpryszcz/deeplexicon:1.2.0'
     tag "${ idfile } on ${ idlist }"
@@ -69,7 +109,7 @@ process extracting_demultiplexed_fast5_deeplexicon {
 	"""
 } 
 
-process extracting_demultiplexed_fast5_readucks {
+process extract_demultiplexed_fast5_readucks {
 
     tag "${ idfile }"
     label (params.LABEL)
@@ -98,7 +138,7 @@ process extracting_demultiplexed_fast5_readucks {
     """
 }
 
-process extracting_demultiplexed_fast5_guppy {
+process extract_demultiplexed_fast5_guppy {
     tag "${ idfile }"
     label (params.LABEL)
     if (params.saveSpace == "YES") publishDir(params.OUTPUT, mode:'move') 
