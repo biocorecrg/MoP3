@@ -1,11 +1,11 @@
 # Parameters
 
 # Needed for fast5 input
-fast5: "${projectDir}/../data/**/*.fast5"
+fast5: ""
 ## This can be empty but then you need to add specify kit and flowcell via command line inside pars_tools
-conffile: "final_summary_01.txt"
+conffile: ""
 ## Can be wither guppy or dorado
-basecalling: "guppy"
+basecalling: ""
 ## Can be OFF / cuda10 / cuda11. Newer version of GUPPY may require cuda11 
 GPU: "OFF"
 demultiplexing: "NO"
@@ -16,7 +16,7 @@ granularity: 1
 barcodes: ""
 
 # Needed for fastq input
-fastq: ""
+fastq: "${projectDir}/../data/fastq/*.fq.gz"
 
 # Common
 reference: "${projectDir}/../anno/yeast_rRNA_ref.fa.gz"
@@ -38,7 +38,6 @@ discovery: "NO"
 ## Convert bam to cram
 cram_conv: "YES"
 subsampling_cram: 50
-saveSpace: "NO"
 hook: ""
 email: ""
-output: "${projectDir}/outfolder"
+output: "${projectDir}/outfolder_fq"
