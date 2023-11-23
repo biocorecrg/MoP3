@@ -8,7 +8,7 @@ nextflow.enable.dsl=2
  */
 
 // Pipeline version
-version = '2.0'
+version = '3.0'
 
 params.help            = false
 params.resume          = false
@@ -20,7 +20,7 @@ log.info """
 ╩ ╩╚═╝╩    ╩  ┴└─└─┘┴  ┴└─└─┘└─┘└─┘└─┘└─┘
                                                                                        
 ====================================================
-BIOCORE@CRG Master of Pores 2. Preprocessing - N F  ~  version ${version}
+BIOCORE@CRG Master of Pores 3. Preprocessing - N F  ~  version ${version}
 ====================================================
 
 conffile                  : ${params.conffile}
@@ -54,9 +54,6 @@ discovery                 : ${params.discovery}
 cram_conv                 : ${params.cram_conv}
 subsampling_cram          : ${params.subsampling_cram}
 
-
-saveSpace                 : ${params.saveSpace}
-
 email                     : ${params.email}
 """
 
@@ -64,46 +61,35 @@ email                     : ${params.email}
 if (params.help) exit 1
 if (params.resume) exit 1, "Are you making the classical --resume typo? Be careful!!!! ;)"
 
-// check multi5 and GPU usage. GPU maybe can be removed as param if there is a way to detect it
-if (params.GPU != "cuda11" && params.GPU != "cuda10" && params.GPU != "OFF" && params.GPU != "ON") exit 1, "Please specify cuda11, cuda10, ON or OFF if GPU processors are available. ON is legacy for cuda10"
-
 // include functions, outdirs from other files
 evaluate(new File("../outdirs.nf"))
-def local_modules = file("$baseDir/../local_modules.nf")
-def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
-joinScript = file("$baseDir/bin/join.r")
+def local_modules = file("${projectDir}/../local_modules.nf")
+def subworkflowsDir = "${projectDir}/../BioNextflow/subworkflows"
+joinScript = file("${projectDir}/bin/join.r")
 
-// check input files
+// get and check input files
 if (params.mapping != "NO") {
     reference = file(params.reference)
     if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
 } else {
     reference = ""
 }
-config_report = file("$baseDir/config.yaml")
+
+config_report = file("${projectDir}/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
-logo = file("$baseDir/../img/logo_small.png")
-Channel.fromPath( "$baseDir/deeplexicon/*.h5").set{deepmodels}
-Channel.fromPath( "$baseDir/seqtagger_models").set{seqtagger_models}
+logo = file("${projectDir}/../img/logo_small.png")
 
-
+Channel.fromPath( "${projectDir}/deeplexicon/*.h5").set{deepmodels}
+Channel.fromPath( "${projectDir}/seqtagger_models").set{seqtagger_models}
 
 Channel
     .from( config_report, logo )
     .collect().set{multiqc_info}
 
-
+// check GPU usage. 
+if (params.GPU != "cuda11" && params.GPU != "cuda10" && params.GPU != "OFF" && params.GPU != "ON") exit 1, "Please specify cuda11, cuda10, ON or OFF if GPU processors are available. ON is legacy for cuda10"
 def gpu = (params.GPU != 'OFF' ? 'ON' : 'OFF')
 def cuda_cont = (params.GPU == 'cuda11' ? 'biocorecrg/mopbasecallc11:0.3' : 'biocorecrg/mopbasecall:0.3')
-
-def tools = [:]
-tools["basecalling"] = params.basecalling
-tools["demultiplexing"] = params.demultiplexing
-tools["mapping"] = params.mapping
-tools["filtering"] = params.filtering
-tools["counting"] = params.counting
-tools["discovery"] = params.discovery
-//tools["variantcall"] = params.variantcall
 
 // Output files
 outputReport   = file("${outputMultiQC}/multiqc_report.html")
@@ -116,17 +102,13 @@ if( outputReport.exists() ) {
   outputReport.moveTo("${outputMultiQC}/multiqc_report.html.old")
 }
 
-/*
-* This is default value in case guppy will be used for RNA demultiplexing
-*/
-params.barcodekit = ""
-
 if (params.ref_type == "genome") {
     if (params.annotation != "") {
         annotation = file(params.annotation)
         if( !annotation.exists() ) exit 1, "Missing annotation file: ${params.annotation}!"
     }
 }
+
 def demulti_fast5_opt = "OFF"
 if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
     demulti_fast5_opt = "ON"
@@ -138,36 +120,42 @@ def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
 def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
 
 
-if (params.saveSpace == "YES") outmode = "move"
-else outmode = "copy"
+outmode = "copy"
 
-// Check the outmode with guppy and read-ducks!
-
-
-include { RNA2DNA; preparing_demultiplexing_fast5_seqtagger; preparing_demultiplexing_fast5_deeplexicon; extract_seqtagger_fastq; extract_deeplexicon_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+include { get_barcode_list; RNA2DNA; preparing_demultiplexing_fast5_seqtagger; preparing_demultiplexing_fast5_deeplexicon; extract_seqtagger_fastq; extract_deeplexicon_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
 include { extract_demultiplexed_fast5 as extract_demultiplexed_fast5_seqtagger;  extract_demultiplexed_fast5 as extract_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUTF5: outputFast5, OUTPUTST: outputQual, LABEL: 'big_cpus')
 include { extract_demultiplexed_fast5_guppy } from "${local_modules}" addParams(OUTPUT: outputFast5, LABEL: 'big_cpus')
 
-def guppypars = parseFinalSummary(params.conffile)
+def guppypars = ""
+// GET PROGRAM PARS AND VERIFY 
+def tools = [:]
+tools["basecalling"] = params.basecalling
+tools["demultiplexing"] = params.demultiplexing
+tools["mapping"] = params.mapping
+tools["filtering"] = params.filtering
+tools["counting"] = params.counting
+tools["discovery"] = params.discovery
 
-// Create a channel for tool options
-if (workflow.profile == "awsbatch") guppypars = guppypars + " --data_path /nextflow-bin/ont-guppy/data"
-progPars = getParameters(params.pars_tools)
-def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
-
-// Create a channel for excluded ids
-if (params.barcodes != "") {
-    barcodes_to_include = file(params.barcodes)
-    if( !barcodes_to_include.exists() ) exit 1, "Missing barcodes_to_include file: ${params.barcodes}!"
-    Channel.from(barcodes_to_include.readLines())
-    .map { line ->
-        [ line ]
-    }.set{ barcodes_to_include}
+// Remove  basecalling and demultiplexing in case of fastq input
+if(params.fast5 == "" && params.fastq != "") {
+    tools["basecalling"] = "NO"
+    tools["demultiplexing"] = "NO"
 } else {
-    barcodes_to_include = Channel.empty()
+    guppypars = parseFinalSummary(params.conffile)
+    // Create a channel for tool options
+    if (workflow.profile == "awsbatch") guppypars = guppypars + " --data_path /nextflow-bin/ont-guppy/data"
 }
 
+progPars = getParameters(params.pars_tools)
+checkTools(tools, progPars)
 
+// Create a channel for excluded ids
+barcodes_to_include = get_barcode_list(params.barcodes)
+
+def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
+
+// INCLUDE MODULES / SUBWORKFLOWS
+include { final_message; notify_slack } from "${subworkflowsDir}/global_functions.nf"
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as READUCKS_DEMULTIPLEX } from "${subworkflowsDir}/demultiplexing/readucks" addParams(EXTRAPARS: progPars["demultiplexing--readucks"], LABEL: 'big_cpus', OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as SEQTAGGER_DEMULTIPLEX } from "${subworkflowsDir}/demultiplexing/seq_tagger" addParams(EXTRAPARS: progPars["demultiplexing--seqtagger"], LABEL: 'demulti_gpus', OUTPUT: output_bc)
@@ -208,6 +196,7 @@ include { bam2stats; countStats; joinCountStats; joinAlnStats} from "${local_mod
 include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as fast5CleanFile} from "${local_modules}"
 include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
 include { bam2Cram } from "${local_modules}" addParams(OUTPUT:outputCRAM, LABEL: 'big_cpus_ignore')
+include { getFast5 } from "${local_modules}" 
 
 /*
 * Simple flow of basecalling and filtering
@@ -239,7 +228,7 @@ workflow flow1 {
 }
 
 /*
-*  Flow of basecalling and demultiplexing, followed by filter and QC
+*  Flow of basecalling and demultiplexing, followed by filtering 
 */
 
 workflow flow2 {
@@ -264,12 +253,8 @@ workflow flow2 {
                 data_for_demux = prep_demux.combine(basecalledbc.transpose().groupTuple(),  by: 0)              
                 extract_demultiplexed_fast5_deeplexicon(data_for_demux)
                 
-                // OPTIONAL CLEANING FASTQ5 FILES
-                if (params.saveSpace == "YES") {
-                    fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
-                }
             }
-        // Demultiplex fastq    
+            // Demultiplex fastq    
             demufq = extract_deeplexicon_fastq(demux.join(outbc.basecalled_fastq))
 
         } else if (params.demultiplexing == "guppy" || params.demultiplexing == "readucks") {
@@ -343,14 +328,10 @@ workflow flow2 {
             nanofilt = NANOFILT_FILTER(reshapedDemufq)
             reshapedDemufq = nanofilt
         } else if (params.filtering == "nanoq") {
-            //nanofilt = NANOQ_FILTER(outbc.basecalled_fastq)
-            //basecalled_fastq = reshapeSamples(nanofilt.out)
             nanofilt = NANOQ_FILTER(reshapedDemufq)
-//          reshapedDemufq = nanofilt
         }
     emit:
         basecalled_fast5 =  fast5_res
-        //basecalled_fastq = basecalled_fastq_res
         basecalled_fastq = reshapedDemufq
         basecalled_stats = basecalled_stats
             
@@ -400,10 +381,9 @@ workflow preprocess_flow {
 
         }    
 
-        // Concatenate bamfiles
+        // Concatenate bamfiles differently depending on if demultiplexed or not
         if (params.demultiplexing == "NO" ) reshaped_aln_reads = reshapeSamples(aln_reads)
         else reshaped_aln_reads = reshapeDemuxSamples(aln_reads)
-
         jaln_reads = SAMTOOLS_CAT(reshaped_aln_reads.groupTuple())
 
         // Perform SORTING and INDEXING on bam files
@@ -415,10 +395,6 @@ workflow preprocess_flow {
             good_ref = checkRef(reference)
             bam2Cram(good_ref, params.subsampling_cram, sorted_alns.join(aln_indexes))
         }
-        // OPTIONAL CLEANING BAM FILES
-        if (params.saveSpace == "YES") {
-            bamCleanFile(reshaped_aln_reads.groupTuple(), jaln_reads.map{it[1]}.collect(), ".bam")
-        }
         // Perform bam2stats on sorted bams
         aln_stats = bam2stats(sorted_alns)
         stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
@@ -428,20 +404,15 @@ workflow preprocess_flow {
         multiqc_data = multiqc_data.mix(stats_aln)
     }   
 
-    // Concatenate fastq files
+    // Concatenate fastq files differently depending on if demultiplexed or not
     if (params.demultiplexing == "NO" ) reshaped_bc_fastq = reshapeSamples(bc_fastq)
     else reshaped_bc_fastq = reshapeDemuxSamples(bc_fastq)
-
     fastq_files = concatenateFastQFiles(reshaped_bc_fastq.groupTuple())
 
     // Perform fastqc QC on fastq
     fastqc_files = FASTQC(fastq_files)
     multiqc_data = multiqc_data.mix(fastqc_files.map{it[1]})
 
-    // OPTIONAL CLEANING FASTQC FILES
-    if (params.saveSpace == "YES") {
-        fastqCleanFile(reshaped_bc_fastq.groupTuple(), fastq_files.map{it[1]}.collect().mix(fastqc_files.map{it[1]}.collect(), jaln_reads.map{it[1]}.collect()).collect(), ".gz")
-    }
     // OPTIONAL Perform COUNTING / ASSIGNMENT
     if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
         read_counts = NANOCOUNT(sorted_alns.join(aln_indexes))
@@ -507,10 +478,9 @@ workflow preprocess_flow {
 
 workflow preprocess_simple {
     take:
-        bc_fastq
+    bc_fastq
         
     main:   
-
     // Perform Fastqc QC on fastq
     fastqc_files = FASTQC(bc_fastq)
 
@@ -524,12 +494,12 @@ workflow preprocess_simple {
         switch(params.mapping) { 
             case "graphmap": 
             dna_bc_fastq = RNA2DNA(bc_fastq)
-                        aln_reads = GRAPHMAP(dna_bc_fastq, reference)
+            aln_reads = GRAPHMAP(dna_bc_fastq, reference)
             break
             case "graphmap2": 
             aln_reads = GRAPHMAP2(bc_fastq, reference)
             break
-                        case "minimap2": 
+            case "minimap2": 
             aln_reads = MINIMAP2(bc_fastq, reference)
             break
             case "bwa": 
@@ -566,7 +536,7 @@ workflow preprocess_simple {
     // OPTIONAL Perform COUNTING / ASSIGNMENT
     if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
         read_counts = NANOCOUNT(sorted_alns.join(aln_indexes))
-                //read_counts = NANOCOUNT(sorted_alns)
+    //read_counts = NANOCOUNT(sorted_alns)
         assignments = AssignReads(sorted_alns, "nanocount")
         stat_counts = countStats(assignments)
         stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
@@ -601,51 +571,22 @@ workflow preprocess_simple {
 
 
  workflow {
+    // INPUT IS FAST5
     if (params.fast5 != "" && params.fastq == "") {
-
-        Channel
-            .fromPath( params.fast5)                                             
-            .ifEmpty { error "Cannot find any file matching: ${params.fast5}" }
-            .set {fast5_files}
-
-        fast5_files.map { 
-            def filepath = file(it)
-            def file_parts = "${filepath}".tokenize("/")
-            def folder_name  = filepath[-2]
-            [folder_name, it]
-        }.groupTuple().set{ fast5_per_folder}
-    
-        // Check tools
-        checkTools(tools, progPars)
-
-        def num = 0
-        fast5_per_folder.map{
-            def folder_name = it[0]
-            def buffer_files = it[1].flatten().collate(params.granularity)
-            [folder_name, buffer_files]
-        }.transpose().map{
-            num++ 
-            [ "${it[0]}---${num}", it[1] ]
-        }.set{ fast5_4_analysis }
+        
+        fast5_4_analysis = getFast5(params.fast5)
 
         //GET_WORKFLOWS(params.flowcell, params.kit).view()
-        if (params.basecalling == "guppy" && params.demultiplexing == "NO" ) outf = flow1(fast5_4_analysis)
+        if (params.demultiplexing == "NO" ) outf = flow1(fast5_4_analysis)
         else outf = flow2(fast5_4_analysis, barcodes_to_include)
         
-        def bc_fast5 = outf.basecalled_fast5
-        def bc_fastq = outf.basecalled_fastq
-        def basecalled_stats = outf.basecalled_stats
-        preprocess_flow(bc_fast5, bc_fastq, basecalled_stats)
+        preprocess_flow(outf.basecalled_fast5, outf.basecalled_fastq, outf.basecalled_stats)
         
     } else if(params.fast5 == "" && params.fastq != "") {
 
-        // Check tools
-        tools["basecalling"] = "NO"
-        tools["demultiplexing"] = "NO"
-        checkTools(tools, progPars)
         Channel.fromFilePairs( params.fastq , size: 1)
-            .ifEmpty { error "Cannot find any file matching: ${params.fastq}" }
-            .set {fastq_files}
+               .ifEmpty { error "Cannot find any file matching: ${params.fastq}" }
+               .set {fastq_files}
         
         preprocess_simple(fastq_files)
     
@@ -668,12 +609,14 @@ workflow preprocess_simple {
  
  }
 
+
 workflow.onComplete {
-    println "Pipeline BIOCORE@CRG Master of Pore - preprocess completed!"
-    println "Started at  $workflow.start" 
-    println "Finished at $workflow.complete"
-    println "Time elapsed: $workflow.duration"
-    println "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
+
+    def text = final_message("MoP3")
+    println text
+    if (params.hook != "") {
+       notify_slack(text, params.hook)
+    }
 }
 
 /*
@@ -687,21 +630,7 @@ else {
     log.info "Sending the email to ${params.email}\n"
 
     workflow.onComplete {
-
-    def msg = """\
-        Pipeline BIOCORE@CRG Master of Pore 2 preprocess execution summary
-        ---------------------------
-        Completed at: ${workflow.complete}
-        Duration    : ${workflow.duration}
-        Success     : ${workflow.success}
-        workDir     : ${workflow.workDir}
-        exit status : ${workflow.exitStatus}
-        Error report: ${workflow.errorReport ?: '-'}
-        """
-        .stripIndent()
-
-        sendMail(to: params.email, subject: "Master of Pore 3 execution", body: msg, attach: "${outputMultiQC}/multiqc_report.html")
+ 	   def msg = final_message("MoP3")	
+        sendMail(to: params.email, subject: "MoP3 - preprocess execution", body: msg, attach: "${outputMultiQC}/multiqc_report.html")
     }
 }
-
-
