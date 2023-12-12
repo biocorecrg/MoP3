@@ -15,7 +15,7 @@ Version 3.0
    * Added readucks for improving demultiplexing with guppy (optional). 
    * new parameter "barcodes" where you can specify a file with barcodes to be kept. Example in **keep_barcodes.txt**
    * Adding a new model for direct RNA basecalling
-   * ...
+   * Added seqTagger
    
 
 
