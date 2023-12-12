@@ -20,6 +20,11 @@ else
 fi
 
 tar -zvxf ont-guppy_${GUPPY_VER}_linux64.tar.gz
+
+wget https://public-docs.crg.es/biocore/projects/mop3/models.tar
+mv models.tar custom_models/
+cd custom_models; tar -xvf  models.tar; rm models.tar; cd ../
+
 for i in custom_models/*.gz; do gzip -cd $i > ont-guppy/data/`basename $i .gz`; done
 mkdir -p ./mop_preprocess/bin/ont-guppy_${GUPPY_VER}
 mv ont-guppy/* ./mop_preprocess/bin/ont-guppy_${GUPPY_VER}
