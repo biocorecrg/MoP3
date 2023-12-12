@@ -21,6 +21,7 @@ Version 3.0
 
 * mop_tail
    * we upgraded tailfindR to version 1.3
+   * Tailfinder can be used either in standard mode or nano3p mode
 
 
 Version 2.0
