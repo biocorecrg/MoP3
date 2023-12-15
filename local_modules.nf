@@ -938,6 +938,13 @@ def reshapeSamples(inputChannel) {
 	return(reshapedChannel)
 }
 
+def homogenizeVals(value) {
+	new_value = value
+	if (value == "ON" || value == "YES" ) new_value = "ON"
+	if (value == "OFF" || value == "NO" ) new_value = "NO"
+	return(new_value)
+}
+
 def mapIDPairs (ids, values) {
 	def combs = ids.combine(values, by:0).map{
 		[it[1], it[0], it[2]]
@@ -945,6 +952,19 @@ def mapIDPairs (ids, values) {
 		[it[1], it[0], it[2],  it[3]]
 	}
 	return(combs)
+}
+
+def filterBarcodes (reshapedPrefiltDemufq, barcodes_to_include) {
+    reshapedDemufq = reshapedPrefiltDemufq.map{
+    	def id_raw = it[0].split("---")
+    	def id_raw2 = id_raw[1].split("\\.")
+    	def ori_id = "${id_raw[0]}---${id_raw2[1]}"
+    	[ori_id, it]
+    }.join(barcodes_to_include).map{
+        it[1]
+    }
+ 
+	return(reshapedDemufq)
 }
 
 // Create a channel for excluded ids
