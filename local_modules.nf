@@ -876,6 +876,24 @@ process nanoConsensus {
 * COMMON FUNCTIONS
 */
 
+// Check the input of mop_preprocess
+def checkInput(fast5_par, fastq_par) {
+	def type = ""
+    if (fast5_par != "" && fastq_par == "") {
+    	type = "fast5"
+	} else if(fast5_par == "" && fastq_par != "") {
+		type = "fastq"
+	} else {
+            println "ERROR ################################################################"
+            println "Please choose one between fast5 and fastq as input!!!" 
+            println "ERROR ################################################################"
+            println "Exiting ..."
+            System.exit(0)		
+	}
+	return (type)
+}
+
+
 // Create a hash for tool options
 def getParameters (pars_tools_file) {
 	pars_tools = file(pars_tools_file)

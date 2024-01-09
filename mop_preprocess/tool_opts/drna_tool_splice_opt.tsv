@@ -1,4 +1,5 @@
 #step	tool	extrapars
+basecalling	dorado	"rna002_70bps_hac@v3"
 basecalling	guppy	""
 demultiplexing	deeplexicon	"-f multi -m resnet20-final.h5"
 demultiplexing	guppy	""
