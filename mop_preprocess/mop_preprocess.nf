@@ -95,13 +95,11 @@ Channel.fromPath( "${projectDir}/deeplexicon/*.h5").set{deepmodels}
 Channel.fromPath( "${projectDir}/dorado_models/*", type: 'dir').collect().set{dorado_models}
 Channel.fromPath( "${projectDir}/seqtagger_models").set{seqtagger_models}
 
-dorado_models.view()
 
 // check GPU usage. 
 if (params.GPU != "cuda11" && params.GPU != "cuda10" && params.GPU != "OFF" && params.GPU != "ON") exit 1, "Please specify cuda11, cuda10, ON or OFF if GPU processors are available. ON is legacy for cuda10"
 def gpu = (params.GPU != 'OFF' ? 'ON' : 'OFF')
 def cuda_cont = (params.GPU == 'cuda11' ? 'biocorecrg/mopbasecallc11:0.3' : 'biocorecrg/mopbasecall:0.3')
-
 
 
 // CHECK INCOMPATIBILITIES AMONG PARAMETERS
@@ -115,7 +113,7 @@ if (params.ref_type == "genome") {
 
 outmode = "copy"
 
-include { get_barcode_list; RNA2DNA; preparing_demultiplexing_fast5_seqtagger; preparing_demultiplexing_fast5_deeplexicon; extract_seqtagger_fastq; extract_deeplexicon_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters; homogenizeVals } from "${local_modules}" 
+include { checkInput; get_barcode_list; RNA2DNA; preparing_demultiplexing_fast5_seqtagger; preparing_demultiplexing_fast5_deeplexicon; extract_seqtagger_fastq; extract_deeplexicon_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters; homogenizeVals } from "${local_modules}" 
 include { extract_demultiplexed_fast5 as extract_demultiplexed_fast5_seqtagger;  extract_demultiplexed_fast5 as extract_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUTF5: outputFast5, OUTPUTST: outputQual, LABEL: 'big_cpus')
 include { extract_demultiplexed_fast5_guppy } from "${local_modules}" addParams(OUTPUT: outputFast5, LABEL: 'big_cpus')
 
@@ -255,7 +253,7 @@ workflow BASECALL {
     emit:
        basecalled_fast5 = bc_fast5
        basecalled_fastq = basecalled_fastq
-       basecalling_stats = bc_stats
+       basecalling_stats = basecalling_stats
 }
 
 /*
@@ -319,80 +317,85 @@ workflow DEMULTIPLEX {
         basecalled_fast5 = basecalled_fast5
 }
 
-workflow preprocess_flow {
-    take:
-        bc_fast5
+/*
+* Wrapper for FILTERING
+*/
+workflow SEQFILTER {
+    take: 
+        raw_bc_fastq
+           
+    main:
+    // Optional fastq filtering
+    switch(params.filtering) {                      
+    	case "nanofilt": 
+            bc_fastq = NANOFILT_FILTER(raw_bc_fastq)
+            break; 
+        case "nanoq": 
+            bc_fastq = NANOQ_FILTER(raw_bc_fastq)
+            break;  
+        default:
+            bc_fastq = raw_bc_fastq
+            break;         
+    } 
+
+    emit:
+        out = bc_fastq
+
+}
+
+/*
+* Wrapper for MAPPING
+*/
+workflow MAPPING {
+
+    take: 
         bc_fastq
-        basecalling_stats
-        
-    main:   
-    // Perform MinIONQC on basecalling stats
-    basecall_qc = MinIONQC(basecalling_stats.groupTuple())   
-    multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
+           
+    main:
 
     // Perform mapping on fastq files
     if (params.mapping == "NO") {
         stats_aln = Channel.value() 
         sorted_alns = Channel.value()   
         nanoplot_qcs = Channel.value()  
+        aln_indexes = Channel.value()  
     }
     else {
         switch(params.mapping) { 
             case "graphmap": 
-            //GRAPHMAP cannot align RNA
-            dna_bc_fastq = RNA2DNA(bc_fastq)
-            aln_reads = GRAPHMAP(dna_bc_fastq, reference)
+            //GRAPHMAP cannot align RNA, WE NEED TO CONVERT
+            	dna_bc_fastq = RNA2DNA(bc_fastq)
+            	aln_reads = GRAPHMAP(dna_bc_fastq, reference)
             break
             case "graphmap2": 
-            aln_reads = GRAPHMAP2(bc_fastq, reference)
+            	aln_reads = GRAPHMAP2(bc_fastq, reference)
             break
             case "minimap2": 
-            aln_reads = MINIMAP2(bc_fastq, reference)
+            	aln_reads = MINIMAP2(bc_fastq, reference)
             break
             case "bwa": 
-            aln_reads = BWA(reference, bc_fastq)
+            	aln_reads = BWA(reference, bc_fastq)
             break
             default: 
-            println "ERROR ################################################################"
-            println "${params.mapping} is not a supported alignment"
-            println "ERROR ################################################################"
-            println "Exiting ..."
-            System.exit(0)
             break
 
-        }    
-
-        // Concatenate bamfiles differently depending on if demultiplexed or not
-        if (params.demultiplexing == "NO" ) reshaped_aln_reads = reshapeSamples(aln_reads)
-        else reshaped_aln_reads = reshapeDemuxSamples(aln_reads)
-        jaln_reads = SAMTOOLS_CAT(reshaped_aln_reads.groupTuple())
-
-        // Perform SORTING and INDEXING on bam files
-        sorted_alns = SAMTOOLS_SORT(jaln_reads)
-        aln_indexes = SAMTOOLS_INDEX(sorted_alns)
-
-        // Converting BAM to CRAM and 
-        if (params.cram_conv == "YES") {
-            good_ref = checkRef(reference)
-            bam2Cram(good_ref, params.subsampling_cram, sorted_alns.join(aln_indexes))
         }
-        // Perform bam2stats on sorted bams
-        aln_stats = bam2stats(sorted_alns)
-        stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
-    
-        // Perform NanoPlot on sorted bams
-        nanoplot_qcs = NANOPLOT_QC(sorted_alns)
-        multiqc_data = multiqc_data.mix(stats_aln)
-    }   
+    }    
 
-    // Concatenate fastq files differently depending on if demultiplexed or not
-    if (params.demultiplexing == "NO" ) reshaped_bc_fastq = reshapeSamples(bc_fastq)
-    else reshaped_bc_fastq = reshapeDemuxSamples(bc_fastq)
-    fastq_files = concatenateFastQFiles(reshaped_bc_fastq.groupTuple())
+    emit:
+        out = aln_reads 
+}
 
-    // Perform fastqc QC on fastq
-    fastqc_files = FASTQC(fastq_files)
-    multiqc_data = multiqc_data.mix(fastqc_files.map{it[1]})
+/*
+* Wrapper for COUNTING
+*/
+workflow COUNTING {
+
+    take: 
+        sorted_alns
+        aln_indexes
+        
+    main:
 
     // OPTIONAL Perform COUNTING / ASSIGNMENT
     if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
@@ -400,7 +403,6 @@ workflow preprocess_flow {
         assignments = AssignReads(sorted_alns, "nanocount")
         stat_counts = countStats(assignments)
         stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
-        multiqc_data = multiqc_data.mix(stats_counts)
     }
     else if (params.counting == "htseq" && params.ref_type == "genome") {
         htseq_out = HTSEQ_COUNT(annotation, sorted_alns.join(aln_indexes))
@@ -408,8 +410,8 @@ workflow preprocess_flow {
         assignments = AssignReads(htseq_out.bam, "htseq")
         stat_counts = countStats(assignments)
         stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
-        multiqc_data = multiqc_data.mix(stats_counts)
     } else if (params.counting == "NO") {
+        stats_counts = Channel.value()  
     } else {
         println "ERROR ################################################################"
         println "${params.counting} is not compatible with ${params.ref_type}"
@@ -419,28 +421,47 @@ workflow preprocess_flow {
         println "Exiting ..."
         System.exit(0)
     } 
+
+
+    emit:
+        stats_counts = stats_counts
+ 
+}
+
+
+/*
+* Wrapper for ASSEMBLY
+*/
+workflow ASSEMBLY {
+
+    take: 
+        sorted_alns
+        reference
+        annotation
+           
+    main:
+
     if (params.discovery == "bambu" && params.ref_type == "genome"){
         sorted_alns.map{
             [it[1]]
         }.collect().map{
             ["assembly", it]
         }.set{data_to_bambu}    
-        bambu_out = BAMBU_ASSEMBLE(reference, annotation, data_to_bambu)
+        BAMBU_ASSEMBLE(reference, annotation, data_to_bambu)
     } else if (params.discovery == "isoquant" && params.ref_type == "genome"){
         aln_indexes.map{
             [it[1]]
         }.collect().map{
             ["assembly", it]
-        }.set{ixd_4_bambu}
+        }.set{ixd_4_isoquant}
         
         sorted_alns.map{
             [it[1]]
         }.collect().map{
             ["assembly", it]
-        }.join(ixd_4_bambu).set{data_to_isoquant}
-        //data_to_isoquant.view()
+        }.join(ixd_4_isoquant).set{data_to_isoquant}
     
-        bambu_out = ISOQUANT_ASSEMBLE(reference, annotation, data_to_isoquant)
+        ISOQUANT_ASSEMBLE(reference, annotation, data_to_isoquant)
     } else if (params.discovery == "NO") {
     } else {
         println "ERROR ################################################################"
@@ -450,154 +471,77 @@ workflow preprocess_flow {
         println "Exiting ..."
         System.exit(0)
     }
+}
+
+ workflow {
+ 
+ 	analysis_type = checkInput(params.fast5, params.fastq)
+ 
+    switch(analysis_type) { 
+    case "fast5":
+     	fast5_4_analysis = getFast5(params.fast5)
+    	if (params.demultiplexing == "NO" ) outf = BASECALL(fast5_4_analysis)
+    	else outf = DEMULTIPLEX(fast5_4_analysis)  
+    	
+        // Perform MinIONQC on basecalling stats
+	    basecall_qc = MinIONQC(outf.basecalling_stats.groupTuple())   
+	    multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
+	    bc_fastq = SEQFILTER(outf.basecalled_fastq).out  
+        alns = MAPPING(bc_fastq).out
+	    // Concatenate fastq and BAM files differently depending on if demultiplexed or not
+	    if (params.demultiplexing == "NO" ) {
+	    	reshaped_bc_fastq = reshapeSamples(bc_fastq)
+	    	reshaped_aln_reads = reshapeSamples(alns)
+	    } else {
+		    reshaped_bc_fastq = reshapeDemuxSamples(bc_fastq)
+		    reshaped_aln_reads = reshapeDemuxSamples(alns)
+	    }
+        jaln_reads = SAMTOOLS_CAT(reshaped_aln_reads.groupTuple())
+    	fastq_files = concatenateFastQFiles(reshaped_bc_fastq.groupTuple())
+    	break
+
+    case "fastq":
+    	fastq_files = Channel.fromFilePairs( params.fastq , size: 1, checkIfExists: true)
+        jaln_reads = MAPPING(fastq_files).out
+        multiqc_data = Channel.value()
+    	break
+    }
+
+    // Perform SORTING and INDEXING on bam files
+    sorted_alns = SAMTOOLS_SORT(jaln_reads)
+    aln_indexes = SAMTOOLS_INDEX(sorted_alns)
+
+    // Converting BAM to CRAM and 
+    if (params.cram_conv == "YES") {
+        good_ref = checkRef(reference)
+        bam2Cram(good_ref, params.subsampling_cram, sorted_alns.join(aln_indexes))
+    }
+
+    // Perform bam2stats on sorted bams
+    aln_stats = bam2stats(sorted_alns)
+    stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
+    
+    // Perform NanoPlot on sorted bams
+    nanoplot_qcs = NANOPLOT_QC(sorted_alns)
+
+    // Perform fastqc QC on fastq
+    fastqc_files = FASTQC(fastq_files)
+    multiqc_data = multiqc_data.mix(fastqc_files.map{it[1]})
+
+    stats_counts = COUNTING(sorted_alns, aln_indexes).stats_counts
+    multiqc_data = multiqc_data.mix(stats_counts)
+
+    // REVISE THIS
+    ASSEMBLY(sorted_alns, reference, params.annotation) 
     
     // Perform MULTIQC report
     MULTIQC(multiqc_data.collect())
     
-}
-
-
-workflow preprocess_simple {
-    take:
-    bc_fastq
-        
-    main:   
-    // Perform Fastqc QC on fastq
-    fastqc_files = FASTQC(bc_fastq)
-
-    // Perform mapping on fastq files
-    if (params.mapping == "NO") {
-        stats_aln = Channel.value() 
-        sorted_alns = Channel.value()   
-        nanoplot_qcs = Channel.value()  
-    }
-    else {
-        switch(params.mapping) { 
-            case "graphmap": 
-            dna_bc_fastq = RNA2DNA(bc_fastq)
-            aln_reads = GRAPHMAP(dna_bc_fastq, reference)
-            break
-            case "graphmap2": 
-            aln_reads = GRAPHMAP2(bc_fastq, reference)
-            break
-            case "minimap2": 
-            aln_reads = MINIMAP2(bc_fastq, reference)
-            break
-            case "bwa": 
-            aln_reads = BWA(reference, bc_fastq)
-            break
-            default: 
-            println "ERROR ################################################################"
-            println "${params.mapping} is not a supported alignment"
-            println "ERROR ################################################################"
-            println "Exiting ..."
-            System.exit(0)
-            break
-        }    
-
-        // Perform SORTING and INDEXING on bam files
-        sorted_alns = SAMTOOLS_SORT(aln_reads)
-        aln_indexes = SAMTOOLS_INDEX(sorted_alns)
-
-        // Converting BAM to CRAM and 
-        if (params.cram_conv == "YES") {
-            good_ref = checkRef(reference)
-            bam2Cram(good_ref, params.subsampling_cram, sorted_alns.join(aln_indexes))
-        }
-        
-        // Perform bam2stats on sorted bams
-        aln_stats = bam2stats(sorted_alns)
-        stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
-    
-        // Perform NanoPlot on sorted bams
-        nanoplot_qcs = NANOPLOT_QC(sorted_alns)
-    }   
-
-
-    // OPTIONAL Perform COUNTING / ASSIGNMENT
-    if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
-        read_counts = NANOCOUNT(sorted_alns.join(aln_indexes))
-    //read_counts = NANOCOUNT(sorted_alns)
-        assignments = AssignReads(sorted_alns, "nanocount")
-        stat_counts = countStats(assignments)
-        stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
-    }
-    else if (params.counting == "htseq" && params.ref_type == "genome") {
-        htseq_out = HTSEQ_COUNT(params.annotation, sorted_alns.join(aln_indexes))
-        read_counts = htseq_out.counts
-        assignments = AssignReads(htseq_out.bam, "htseq")
-        stat_counts = countStats(assignments)
-        stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
-    } 
-    else if (params.counting == "NO") {
-        // Default empty channels for reporting
-        stats_counts = Channel.value()
-    } else {
-        println "ERROR ################################################################"
-        println "${params.counting} is not compatible with ${params.ref_type}"
-        println "htseq requires a genome as reference and an annotation in GTF"
-        println "nanocount requires a transcriptome as a reference"     
-        println "ERROR ################################################################"
-        println "Exiting ..."
-        System.exit(0)
-    } 
-    
-
-    // Perform MULTIQC report
-    fastqc_files.map{it[1]}.set{qcs}
-    all_res = qcs.mix(multiqc_info,stats_counts, stats_aln)
-    MULTIQC(all_res.collect())
-    
-}
-
-
- workflow {
- 
-    // INPUT IS FAST5
-    if (params.fast5 != "" && params.fastq == "") {
-        fast5_4_analysis = getFast5(params.fast5)
-        
-        if (params.demultiplexing == "NO" ) outf = BASECALL(fast5_4_analysis)
-        else outf = DEMULTIPLEX(fast5_4_analysis)
-
-       // Optional fastq filtering 
-        switch(params.filtering) {                      
-          case "nanofilt": 
-            basecalled_fastq = NANOFILT_FILTER(outf.basecalled_fastq)
-            break; 
-          case "nanoq": 
-            basecalled_fastq = NANOQ_FILTER(outf.basecalled_fastq)
-            break;  
-          default:
-            basecalled_fastq = outf.basecalled_fastq
-            break;         
-        }   
-        
-        preprocess_flow(outf.basecalled_fast5, basecalled_fastq, outf.basecalling_stats)
-        
-    } else if(params.fast5 == "" && params.fastq != "") {
-    // INPUT IS FASTQ
-        Channel.fromFilePairs( params.fastq , size: 1)
-               .ifEmpty { error "Cannot find any file matching: ${params.fastq}" }
-               .set {fastq_files}
-        
-        preprocess_simple(fastq_files)
-    
-    } else {
-            println "ERROR ################################################################"
-            println "Please choose one between fast5 and fastq as input!!!" 
-            println "ERROR ################################################################"
-            println "Exiting ..."
-            System.exit(0)
-        
-    }
-
     //all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(NANOQ_VER()).mix(NANOFILT_VER())
     //.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
     //.mix(MINIMAP2_VER()).mix(BWA_VER()).mix(FASTQC_VER())
     //.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
     //.collectFile(name: 'tool_version.txt', newLine: false, storeDir:outputMultiQC)
-    
  
  }
 
