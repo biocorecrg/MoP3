@@ -282,7 +282,7 @@ process AssignReads {
     	"""
     else if(tool == "htseq")
     	"""
-			samtools view ${input} | awk '{gsub(/XF:Z:/,"",\$NF); print \$1"\t"\$NF}' |grep -v '__' > ${id}.assigned
+			samtools view ${input} | awk '{if (\$NF>1) {gsub(/XF:Z:/,"",\$NF); print \$1"     "\$NF} }' | awk '{if (\$0!~"__") print }' > ${id}.assigned
     	"""
     else 
         error "Invalid alignment mode: ${tool}"
