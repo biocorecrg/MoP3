@@ -36,7 +36,7 @@ process extract_seqtagger_fastq {
 	
 	
 	output:
-	tuple val(idfile), path ("*.fq.gz")
+	tuple val(idfile), path ("*.fastq.gz")
 
 	script:
 	"""
