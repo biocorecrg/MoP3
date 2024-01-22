@@ -827,12 +827,14 @@ process getChromInfo {
     path(reference)
     
     output:
-    path("chrom.sizes")   
+    path("chrom.sizes"), emit: sizes   
+    stdout emit: chromosomes
        
     script:
 	"""
 	samtools faidx ${reference}
 	cut -f 1,2 ${reference}.fai > chrom.sizes
+	cut -f 1 chrom.sizes
 	"""
 }
 
