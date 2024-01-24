@@ -21,7 +21,7 @@ fi
 
 tar -zvxf ont-guppy_${GUPPY_VER}_linux64.tar.gz
 
-wget https://public-docs.crg.es/biocore/projects/mop3/models.tar
+wget https://biocore.crg.eu/public/mop3_pub/models.tar
 mv models.tar custom_models/
 cd custom_models; tar -xvf  models.tar; rm models.tar; cd ../
 
@@ -30,6 +30,12 @@ mkdir -p ./mop_preprocess/bin/ont-guppy_${GUPPY_VER}
 mv ont-guppy/* ./mop_preprocess/bin/ont-guppy_${GUPPY_VER}
 rmdir ont-guppy
 
+if [ -e "./mop_preprocess/bin/guppy_basecaller" ] ; then
+	rm ./mop_preprocess/bin/guppy_*; rm ./mop_preprocess/bin/lib*
+fi
+if [ -e "./mop_preprocess/bin/MINIMAP2_LICENSE" ] ; then
+        rm ./mop_preprocess/bin/MINIMAP*;
+fi
 cd ./mop_preprocess/bin/
 ln -s ont-guppy_${GUPPY_VER}/bin/guppy_* .
 ln -s ont-guppy_${GUPPY_VER}/lib/* .
