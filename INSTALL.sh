@@ -20,17 +20,35 @@ else
 fi
 
 tar -zvxf ont-guppy_${GUPPY_VER}_linux64.tar.gz
-for i in custom_models/*.gz; do gzip -cd $i > ont-guppy/data/`basename $i .gz`; done
-mv ont-guppy mop_preprocess/bin/
 
-cd mop_preprocess/bin
-ln -s ont-guppy/bin/guppy_* .
-ln -s ont-guppy/lib/* .
-cd ../../
-if [ ! -e "mop_preprocess/bin/ont-guppy/lib/libz.so" ] ; then
-        unlink mop_preprocess/bin/ont-guppy/lib/libz.so
-        cd mop_preprocess/bin/ont-guppy/lib/
-        ln -s libz.so.1 libz.so
-        cd ../../../../
+wget https://biocore.crg.eu/public/mop3_pub/models.tar
+mv models.tar custom_models/
+cd custom_models; tar -xvf  models.tar; rm models.tar; cd ../
+
+for i in custom_models/*.gz; do gzip -cd $i > ont-guppy/data/`basename $i .gz`; done
+mkdir -p ./mop_preprocess/bin/ont-guppy_${GUPPY_VER}
+mv ont-guppy/* ./mop_preprocess/bin/ont-guppy_${GUPPY_VER}
+rmdir ont-guppy
+
+if [ -e "./mop_preprocess/bin/guppy_basecaller" ] ; then
+	rm ./mop_preprocess/bin/guppy_*; rm ./mop_preprocess/bin/lib*
 fi
+if [ -e "./mop_preprocess/bin/MINIMAP2_LICENSE" ] ; then
+        rm ./mop_preprocess/bin/MINIMAP*;
+fi
+cd ./mop_preprocess/bin/
+ln -s ont-guppy_${GUPPY_VER}/bin/guppy_* .
+ln -s ont-guppy_${GUPPY_VER}/lib/* .
+cd ../../
+
+if [ ! -e "./mop_preprocess/bin/ont-guppy_${GUPPY_VER}/lib/libz.so" ] ; then
+	if [ -e "./mop_preprocess/bin/ont-guppy_${GUPPY_VER}/lib/libz.so.1" ] ; then
+        	unlink mop_preprocess/bin/ont-guppy_${GUPPY_VER}/lib/libz.so
+        	cd mop_preprocess/bin/ont-guppy_${GUPPY_VER}/lib/
+        	ln -s libz.so.1 libz.so
+        	cd ../../../../
+	fi
+fi
+
 rm ont-guppy_${GUPPY_VER}_linux64.tar.gz
+

@@ -12,7 +12,7 @@ Version 3.0
 * mop_preprocess
    * We added a custom model for m6A basecalling. It is automatically installed when running INSTALL.sh. For using it you need to indicated ``--pars_tools "drna_tool_splice_m6A_opt.tsv" ``
    * We add support to cuda11 for guppy version > 4.4.1. Please note that at certain point Guppy started to separate fastq files in PASS and FAIL, for avoiding this we need to add an extra parameter **--disable_qscore_filtering** in *_opt.tsv files. We added two more: **drna_tool_splice_m6A_guppy6_opt.tsv** and **drna_tool_unsplice_guppy6_opt.tsv**. 
-   * Added readucks for improving demultiplexing with guppy (optional). 
+   * Added readucks for improving demultiplexing with guppy (optional). **Fast5 won't be demultiplexed when using readucks!** 
    * new parameter "barcodes" where you can specify a file with barcodes to be kept. Example in **keep_barcodes.txt**
    * Adding a `new model for direct RNA basecalling <https://www.biorxiv.org/content/10.1101/2023.11.28.568965v1>`__.
    * Added seqTagger

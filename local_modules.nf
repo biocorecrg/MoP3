@@ -36,7 +36,7 @@ process extract_seqtagger_fastq {
 	
 	
 	output:
-	tuple val(idfile), path ("*.fq.gz")
+	tuple val(idfile), path ("*.fastq.gz")
 
 	script:
 	"""
@@ -282,7 +282,7 @@ process AssignReads {
     	"""
     else if(tool == "htseq")
     	"""
-			samtools view ${input} | awk '{gsub(/XF:Z:/,"",\$NF); print \$1"\t"\$NF}' |grep -v '__' > ${id}.assigned
+			samtools view ${input} | awk '{if (\$NF>1) {gsub(/XF:Z:/,"",\$NF); print \$1"     "\$NF} }' | awk '{if (\$0!~"__") print }' > ${id}.assigned
     	"""
     else 
         error "Invalid alignment mode: ${tool}"
@@ -827,12 +827,14 @@ process getChromInfo {
     path(reference)
     
     output:
-    path("chrom.sizes")   
+    path("chrom.sizes"), emit: sizes   
+    stdout emit: chromosomes
        
     script:
 	"""
 	samtools faidx ${reference}
 	cut -f 1,2 ${reference}.fai > chrom.sizes
+	cut -f 1 chrom.sizes
 	"""
 }
 
@@ -876,10 +878,28 @@ process nanoConsensus {
 * COMMON FUNCTIONS
 */
 
-// Create a channel for tool options
-def getParameters(pars_tools_file) {
-	def pars_tools = file(pars_tools_file)
-	if( !pars_tools.exists() ) exit 1, "Missing tools options config: '$pars_tools'"
+// Check the input of mop_preprocess
+def checkInput(fast5_par, fastq_par) {
+	def type = ""
+    if (fast5_par != "" && fastq_par == "") {
+    	type = "fast5"
+	} else if(fast5_par == "" && fastq_par != "") {
+		type = "fastq"
+	} else {
+            println "ERROR ################################################################"
+            println "Please choose one between fast5 and fastq as input!!!" 
+            println "ERROR ################################################################"
+            println "Exiting ..."
+            System.exit(0)		
+	}
+	return (type)
+}
+
+
+// Create a hash for tool options
+def getParameters (pars_tools_file) {
+	pars_tools = file(pars_tools_file)
+	if( !pars_tools.exists() ) exit 1, "Missing tools options config: '$pars_tools_file'"
 
 	def progPars = [:]
 	def allLines  = pars_tools.readLines()
@@ -938,6 +958,13 @@ def reshapeSamples(inputChannel) {
 	return(reshapedChannel)
 }
 
+def homogenizeVals(value) {
+	new_value = value
+	if (value == "ON" || value == "YES" ) new_value = "ON"
+	if (value == "OFF" || value == "NO" ) new_value = "NO"
+	return(new_value)
+}
+
 def mapIDPairs (ids, values) {
 	def combs = ids.combine(values, by:0).map{
 		[it[1], it[0], it[2]]
@@ -946,6 +973,61 @@ def mapIDPairs (ids, values) {
 	}
 	return(combs)
 }
+
+def filterBarcodes (reshapedPrefiltDemufq, barcodes_to_include) {
+    reshapedDemufq = reshapedPrefiltDemufq.map{
+    	def id_raw = it[0].split("---")
+    	def id_raw2 = id_raw[1].split("\\.")
+    	def ori_id = "${id_raw[0]}---${id_raw2[1]}"
+    	[ori_id, it]
+    }.join(barcodes_to_include).map{
+        it[1]
+    }
+ 
+	return(reshapedDemufq)
+}
+
+// Create a channel for excluded ids
+def get_barcode_list (barcodes) {
+	if (barcodes != "") {
+	    barcodes_to_include = file(barcodes)
+	    if( !barcodes_to_include.exists() ) exit 1, "Missing barcodes_to_include file: ${barcodes}!"
+	    Channel.from(barcodes_to_include.readLines())
+	    .map { line ->
+	        [ line ]
+	    }.set{ barcodes_to_include}
+	} else {
+	    barcodes_to_include = Channel.empty()
+	}
+	return(barcodes_to_include)
+}
+
+// Create a channel for excluded ids
+def  getFast5 (fast5_string_path) {
+
+     fast5_files = Channel.fromPath( fast5_string_path, checkIfExists: true)                                             
+           
+     fast5_per_folder = fast5_files.map { 
+         def filepath = file(it)
+         def file_parts = "${filepath}".tokenize("/")
+         def folder_name  = filepath[-2]
+         [folder_name, it]
+     }.groupTuple()
+    
+     def num = 0
+     fast5_4_analysis = fast5_per_folder.map{
+         def folder_name = it[0]
+         def buffer_files = it[1].flatten().collate(params.granularity)
+         [folder_name, buffer_files]
+     }.transpose().map{
+         num++ 
+         [ "${it[0]}---${num}", it[1] ]
+     }
+        
+    return(fast5_4_analysis)
+}
+
+
 
 def checkTools(tool_names, tool_lists) {
 	println "----------------------CHECK TOOLS -----------------------------"

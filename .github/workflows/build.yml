@@ -20,6 +20,9 @@ jobs:
         java_version: [11]
 
     steps:
+      - name: Delete huge unnecessary tools folder
+        run: rm -rf /opt/hostedtoolcache
+        
       - name: Environment
         run: env | sort
 
