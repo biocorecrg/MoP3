@@ -160,10 +160,8 @@ def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
 
 def basecaller_pars = ["guppy" : guppy_basecall_pars, "dorado" : progPars["basecalling--dorado"] ]
 
-basecaller_pars.println()
-
 // INCLUDE WORKFLOWS
-//include { BASECALL } from "${workflowsDir}/basecaller" addParams(gpu: gpu, label: guppy_basecall_label, extrapars: basecaller_pars, models: "${projectDir}/dorado_models" )
+include { BASECALL } from "${workflowsDir}/basecaller" addParams(gpu: gpu, label: guppy_basecall_label, extrapars: basecaller_pars, models: "${projectDir}/dorado_models" )
 
 
 
@@ -215,7 +213,7 @@ include { bam2Cram } from "${local_modules}" addParams(OUTPUT:outputCRAM, LABEL:
 include { getFast5; filterBarcodes } from "${local_modules}" 
 
 
-// ADD A CHECK FOR GUPPY FOR DISABLING SCORE
+/* ADD A CHECK FOR GUPPY FOR DISABLING SCORE
 
 def separateGuppy (fast5) {
 
@@ -235,7 +233,7 @@ def separateGuppy (fast5) {
 
 /*
 * Wrapper for basecalling
-*/
+
 workflow BASECALL {
     take: 
         fast5_4_analysis
@@ -273,7 +271,7 @@ workflow BASECALL {
        basecalled_fastq = basecalled_fastq
        basecalling_stats = bc_stats
 }
-
+*/
 
 /*
 * Wrapper for demultiplexing
@@ -501,11 +499,18 @@ workflow ASSEMBLY {
     switch(analysis_type) { 
     case "fast5":
      	fast5_4_analysis = getFast5(params.fast5)
-    	if (params.demultiplexing == "NO" ) outf = BASECALL(fast5_4_analysis)
-    	//else outf = DEMULTIPLEX(fast5_4_analysis)  
-    	
+    	if (params.demultiplexing == "NO" ) {
+    		outf = BASECALL(fast5_4_analysis)
+//    		reshaped_fastq = reshapeSamples(outf.basecalled_fastq)
+//   		basecalled_fastq = concatenateFastQFiles(reshaped_fastq.groupTuple())
+			basecalling_stats = reshapeSamples(outf.basecalling_stats)
+			basecalling_fast5 = reshapeSamples(outf.basecalled_fast5)
+  		}
+    	else {
+    		outf = DEMULTIPLEX(fast5_4_analysis)  
+    	}
         // Perform MinIONQC on basecalling stats
-	    basecall_qc = MinIONQC(outf.basecalling_stats.groupTuple())   
+	    basecall_qc = MinIONQC(basecalling_stats.groupTuple())   
 	    multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
 	    bc_fastq = SEQFILTER(outf.basecalled_fastq).out  
         alns = MAPPING(bc_fastq).out
