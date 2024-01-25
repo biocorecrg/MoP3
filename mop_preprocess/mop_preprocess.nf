@@ -65,6 +65,7 @@ if (params.resume) exit 1, "Are you making the classical --resume typo? Be caref
 evaluate(new File("../outdirs.nf"))
 def local_modules = file("${projectDir}/../local_modules.nf")
 def subworkflowsDir = "${projectDir}/../BioNextflow/subworkflows"
+def workflowsDir = "${projectDir}/../BioNextflow/workflows"
 joinScript = file("${projectDir}/bin/join.r")
 
 // get and check input files
@@ -155,13 +156,22 @@ barcodes_to_include = get_barcode_list(params.barcodes)
 include { GET_VERSION as GUPPY_VERSION } from "${subworkflowsDir}/basecalling/guppy" 
 
 def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
-def guppy6_basecall_pars = guppy_basecall_pars + "--disable_qscore_filtering"
+//def guppy6_basecall_pars = guppy_basecall_pars + "--disable_qscore_filtering"
+
+def basecaller_pars = ["guppy" : guppy_basecall_pars, "dorado" : progPars["basecalling--dorado"] ]
+
+basecaller_pars.println()
+
+// INCLUDE WORKFLOWS
+//include { BASECALL } from "${workflowsDir}/basecaller" addParams(gpu: gpu, label: guppy_basecall_label, extrapars: basecaller_pars, models: "${projectDir}/dorado_models" )
+
 
 
 // INCLUDE MODULES / SUBWORKFLOWS
 include { final_message; notify_slack } from "${subworkflowsDir}/global_functions.nf"
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
-include { BASECALL as GUPPY6_BASECALL; BASECALL_DEMULTI as GUPPY6_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy6_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
+include { BASECALL as GUPPY6_BASECALL; BASECALL_DEMULTI as GUPPY6_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(VERSION:"6", EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
+include { BASECALL as GUPPY65_BASECALL; BASECALL_DEMULTI as GUPPY65_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(VERSION:"6.5", EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, CONTAINER: cuda_cont, OUTPUTMODE: outmode)
 include { BASECALL as DORADO_BASECALL } from "${subworkflowsDir}/basecalling/dorado" addParams(EXTRAPARS: progPars["basecalling--dorado"], LABEL: guppy_basecall_label, GPU: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as READUCKS_DEMULTIPLEX } from "${subworkflowsDir}/demultiplexing/readucks" addParams(EXTRAPARS: progPars["demultiplexing--readucks"], LABEL: 'big_cpus', OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as SEQTAGGER_DEMULTIPLEX } from "${subworkflowsDir}/demultiplexing/seq_tagger" addParams(EXTRAPARS: progPars["demultiplexing--seqtagger"], LABEL: 'demulti_gpus', OUTPUT: output_bc)
@@ -211,13 +221,15 @@ def separateGuppy (fast5) {
 
 	data_and_ver = GUPPY_VERSION().map{
         def vals = it.split("\\.")
-    	vals[0] 
-    }.toInteger().combine(fast5)
-		
-    newer = data_and_ver.map{ if (it[0] >= 6) [ it[1], it[2] ]}
+    	"${vals[0]}.${vals[1]}"
+    }.toBigDecimal().combine(fast5)
+	
+	
     older = data_and_ver.map{ if (it[0] < 6 ) [ it[1], it[2] ]}
- 
-    return([newer, older])   
+    middle = data_and_ver.map{ if (it[0] >= 6 && it[0] < 6.5) [ it[1], it[2] ]}
+    newer = data_and_ver.map{ if (it[0] >= 6.5 ) [ it[1], it[2] ]}
+
+    return([newer, middle, older])   
 }
     
 
@@ -231,16 +243,22 @@ workflow BASECALL {
     main:
         switch(params.basecalling) {                      
            case "guppy":
-               (newer, older) = separateGuppy(fast5_4_analysis)    
-               outbc = GUPPY6_BASECALL(newer)
-               outbc6 = GUPPY_BASECALL(older)  
+               (newer, middle, older) = separateGuppy(fast5_4_analysis) 
                
-               basecalled_fastq = outbc.basecalled_fastq.concat(outbc6.basecalled_fastq)    
-               basecalled_fast5 = outbc.basecalled_fast5.concat(outbc6.basecalled_fast5)    
-               basecalling_stats = outbc.basecalling_stats.concat(outbc6.basecalling_stats)    
+               outbc65 = GUPPY65_BASECALL(newer)  
+               outbc6 = GUPPY6_BASECALL(middle)
+               outbc = GUPPY_BASECALL(older)  
+               
+               basecalled_fastq = outbc.basecalled_fastq.concat(outbc6.basecalled_fastq).concat(outbc65.basecalled_fastq)    
+               basecalled_fast5 = outbc.basecalled_fast5.concat(outbc6.basecalled_fast5).concat(outbc65.basecalled_fast5)    
+               basecalling_stats = outbc.basecalling_stats.concat(outbc6.basecalling_stats).concat(outbc65.basecalling_stats)   
  
                bc_fast5 = reshapeSamples(basecalled_fast5)
                bc_stats = reshapeSamples(basecalling_stats)
+    
+    			//basecalled_fastq = channel.empty()
+    			//bc_fast5 = channel.empty()
+    			//bc_stats = channel.empty()
                break; 
            case "dorado": 
        	       outbc = DORADO_BASECALL (fast5_4_analysis, dorado_models)
@@ -253,8 +271,9 @@ workflow BASECALL {
     emit:
        basecalled_fast5 = bc_fast5
        basecalled_fastq = basecalled_fastq
-       basecalling_stats = basecalling_stats
+       basecalling_stats = bc_stats
 }
+
 
 /*
 * Wrapper for demultiplexing
@@ -280,9 +299,11 @@ workflow DEMULTIPLEX {
                basecalled_fast5 = outbc.basecalled_fast5 
                break;
            default:
-               (newer, older) = separateGuppy(fast5_4_analysis)   
-               outbc = GUPPY_BASECALL_DEMULTI(older)
-               outbc6 = GUPPY6_BASECALL_DEMULTI(newer)
+               (newer, middle, older) = separateGuppy(fast5_4_analysis) 
+               
+               outbc65 = GUPPY65_BASECALL_DEMULTI(newer)  
+               outbc6 = GUPPY6_BASECALL_DEMULTI(middle)
+               outbc = GUPPY_BASECALL_DEMULTI(older)  
 
                demufq = outbc.basecalled_fastq.concat(outbc6.basecalled_fastq)    
                basecalled_fast5 = outbc.basecalled_fast5.concat(outbc6.basecalled_fast5)    
@@ -481,7 +502,7 @@ workflow ASSEMBLY {
     case "fast5":
      	fast5_4_analysis = getFast5(params.fast5)
     	if (params.demultiplexing == "NO" ) outf = BASECALL(fast5_4_analysis)
-    	else outf = DEMULTIPLEX(fast5_4_analysis)  
+    	//else outf = DEMULTIPLEX(fast5_4_analysis)  
     	
         // Perform MinIONQC on basecalling stats
 	    basecall_qc = MinIONQC(outf.basecalling_stats.groupTuple())   
@@ -535,7 +556,7 @@ workflow ASSEMBLY {
     ASSEMBLY(sorted_alns, reference, params.annotation) 
     
     // Perform MULTIQC report
-    MULTIQC(multiqc_data.collect())
+   // MULTIQC(multiqc_data.collect())
     
     //all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(NANOQ_VER()).mix(NANOFILT_VER())
     //.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
