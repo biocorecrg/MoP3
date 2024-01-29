@@ -26,12 +26,12 @@ BIOCORE@CRG Master of Pores 2. Estimating PolyA tail - N F  ~  version ${version
 *****************   Input files    *********************
 input_path               : ${params.input_path}
 output                   : ${params.output}
-pars_tools				 : ${params.pars_tools}
+pars_tools               : ${params.pars_tools}
 
 ******* reference has to be the genome **********
 reference                : ${params.reference}
 
-email                     : ${params.email}
+email                    : ${params.email}
 
 ************************* Flows *******************************
 tailfindr                             	: ${params.tailfindr}
