@@ -45,7 +45,7 @@ You can replace ```-with-singularity``` with ```-with-docker``` if you want to u
 
 ```
 cd mop_preprocess
-nextflow run mop_preprocess.nf -with-singularity -bg -profile local > log
+nextflow run mop_preprocess.nf -with-singularity -bg -profile local -params-file params.yaml > log
 ```
 
 ## Upgrading
