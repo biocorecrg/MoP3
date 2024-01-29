@@ -1,4 +1,4 @@
-input_path: "${projectDir}/../mop_preprocess/output/"
+input_path: "${projectDir}/../mop_preprocess/outfolder/"
 reference: "${projectDir}/../anno/yeast_rRNA_ref.fa.gz"
     
 pars_tools: "${projectDir}/tools_opt.tsv"
