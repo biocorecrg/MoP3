@@ -8,7 +8,7 @@ nextflow.enable.dsl=2
  */
 
 // Pipeline version
-version = '2.0'
+version = '3.0'
 
 params.help            = false
 params.resume          = false
@@ -20,7 +20,7 @@ log.info """
 ╩ ╩╚═╝╩     ╩ ╩ ╩╩╩═╝
                                                                                        
 ====================================================
-BIOCORE@CRG Master of Pores 2. Estimating PolyA tail - N F  ~  version ${version}
+BIOCORE@CRG Master of Pores 3. Estimating PolyA tail - N F  ~  version ${version}
 ====================================================
 
 *****************   Input files    *********************
