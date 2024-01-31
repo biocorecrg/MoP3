@@ -379,7 +379,8 @@ workflow MAPPING {
         stats_aln = Channel.value() 
         sorted_alns = Channel.value()   
         nanoplot_qcs = Channel.value()  
-        aln_indexes = Channel.value()  
+        aln_indexes = Channel.value()
+        aln_reads = Channel.value()  
     }
     else {
         switch(params.mapping) { 
