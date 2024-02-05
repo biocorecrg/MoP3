@@ -161,8 +161,7 @@ def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
 def basecaller_pars = ["guppy" : guppy_basecall_pars, "dorado" : progPars["basecalling--dorado"] ]
 
 // INCLUDE WORKFLOWS
-include { BASECALL } from "${workflowsDir}/basecaller" addParams(gpu: gpu, label: guppy_basecall_label, extrapars: basecaller_pars, models: "${projectDir}/dorado_models" )
-
+include { BASECALL } from "${workflowsDir}/basecaller" addParams(gpu: gpu, label: guppy_basecall_label, type:params.basecalling ,  extrapars: basecaller_pars, models: "${projectDir}/dorado_models" )
 
 
 // INCLUDE MODULES / SUBWORKFLOWS
