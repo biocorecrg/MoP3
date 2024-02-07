@@ -228,49 +228,7 @@ def separateGuppy (fast5) {
 
     return([newer, middle, older])   
 }
-    
 
-/*
-* Wrapper for basecalling
-
-workflow BASECALL {
-    take: 
-        fast5_4_analysis
-        
-    main:
-        switch(params.basecalling) {                      
-           case "guppy":
-               (newer, middle, older) = separateGuppy(fast5_4_analysis) 
-               
-               outbc65 = GUPPY65_BASECALL(newer)  
-               outbc6 = GUPPY6_BASECALL(middle)
-               outbc = GUPPY_BASECALL(older)  
-               
-               basecalled_fastq = outbc.basecalled_fastq.concat(outbc6.basecalled_fastq).concat(outbc65.basecalled_fastq)    
-               basecalled_fast5 = outbc.basecalled_fast5.concat(outbc6.basecalled_fast5).concat(outbc65.basecalled_fast5)    
-               basecalling_stats = outbc.basecalling_stats.concat(outbc6.basecalling_stats).concat(outbc65.basecalling_stats)   
- 
-               bc_fast5 = reshapeSamples(basecalled_fast5)
-               bc_stats = reshapeSamples(basecalling_stats)
-    
-    			//basecalled_fastq = channel.empty()
-    			//bc_fast5 = channel.empty()
-    			//bc_stats = channel.empty()
-               break; 
-           case "dorado": 
-       	       outbc = DORADO_BASECALL (fast5_4_analysis, dorado_models)
-               basecalled_fastq = outbc.basecalled_fastq
-               bc_fast5 = Channel.empty()
-               bc_stats = Channel.empty()
-               break; 
-        }        
-		
-    emit:
-       basecalled_fast5 = bc_fast5
-       basecalled_fastq = basecalled_fastq
-       basecalling_stats = bc_stats
-}
-*/
 
 /*
 * Wrapper for demultiplexing
@@ -302,13 +260,20 @@ workflow DEMULTIPLEX {
                outbc6 = GUPPY6_BASECALL_DEMULTI(middle)
                outbc = GUPPY_BASECALL_DEMULTI(older)  
 
-               demufq = outbc.basecalled_fastq.concat(outbc6.basecalled_fastq)    
-               basecalled_fast5 = outbc.basecalled_fast5.concat(outbc6.basecalled_fast5)    
-               basecalling_stats = outbc.basecalling_stats.concat(outbc6.basecalling_stats)    
+              // demufq = outbc.basecalled_fastq.concat(outbc6.basecalled_fastq)    
+              // basecalled_fast5 = outbc.basecalled_fast5.concat(outbc6.basecalled_fast5)    
+              // basecalling_stats = outbc.basecalling_stats.concat(outbc6.basecalling_stats)    
+  
+               basecalled_fastq = outbc.basecalled_fastq.concat(outbc6.basecalled_fastq).concat(outbc65.basecalled_fastq)    
+               demufq = outbc.basecalled_fast5.concat(outbc6.basecalled_fast5).concat(outbc65.basecalled_fast5)    
+               basecalling_stats = outbc.basecalling_stats.concat(outbc6.basecalling_stats).concat(outbc65.basecalling_stats)    
+
+  
                if (params.demultiplexing == "readucks") {
                     demufq = READUCKS_DEMULTIPLEX(demufq)
                }
                break;
+
         }        
 
     reshapedPrefiltDemufq = demufq.transpose().map{
@@ -331,7 +296,8 @@ workflow DEMULTIPLEX {
     emit:
         demultiplexed_fastqs =  demufq
         basecalled_fastq = reshapedDemufq
-        basecalling_stats = basecalling_stats
+    //    basecalling_stats = basecalling_stats
+        basecalling_stats = channel.empty()
         basecalled_fast5 = basecalled_fast5
 }
 
@@ -509,7 +475,7 @@ workflow ASSEMBLY {
     		outf = DEMULTIPLEX(fast5_4_analysis)  
     	}
         // Perform MinIONQC on basecalling stats
-	    basecall_qc = MinIONQC(basecalling_stats.groupTuple())   
+	    basecall_qc = MinIONQC(outf.basecalling_stats.groupTuple())   
 	    multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
 	    bc_fastq = SEQFILTER(outf.basecalled_fastq).out  
         alns = MAPPING(bc_fastq).out
