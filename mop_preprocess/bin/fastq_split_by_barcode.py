@@ -51,7 +51,7 @@ def main():
     parser.add_argument("-i", "--demux", required=True, help="demux file name")
     parser.add_argument("-f", "--fastq", nargs="+", help="input FastQ file(s)")
     parser.add_argument("-o", "--outname", required=True,
-                        help="output basename (.bc_?.fastq.gz will be added)")
+                        help="output basename (.bc_?.fq.gz will be added)")
     parser.add_argument("-b", "--minbaseQ", default=50, type=int,
                         help="minimum demux quality [%(default)s]")
     
