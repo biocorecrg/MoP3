@@ -1,7 +1,7 @@
 #step	tool	extrapars
 basecalling	dorado	""
 basecalling	guppy	""
-demultiplexing	seqtagger	"-k models/b100"
+demultiplexing	seqtagger	"-k b100"
 demultiplexing	deeplexicon	""
 demultiplexing	guppy	""
 filtering	nanofilt	""

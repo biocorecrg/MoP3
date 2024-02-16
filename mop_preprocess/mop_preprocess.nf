@@ -94,7 +94,7 @@ if( outputReport.exists() ) {
 // Get models
 Channel.fromPath( "${projectDir}/deeplexicon/*.h5").set{deepmodels}
 Channel.fromPath( "${projectDir}/dorado_models/*", type: 'dir').collect().set{dorado_models}
-Channel.fromPath( "${projectDir}/seqtagger_models").set{seqtagger_models}
+Channel.fromPath( "${projectDir}/seqtagger_models/*", type: 'dir').collect().set{seqtagger_models}
 
 
 // check GPU usage. 
@@ -526,7 +526,7 @@ workflow ASSEMBLY {
     ASSEMBLY(sorted_alns, reference, params.annotation) 
     
     // Perform MULTIQC report
-   // MULTIQC(multiqc_data.collect())
+    MULTIQC(multiqc_data.collect())
     
     //all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(NANOQ_VER()).mix(NANOFILT_VER())
     //.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
