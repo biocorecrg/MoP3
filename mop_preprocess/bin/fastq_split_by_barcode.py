@@ -31,7 +31,7 @@ def split_by_barcode(demux, fastq, outname, minbaseQ):
             if read_id not in read2bc: continue
             bc = read2bc[read_id]
             if bc not in outs:
-                outs[bc] = gzip.open("%s.bc_%s.fastq.gz"%(outname, bc), "wt")
+                outs[bc] = gzip.open("%s.bc_%d.fastq.gz"%(outname, bc), "wt")
                 b2c[bc] = 0
             outs[bc].write(r.format('fastq'))
             b2c[bc] += 1
