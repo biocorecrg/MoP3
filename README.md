@@ -64,6 +64,12 @@ However, please go over the previous issues (including closed issues) before ope
 
 
 ## Reference
-If you use this tool, please cite our paper:
+If you use this tool, please cite our papers:
 
-["MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets" Luca Cozzuto, Huanle Liu, Leszek P. Pryszcz, Toni Hermoso Pulido, Anna Delgado-Tejedor, Julia Ponomarenko, Eva Maria Novoa. Front. Genet., 17 March 2020](https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full)
+["Nanopore Direct RNA Sequencing Data Processing and Analysis Using MasterOfPores"
+Cozzuto L, Delgado-Tejedor A, Hermoso Pulido T, Novoa EM, Ponomarenko J. *N. Methods Mol Biol. 2023*;2624:185-205. doi: 10.1007/978-1-0716-2962-8_13.](https://link.springer.com/protocol/10.1007/978-1-0716-2962-8_13)
+
+["MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets"
+Luca Cozzuto, Huanle Liu, Leszek P. Pryszcz, Toni Hermoso Pulido, Anna Delgado-Tejedor, Julia Ponomarenko, Eva Maria Novoa.
+*Front. Genet., 17 March 2020.* https://doi.org/10.3389/fgene.2020.00211](https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full)
+
