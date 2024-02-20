@@ -23,7 +23,7 @@ It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.
 
 ![MOP3](https://github.com/biocorecrg/MoP3/blob/master/img/goku3.png?raw=true)
 
-The nane is inspired by the Metallica's [Master Of Puppets](https://www.youtube.com/watch?v=S7blkui3nQc)
+The name is inspired by the Metallica's [Master Of Puppets](https://www.youtube.com/watch?v=S7blkui3nQc)
 
 ## Install
 Please install nextflow and singularity or docker before.
