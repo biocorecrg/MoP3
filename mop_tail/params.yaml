@@ -6,6 +6,8 @@ pars_tools: "${projectDir}/tools_opt.tsv"
 output: "${projectDir}/outputPoly"
 
 tailfindr: "YES"
+
+# Different modes: standard, n3ps_r9 or n3ps_r10
 tailfindr_mode: "standard"
 
 nanopolish: "YES"
