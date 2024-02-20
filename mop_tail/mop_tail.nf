@@ -65,14 +65,23 @@ progPars = getParameters(params.pars_tools)
 
 def tailFindrCont = (params.tailfindr_mode != 'nano3p' ? 'biocorecrg/moptail:1.3' : 'biocorecrg/moptail:nano3p_5')
 
-if (params.tailfindr_mode == 'nano3p') {
-    println "tailfindr is in nano3p mode"
-} else {
-    println "tailfindr is in default mode"
-}
+def tailfindr_mode = "default"
+switch(params.tailfindr_mode) { 
+        case "n3ps_r9": 
+        	tailfindr_mode = params.tailfindr_mode
+    		println "tailfindr is in nano3p mode, R9 chemistry"
+        break
+        case "n3ps_r10": 
+        	tailfindr_mode = params.tailfindr_mode
+    		println "tailfindr is in nano3p mode, R10 chemistry"
+  		break
+		default:
+    		println "tailfindr is in default mode"
+		break
+}	  		
 
 
-include { GET_VERSION as TAILFINDR_VER; ESTIMATE_TAIL as TAILFINDR_ESTIMATE_TAIL } from "${subworkflowsDir}/chem_modification/tailfindr" addParams(CONTAINER:tailFindrCont, LABEL: 'big_cpus_retry', EXTRAPARS: progPars["tailfindr--tailfindr"])
+include { GET_VERSION as TAILFINDR_VER; ESTIMATE_TAIL as TAILFINDR_ESTIMATE_TAIL } from "${subworkflowsDir}/chem_modification/tailfindr" addParams(CONTAINER:tailFindrCont, LABEL: 'big_cpus_retry', EXTRAPARS: progPars["tailfindr--tailfindr"], MODE:tailfindr_mode)
 
 
 include { GET_VERSION as SAMTOOLS_VER; INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools"
