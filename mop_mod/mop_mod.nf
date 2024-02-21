@@ -159,7 +159,7 @@ workflow {
         outchr = getChromInfo(ref_file)
         chromSizes = outchr.sizes
         chroms = outchr.chromosomes.splitText() { it.trim() }
-	}
+    }
 	
     if (params.modphred == "YES") {
     	//chroms.subscribe{ println "Got: ***${it}***" }
@@ -314,7 +314,7 @@ workflow compore_polish_flow {
     
     main:   
         chromSizes = getChromInfo(ref_file)
-        chromSizes.splitText(file: true, by: 500).set{chromFiles}
+        chromSizes.sizes.splitText(file: true, by: 500).set{chromFiles}
         outnp = NANOPOLISH_EVENTALIGN(fast5_folders, bams, bais, fastqs, summaries, ref_file)
         mean_pps = mean_per_pos(outnp.aligned_events)
         concat_chunks = concat_mean_per_pos(mean_pps.groupTuple().combine(chromFiles))
