@@ -940,6 +940,21 @@ def parseFinalSummary(final_summary_file) {
 	return(outstring)
 }
 
+// Create a channel for included ids
+def filterPerBacodes (mybarcodes, barcoded_data) {
+	reshaped_barcoded_data = barcoded_data.map {
+		def id = it[0].split("---")[0]
+		def bc_id = it[0].split("\\.")[1]
+		def ori_id = "${id}---${bc_id}"
+		[ori_id, it]
+	}
+	
+	filtered_data = reshaped_barcoded_data.combine(mybarcodes, by: 0).map {
+		it[1]
+	}
+	return(filtered_data)
+}
+
 
 def reshapeDemuxSamples(inputChannel) {
 	def reshapedChannel = inputChannel.map {
@@ -974,28 +989,11 @@ def mapIDPairs (ids, values) {
 	return(combs)
 }
 
-def filterBarcodes (reshapedPrefiltDemufq, barcodes_to_include) {
-    reshapedDemufq = reshapedPrefiltDemufq.map{
-    	def id_raw = it[0].split("---")
-    	def id_raw2 = id_raw[1].split("\\.")
-    	def ori_id = "${id_raw[0]}---${id_raw2[1]}"
-    	[ori_id, it]
-    }.join(barcodes_to_include).map{
-        it[1]
-    }
- 
-	return(reshapedDemufq)
-}
 
 // Create a channel for excluded ids
 def get_barcode_list (barcodes) {
 	if (barcodes != "") {
-	    barcodes_to_include = file(barcodes)
-	    if( !barcodes_to_include.exists() ) exit 1, "Missing barcodes_to_include file: ${barcodes}!"
-	    Channel.from(barcodes_to_include.readLines())
-	    .map { line ->
-	        [ line ]
-	    }.set{ barcodes_to_include}
+	    barcodes_to_include = Channel.fromPath( barcodes, checkIfExists: true ).splitText(){ it.trim() }
 	} else {
 	    barcodes_to_include = Channel.empty()
 	}
