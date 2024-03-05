@@ -112,6 +112,29 @@ The command line options for each tool used in the pipeline are stored within sp
 
 .. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtagger_opt.tsv
 
+Model libraries for specific tools
+====================
+The following folders are available for the respective tool:
+
+* deeplexicon_models
+* dorado_models
+* seqtagger_models
+
+You need to add the dedicated parameter within the tool_opts file for the specific tool as:
+
+.. code-block:: console
+
+   basecalling dorado   "rna002_70bps_hac@v3"
+   demultiplexing	seqtagger   "-k b100"
+   demultiplexing	deeplexicon   "-f multi -m resnet20-final.h5"
+
+Barcodes
+===================
+
+You can select the barcodes you are interested in by writing them down in a txt file as in this example. The format is *samplename---barcodeID*
+
+.. literalinclude:: ../mop_preprocess/keep_barcodes.txt
+
 Results
 ====================
 
