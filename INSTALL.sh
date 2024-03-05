@@ -16,13 +16,13 @@ else
 fi
 
 
-#wget https://cdn.oxfordnanoportal.com/software/analysis/ont-guppy_${GUPPY_VER}_linux64.tar.gz 
-#if [ $? -eq 0 ]; then
-#	echo "INSTALLING GUPPY VERSION ${GUPPY_VER}"
-#else
-#    echo "GUPPY VERSION ${GUPPY_VER} is not found" 
-#    exit
-#fi
+wget https://cdn.oxfordnanoportal.com/software/analysis/ont-guppy_${GUPPY_VER}_linux64.tar.gz 
+if [ $? -eq 0 ]; then
+	echo "INSTALLING GUPPY VERSION ${GUPPY_VER}"
+else
+    echo "GUPPY VERSION ${GUPPY_VER} is not found" 
+    exit
+fi
 
 tar -zvxf ont-guppy_${GUPPY_VER}_linux64.tar.gz
 
