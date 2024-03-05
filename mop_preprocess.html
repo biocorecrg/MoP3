@@ -89,91 +89,55 @@
              
   <section id="mop-preprocess">
 <span id="home-page-moprepr"></span><h1>MOP_PREPROCESS<a class="headerlink" href="#mop-preprocess" title="Link to this heading"></a></h1>
-<p>This module takes as input the raw fast5 reads - single or multi - and produces a number of outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module is able to perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a genome / transcriptome reference, feature counting, discovery of novel transcripts and it generates a final report of the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi sequence).</p>
+<p>This module takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). In theory, it can also support the new pod5 format but it won’t output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well.</p>
 <section id="input-parameters">
 <h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Link to this heading"></a></h2>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 25.0%" />
-<col style="width: 75.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter name</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><strong>conffile</strong></p></td>
-<td><p>Configuration file produced by the Nanopore instrument. It can be omitted but in that case the user must specify either the guppy parameters “–kit” and “–flowcell” or the custom model via <strong>[NAME_tool_opt.tsv]</strong> file</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>fast5 files</strong></p></td>
-<td><p>Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. <strong>[/Path/**/*.fast5]</strong>. If empty it will search for fastq files and skip basecalling</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>fastq files</strong></p></td>
-<td><p>Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling <strong>[/Path/**/*.fastq]</strong>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>reference</strong></p></td>
-<td><p>File in fasta format. <strong>[Reference_file.fa]</strong></p></td>
-</tr>
-<tr class="row-even"><td><p><strong>ref_type</strong></p></td>
-<td><p>Specify if the reference is a genome or a transcriptome. <strong>[genome / transcriptome]</strong></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>annotation</strong></p></td>
-<td><p>Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. <strong>[Annotation_file.gtf]</strong>.</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>pars_tools</strong></p></td>
-<td><p>Parameters of tools. It is ha tab separated file with custom parameters for each tool <strong>[NAME_tool_opt.tsv]</strong></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>barcodes</strong></p></td>
-<td><p>File containing a list of ids (combinations of sample names and barcode ids) to be kept after the demulitplexing.</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>output</strong></p></td>
-<td><p>Output folder name. <strong>[/Path/to_output_folder]</strong></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>qualityqc</strong></p></td>
-<td><p>Quality threshold for QC. <strong>[5]</strong></p></td>
-</tr>
-<tr class="row-even"><td><p><strong>granularity</strong></p></td>
-<td><p>indicates the number of input fast5 files analyzed in a single process.</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>basecalling</strong></p></td>
-<td><p>Tool for basecalling <strong>[guppy / NO ]</strong></p></td>
-</tr>
-<tr class="row-even"><td><p><strong>GPU</strong></p></td>
-<td><p>Allow the pipeline to run with GPU. You can choose cuda10 for Guppy &lt; 3.4.3 and cuda11 for higher versions. <strong>[cuda10 / cuda11 /  OFF / ON (legacy for cuda10) ]</strong></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>demultiplexing</strong></p></td>
-<td><p>Tool for demultiplexing algorithm. <strong>[deeplexicon / guppy / NO ]</strong></p></td>
-</tr>
-<tr class="row-even"><td><p><strong>demulti_fast5</strong></p></td>
-<td><p>If performing demultiplexing generate demultiplexed multifast5 files too. <strong>[YES / NO]</strong></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>filtering</strong></p></td>
-<td><p>Tool for filtering fastq files. <strong>[nanofilt / NO]</strong></p></td>
-</tr>
-<tr class="row-even"><td><p><strong>mapping</strong></p></td>
-<td><p>Tool for mapping reads. <strong>[minimap2 / graphmap / graphmap2 / bwa / NO ]</strong></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>counting</strong></p></td>
-<td><p>Tool for gene or transcripts counts <strong>[htseq / nanocount / NO””]</strong></p></td>
-</tr>
-<tr class="row-even"><td><p><strong>discovery</strong></p></td>
-<td><p>Tool for generating novel transcripts. <strong>[bambu / isoquant / NO]</strong></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>cram_conv</strong></p></td>
-<td><p>Converting bam in cram. <strong>[YES / “”]</strong></p></td>
-</tr>
-<tr class="row-even"><td><p><strong>subsampling_cram</strong></p></td>
-<td><p>Subsampling BAM before CRAM conversion. <strong>[YES / “”]</strong></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>saveSpace</strong></p></td>
-<td><p>Remove intermediate files (<strong>beta</strong>) <strong>[YES / “”]</strong></p></td>
-</tr>
-<tr class="row-even"><td><p><strong>email</strong></p></td>
-<td><p>Users email for receving the final report when the pipeline is finished. <strong>[user_email]</strong></p></td>
-</tr>
-</tbody>
-</table>
+<p>The input parameters are stored in yaml files like the one represented here:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Parameters</span>
+
+<span class="c1"># Needed for fast5 input</span>
+<span class="nt">fast5</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;${projectDir}/../data/fast5_rna_dem/**/*.fast5&quot;</span>
+<span class="c1">## This can be empty but then you need to add specify kit and flowcell via command line inside pars_tools</span>
+<span class="nt">conffile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;final_summary_01.txt&quot;</span>
+<span class="c1">## Can be wither guppy or dorado</span>
+<span class="nt">basecalling</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;guppy&quot;</span>
+<span class="c1">## Can be OFF / cuda10 / cuda11. Newer version of GUPPY may require cuda11 </span>
+<span class="nt">GPU</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cuda11&quot;</span>
+<span class="nt">demultiplexing</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;seqtagger&quot;</span>
+<span class="nt">demulti_fast5</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;YES&quot;</span>
+<span class="c1">### Number of fast5 basecalled per parallel job</span>
+<span class="nt">granularity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="c1">### File with the list of accepted barcodes. It can be empty</span>
+<span class="nt">barcodes</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+
+<span class="c1"># Needed for fastq input</span>
+<span class="nt">fastq</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+
+<span class="c1"># Common</span>
+<span class="nt">reference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/db/gencode/human/release_38/GRCh38.primary_assembly.genome.fa.gz&quot;</span>
+<span class="c1">## Can be transcriptome / genome</span>
+<span class="nt">ref_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;genome&quot;</span>
+<span class="nt">annotation</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/db/gencode/human/release_38/gencode.v38.tRNAs.gtf.gz&quot;</span>
+<span class="c1">## command line options</span>
+<span class="nt">pars_tools</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;${projectDir}/tool_opts/drna_tool_seqtagger_opt.tsv&quot;</span>
+<span class="c1">## Cut off quality for QC</span>
+<span class="nt">qualityqc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="c1">## Can be nanoq / nanofilt</span>
+<span class="nt">filtering</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nanoq&quot;</span>
+<span class="c1">## Can be graphmap / graphmap2 / minimap2 / bwa</span>
+<span class="nt">mapping</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;minimap2&quot;</span>
+<span class="c1">## Can be nanocount for transcriptome / htseq for genome</span>
+<span class="nt">counting</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;htseq&quot;</span>
+<span class="c1">## Can be NO / bambu / isoquant</span>
+<span class="nt">discovery</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;NO&quot;</span>
+<span class="c1">## Convert bam to cram</span>
+<span class="nt">cram_conv</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;NO&quot;</span>
+<span class="nt">subsampling_cram</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="nt">hook</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="nt">email</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;${projectDir}/outfolder_rnadem&quot;</span>
+</pre></div>
+</div>
 <p>You can change them by editing the <strong>params.config</strong> file or using the command line - please, see next section.</p>
 </section>
 <section id="how-to-run-the-pipeline">
