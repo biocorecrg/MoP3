@@ -138,45 +138,52 @@
 <span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;${projectDir}/outfolder_rnadem&quot;</span>
 </pre></div>
 </div>
-<p>You can change them by editing the <strong>params.config</strong> file or using the command line - please, see next section.</p>
+<p>You can change them by editing this file or using the command line as explained in the next section.</p>
 </section>
 <section id="how-to-run-the-pipeline">
 <h2>How to run the pipeline<a class="headerlink" href="#how-to-run-the-pipeline" title="Link to this heading"></a></h2>
-<p>Before launching the pipeline, user should decide which containers to use - either docker or singularity <strong>[-with-docker / -with-singularity]</strong>.</p>
-<p>Then, to launch the pipeline, please use the following command:
-.. code-block:: console</p>
-<blockquote>
-<div><p>nextflow run mop_preprocess.nf -with-singularity &gt; log.txt</p>
-</div></blockquote>
-<p>You can run the pipeline in the background adding the nextflow parameter <strong>-bg</strong>:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg &gt; log.txt</span>
+<p>Before launching the pipeline, the user can decide which containers to use: either docker or singularity <strong>[-with-docker / -with-singularity]</strong>.</p>
+<p>Then, to launch the pipeline, please use the following command by specifying the path of the yaml parameter file:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml &gt; log.txt</span>
 </pre></div>
 </div>
-<p>You can change the parameters either by changing <strong>params.config</strong> file or by feeding the parameters via command line:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg --output test2 &gt; log.txt</span>
+<p>You can run the pipeline in the background by adding the nextflow parameter <strong>-bg</strong>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -params-file params.yaml -with-singularity -bg &gt; log.txt</span>
+</pre></div>
+</div>
+<p>You can change the parameters either by changing the yaml config file or by feeding the parameters via command line:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg --output test2 &gt; log.txt</span>
 </pre></div>
 </div>
 <p>You can specify a different working directory with temporary files:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory &gt; log.txt</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg -w /path/working_directory &gt; log.txt</span>
 </pre></div>
 </div>
-<p>You can use different profiles specifying the different environments. We have one set up for HPC using the SGE scheduler:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory -profile cluster &gt; log.txt</span>
+<p>You can use different profiles for running the pipeline in different environments. We have one set up for HPC using the SGE scheduler:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile cluster &gt; log.txt</span>
+</pre></div>
+</div>
+<p>One for HPC using the slurm scheduler</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile slurm &gt; log.txt</span>
+</pre></div>
+</div>
+<p>One for emulating the new M1 processor for Apple:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile m1mac &gt; log.txt</span>
 </pre></div>
 </div>
 <p>or you can run the pipeline locally:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory -profile local &gt; log.txt</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile local &gt; log.txt</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>In case of errors you can troubleshoot seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also find the working directory of the process in the file. Then, access that directory indicated by the error output and check both the <cite>.command.log</cite> and <cite>.command.err</cite> files.</p></li>
+<li><p>In case of errors you can troubleshoot by seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also go to the intermediate directory indicated in the log and check both the <cite>.command.log</cite> and <cite>.command.err</cite> files.</p></li>
 </ul>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>Once the error has been solved or if you change a specific parameter, you can resume the execution with the <strong>Netxtlow</strong> parameter <strong>- resume</strong> (only one dash!). If there was an error, the pipeline will resume from the process that had the error and proceed with the rest.    If a parameter was changed, only processes affected by this parameter will be re-run.</p>
+<p>Once the error has been solved or if you change a specific parameter, you can resume the execution with the <strong>Netxtlow</strong> parameter <strong>- resume</strong> (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If a parameter is changed, only processes affected by this parameter will be re-run.</p>
 </div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">...</span>
 
@@ -189,7 +196,7 @@
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, pipeline will re-start from the beginning.</p>
+<p>To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, the pipeline will re-start from the beginning.</p>
 </div>
 </section>
 <section id="results">
@@ -208,11 +215,11 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Newer versions of guppy automatically separate the reads depending on the quality. You need to disable this via custom options for being used in MoP3. This is also to avoid losing interesting signals since the modified bases have often low qualities. GUPPY 6 seems to require singularity 3.7.0 or higher.</p>
+<p>MOP3 will automatically detect the version of guppy and modify the parameters accordingly. You don’t need to add any extra parameter as in MOP2.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>You can pass via parameter a custom NAME_tool_opt.tsv file with custom guppy options to disable the qscore filtering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv</p>
+<p>You can pass via parameter a custom NAME_tool_opt.tsv file with custom options for each step to customise  to disable the qscore filtering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv</p>
 </div>
 </section>
 </section>
