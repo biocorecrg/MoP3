@@ -124,9 +124,9 @@ You need to add the dedicated parameter within the tool_opts file for the specif
 
 .. code-block:: console
 
-basecalling dorado   "rna002_70bps_hac@v3"
-demultiplexing	seqtagger   "-k b100"
-demultiplexing	deeplexicon   "-f multi -m resnet20-final.h5"
+   basecalling dorado   "rna002_70bps_hac@v3"
+   demultiplexing	seqtagger   "-k b100"
+   demultiplexing	deeplexicon   "-f multi -m resnet20-final.h5"
 
 Barcodes
 ===================
