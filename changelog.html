@@ -95,11 +95,19 @@
 <li><dl class="simple">
 <dt>mop_preprocess</dt><dd><ul>
 <li><p>We added a custom model for m6A basecalling. It is automatically installed when running INSTALL.sh. For using it you need to indicated <a href="#id1"><span class="problematic" id="id2">``</span></a>–pars_tools “drna_tool_splice_m6A_opt.tsv” ``</p></li>
-<li><p>We add support to cuda11 for guppy version &gt; 4.4.1. Please note that at certain point Guppy started to separate fastq files in PASS and FAIL, for avoiding this we need to add an extra parameter <strong>–disable_qscore_filtering</strong> in <em>_opt.tsv files. We added two more: **drna_tool_splice_m6A_guppy6_opt.tsv*</em> and <strong>drna_tool_unsplice_guppy6_opt.tsv</strong>.</p></li>
-<li><p>Added readucks for improving demultiplexing with guppy (optional). <strong>Fast5 won’t be demultiplexed when using readucks!</strong></p></li>
-<li><p>new parameter “barcodes” where you can specify a file with barcodes to be kept. Example in <strong>keep_barcodes.txt</strong></p></li>
+<li><p>We add support to cuda11 for guppy version &gt; 4.4.1.</p></li>
+<li><p>Added readucks for improving demultiplexing with guppy (optional).</p></li>
+<li><p>New parameter “barcodes” where you can specify a file with barcodes to be kept. Example in <strong>keep_barcodes.txt</strong></p></li>
 <li><p>Adding a <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2023.11.28.568965v1">new model for direct RNA basecalling</a>.</p></li>
-<li><p>Added seqTagger</p></li>
+<li><p>Added seqTagger (add reference)</p></li>
+<li><p>Added support to dorado basecalling. Not yet supported the demultiplexing</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>mop_tail</dt><dd><ul>
+<li><p>Added support to <em>nano3p mode</em> in tailfindr for R10 chemistry</p></li>
 </ul>
 </dd>
 </dl>
@@ -107,7 +115,7 @@
 <li><dl class="simple">
 <dt>mop_tail</dt><dd><ul>
 <li><p>we upgraded tailfindR to version 1.3</p></li>
-<li><p>Tailfinder can be used either in standard mode or nano3p mode</p></li>
+<li><p>Tailfinder can be used either in standard mode or nano3p mode (chemistry R10 and R9) by specifying the <em>tailfindr_mode</em> to: standard, n3ps_r9 or n3ps_r10.</p></li>
 </ul>
 </dd>
 </dl>
