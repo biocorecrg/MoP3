@@ -19,63 +19,76 @@ The input parameters are stored in yaml files like the one represented here:
 .. literalinclude:: ../mop_preprocess/params.f5.demrna.yaml
    :language: yaml
 
-You can change them by editing the **params.config** file or using the command line - please, see next section. 
+You can change them by editing this file or using the command line as explained in the next section. 
 
 How to run the pipeline
 =============================
 
-Before launching the pipeline, user should decide which containers to use - either docker or singularity **[-with-docker / -with-singularity]**.
+Before launching the pipeline, the user can decide which containers to use: either docker or singularity **[-with-docker / -with-singularity]**.
 
-Then, to launch the pipeline, please use the following command:
-.. code-block:: console
-
-   nextflow run mop_preprocess.nf -with-singularity > log.txt
-
-
-You can run the pipeline in the background adding the nextflow parameter **-bg**:
+Then, to launch the pipeline, please use the following command by specifying the path of the yaml parameter file:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg > log.txt
+   nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml > log.txt
 
-You can change the parameters either by changing **params.config** file or by feeding the parameters via command line:
+
+You can run the pipeline in the background by adding the nextflow parameter **-bg**:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg --output test2 > log.txt
+   nextflow run mop_preprocess.nf -params-file params.yaml -with-singularity -bg > log.txt
+
+You can change the parameters either by changing the yaml config file or by feeding the parameters via command line:
+
+.. code-block:: console
+
+   nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg --output test2 > log.txt
 
 
 You can specify a different working directory with temporary files:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory > log.txt
+   nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg -w /path/working_directory > log.txt
 
-You can use different profiles specifying the different environments. We have one set up for HPC using the SGE scheduler:
+You can use different profiles for running the pipeline in different environments. We have one set up for HPC using the SGE scheduler:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory -profile cluster > log.txt
+   nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile cluster > log.txt
+
+One for HPC using the slurm scheduler
+
+.. code-block:: console
+
+   nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile slurm > log.txt
+
+One for emulating the new M1 processor for Apple:
+
+.. code-block:: console
+
+   nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile m1mac > log.txt
+
 
 or you can run the pipeline locally:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory -profile local > log.txt
+   nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile local > log.txt
 
 
 .. note::
  
-   * In case of errors you can troubleshoot seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also find the working directory of the process in the file. Then, access that directory indicated by the error output and check both the `.command.log` and `.command.err` files. 
-
+   * In case of errors you can troubleshoot by seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also go to the intermediate directory indicated in the log and check both the `.command.log` and `.command.err` files. 
 
 .. tip::
 
-   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there was an error, the pipeline will resume from the process that had the error and proceed with the rest.    If a parameter was changed, only processes affected by this parameter will be re-run. 
+   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If a parameter is changed, only processes affected by this parameter will be re-run. 
 
 
 .. code-block:: console
-   nextflow run mop_preprocess.nf -with-singularity -bg -resume > log_resumed.txt
+   nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg -resume > log_resumed.txt
 
    To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed process are found as   *Cached*, resume worked!
 
@@ -91,7 +104,7 @@ or you can run the pipeline locally:
 
 
 .. note::
-   To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, pipeline will re-start from the beginning. 
+   To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, the pipeline will re-start from the beginning. 
 
 Results
 ====================
@@ -110,10 +123,10 @@ Several folders are created by the pipeline within the output directory specifie
 * **assembly**: It contains assembled transcripts.
 
 .. note::
-   Newer versions of guppy automatically separate the reads depending on the quality. You need to disable this via custom options for being used in MoP3. This is also to avoid losing interesting signals since the modified bases have often low qualities. GUPPY 6 seems to require singularity 3.7.0 or higher.
+   MOP3 will automatically detect the version of guppy and modify the parameters accordingly. You don't need to add any extra parameter as in MOP2.
    
 .. tip::
-   You can pass via parameter a custom NAME_tool_opt.tsv file with custom guppy options to disable the qscore filtering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv
+   You can pass via parameter a custom NAME_tool_opt.tsv file with custom options for each step to customise  to disable the qscore filtering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv
    
    
 
