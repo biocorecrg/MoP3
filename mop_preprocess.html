@@ -52,6 +52,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MOP_PREPROCESS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#input-parameters">Input Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-run-the-pipeline">How to run the pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tool-opts">tool_opts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
 </ul>
 </li>
@@ -199,6 +200,27 @@
 <p>To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, the pipeline will re-start from the beginning.</p>
 </div>
 </section>
+<section id="tool-opts">
+<h2>tool_opts<a class="headerlink" href="#tool-opts" title="Link to this heading"></a></h2>
+<p>The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  <em>tool_opts</em> folder. Here you have an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#step	tool	extrapars</span>
+<span class="n">basecalling</span>	<span class="n">dorado</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">basecalling</span>	<span class="n">guppy</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">demultiplexing</span>	<span class="n">seqtagger</span>	<span class="s2">&quot;-k b100&quot;</span>
+<span class="n">demultiplexing</span>	<span class="n">deeplexicon</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">demultiplexing</span>	<span class="n">guppy</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">filtering</span>	<span class="n">nanofilt</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">filtering</span>	<span class="n">nanoq</span>	<span class="s2">&quot;&quot;</span>	
+<span class="n">mapping</span>	<span class="n">graphmap</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">mapping</span>	<span class="n">graphmap2</span>	<span class="s2">&quot;-x rnaseq&quot;</span>
+<span class="n">mapping</span>	<span class="n">minimap2</span>	<span class="s2">&quot;-uf -ax splice -k14&quot;</span>
+<span class="n">mapping</span>	<span class="n">bwa</span>	<span class="s2">&quot;&quot;</span>	
+<span class="n">counting</span>	<span class="n">htseq</span>	<span class="s2">&quot;-a 0&quot;</span>
+<span class="n">counting</span>	<span class="n">nanocount</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">discovery</span>	<span class="n">bambu</span>	<span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+</section>
 <section id="results">
 <h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
 <p>Several folders are created by the pipeline within the output directory specified by the <strong>output</strong> parameter:</p>
@@ -216,10 +238,6 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>MOP3 will automatically detect the version of guppy and modify the parameters accordingly. You don’t need to add any extra parameter as in MOP2.</p>
-</div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>You can pass via parameter a custom NAME_tool_opt.tsv file with custom options for each step to customise  to disable the qscore filtering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv</p>
 </div>
 </section>
 </section>
