@@ -7,124 +7,88 @@ MOP_PREPROCESS
 .. autosummary::
    :toctree: generated
 
-This module takes as input the raw fast5 reads - single or multi - and produces a number of outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module is able to perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a genome / transcriptome reference, feature counting, discovery of novel transcripts and it generates a final report of the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi sequence).
+This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). In theory, it can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. 
+
   
 
 Input Parameters
 ======================
 
-.. list-table:: 
-   :widths: 25 75
-   :header-rows: 1
+The input parameters are stored in yaml files like the one represented here:
 
-   * - Parameter name
-     - Description
-   * - **conffile**
-     - Configuration file produced by the Nanopore instrument. It can be omitted but in that case the user must specify either the guppy parameters "--kit" and "--flowcell" or the custom model via **[NAME_tool_opt.tsv]** file
-   * - **fast5 files**
-     - Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/\*\*/*.fast5]**. If empty it will search for fastq files and skip basecalling
-   * - **fastq files**
-     - Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling **[/Path/\*\*/*.fastq]**. 
-   * - **reference**
-     - File in fasta format. **[Reference_file.fa]**
-   * - **ref_type**
-     -  Specify if the reference is a genome or a transcriptome. **[genome / transcriptome]** 
-   * - **annotation**
-     - Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. **[Annotation_file.gtf]**. 
-   * - **pars_tools**
-     - Parameters of tools. It is ha tab separated file with custom parameters for each tool **[NAME_tool_opt.tsv]**
-   * - **barcodes**
-     - File containing a list of ids (combinations of sample names and barcode ids) to be kept after the demulitplexing.
-   * - **output**
-     - Output folder name. **[/Path/to_output_folder]**
-   * - **qualityqc**
-     - Quality threshold for QC. **[5]**
-   * - **granularity**
-     - indicates the number of input fast5 files analyzed in a single process.
-   * - **basecalling**
-     - Tool for basecalling **[guppy / NO ]**
-   * - **GPU**
-     -  Allow the pipeline to run with GPU. You can choose cuda10 for Guppy < 3.4.3 and cuda11 for higher versions. **[cuda10 / cuda11 /  OFF / ON (legacy for cuda10) ]**
-   * - **demultiplexing**
-     -  Tool for demultiplexing algorithm. **[deeplexicon / guppy / NO ]**
-   * - **demulti_fast5**
-     -  If performing demultiplexing generate demultiplexed multifast5 files too. **[YES / NO]**
-   * - **filtering**
-     -  Tool for filtering fastq files. **[nanofilt / NO]**
-   * - **mapping**
-     -  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / bwa / NO ]** 
-   * - **counting**
-     -  Tool for gene or transcripts counts **[htseq / nanocount / NO""]**
-   * - **discovery**
-     -  Tool for generating novel transcripts. **[bambu / isoquant / NO]** 
-   * - **cram_conv**
-     -  Converting bam in cram. **[YES / ""]**
-   * - **subsampling_cram**
-     -  Subsampling BAM before CRAM conversion. **[YES / ""]**
-   * - **saveSpace**
-     -  Remove intermediate files (**beta**) **[YES / ""]**
-   * - **email**
-     -  Users email for receving the final report when the pipeline is finished. **[user_email]**
+.. literalinclude:: ../mop_preprocess/params.f5.demrna.yaml
+   :language: yaml
 
-
-
-You can change them by editing the **params.config** file or using the command line - please, see next section. 
+You can change them by editing this file or using the command line as explained in the next section. 
 
 How to run the pipeline
 =============================
 
-Before launching the pipeline, user should decide which containers to use - either docker or singularity **[-with-docker / -with-singularity]**.
+Before launching the pipeline, the user can decide which containers to use: either docker or singularity **[-with-docker / -with-singularity]**.
 
-Then, to launch the pipeline, please use the following command:
-.. code-block:: console
-
-   nextflow run mop_preprocess.nf -with-singularity > log.txt
-
-
-You can run the pipeline in the background adding the nextflow parameter **-bg**:
+Then, to launch the pipeline, please use the following command by specifying the path of the yaml parameter file:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg > log.txt
+   nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml > log.txt
 
-You can change the parameters either by changing **params.config** file or by feeding the parameters via command line:
+
+You can run the pipeline in the background by adding the nextflow parameter **-bg**:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg --output test2 > log.txt
+   nextflow run mop_preprocess.nf -params-file params.yaml -with-singularity -bg > log.txt
+
+You can change the parameters either by changing the yaml config file or by feeding the parameters via command line:
+
+.. code-block:: console
+
+   nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg --output test2 > log.txt
 
 
 You can specify a different working directory with temporary files:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory > log.txt
+   nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg -w /path/working_directory > log.txt
 
-You can use different profiles specifying the different environments. We have one set up for HPC using the SGE scheduler:
+You can use different profiles for running the pipeline in different environments. We have one set up for HPC using the SGE scheduler:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory -profile cluster > log.txt
+   nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile cluster > log.txt
+
+One for HPC using the slurm scheduler
+
+.. code-block:: console
+
+   nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile slurm > log.txt
+
+One for emulating the new M1 processor for Apple:
+
+.. code-block:: console
+
+   nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile m1mac > log.txt
+
 
 or you can run the pipeline locally:
 
 .. code-block:: console
 
-   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory -profile local > log.txt
+   nextflow run mop_preprocess.nf -with-singularity -bg -params-file params.yaml -w /path/working_directory -profile local > log.txt
 
 
 .. note::
  
-   * In case of errors you can troubleshoot seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also find the working directory of the process in the file. Then, access that directory indicated by the error output and check both the `.command.log` and `.command.err` files. 
-
+   * In case of errors you can troubleshoot by seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also go to the intermediate directory indicated in the log and check both the `.command.log` and `.command.err` files. 
 
 .. tip::
 
-   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there was an error, the pipeline will resume from the process that had the error and proceed with the rest.    If a parameter was changed, only processes affected by this parameter will be re-run. 
+   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If a parameter is changed, only processes affected by this parameter will be re-run. 
 
 
 .. code-block:: console
-   nextflow run mop_preprocess.nf -with-singularity -bg -resume > log_resumed.txt
+   nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg -resume > log_resumed.txt
 
    To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed process are found as   *Cached*, resume worked!
 
@@ -138,9 +102,15 @@ or you can run the pipeline locally:
    [c8/3f5d17] Cached process > mapping (RNA081120181_1)
    ...
 
-
 .. note::
-   To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, pipeline will re-start from the beginning. 
+   To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, the pipeline will re-start from the beginning. 
+
+tool_opts
+====================
+
+The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  *tool_opts* folder. Here you have an example:
+
+.. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtagger_opt.tsv
 
 Results
 ====================
@@ -159,13 +129,8 @@ Several folders are created by the pipeline within the output directory specifie
 * **assembly**: It contains assembled transcripts.
 
 .. note::
-   Newer versions of guppy automatically separate the reads depending on the quality. You need to disable this via custom options for being used in MoP3. This is also to avoid losing interesting signals since the modified bases have often low qualities. GUPPY 6 seems to require singularity 3.7.0 or higher.
+   MOP3 will automatically detect the version of guppy and modify the parameters accordingly. You don't need to add any extra parameter as in MOP2.
    
-.. tip::
-   You can pass via parameter a custom NAME_tool_opt.tsv file with custom guppy options to disable the qscore filtering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv
-   
-   
-
 
 
 
