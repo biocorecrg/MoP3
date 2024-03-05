@@ -232,12 +232,11 @@
 <li><p>seqtagger_models</p></li>
 </ul>
 <p>You need to add the dedicated parameter within the tool_opts file for the specific tool as:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">basecalling dorado   &quot;rna002_70bps_hac@v3&quot;</span>
+<span class="go">demultiplexing       seqtagger   &quot;-k b100&quot;</span>
+<span class="go">demultiplexing       deeplexicon   &quot;-f multi -m resnet20-final.h5&quot;</span>
 </pre></div>
 </div>
-<p>basecalling dorado   “<a class="reference external" href="mailto:rna002_70bps_hac&#37;&#52;&#48;v3">rna002_70bps_hac<span>&#64;</span>v3</a>”
-demultiplexing  seqtagger   “-k b100”
-demultiplexing  deeplexicon   “-f multi -m resnet20-final.h5”</p>
 </section>
 <section id="barcodes">
 <h2>Barcodes<a class="headerlink" href="#barcodes" title="Link to this heading"></a></h2>
