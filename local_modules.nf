@@ -6,108 +6,7 @@ params.saveSpace = "NO"
 
 // MODULES 
 // MOP_PREPROCESS
-process extract_deeplexicon_fastq {
-    label (params.LABEL)
-    tag "${ idfile }"
-			
-	input:
-	tuple val(idfile), path(demux), path(fastq) 
-	
-	
-	output:
-	tuple val(idfile), path ("*.fastq.gz")
 
-	script:
-	"""
-		extract_sequence_from_fastq.py ${demux} ${fastq}
-		for i in *.fastq; do gzip \$i; done
-	"""
-}
-
-process extract_seqtagger_fastq {
-
-    tag { idfile }
-    label (params.LABEL)
-
-   // container params.CONTAINER
-             
- 	input:
-	tuple val(idfile), path(demux), path(fastq) 
-	
-	
-	output:
-	tuple val(idfile), path ("*.fastq.gz")
-
-	script:
-	"""
-		fastq_split_by_barcode.py -b 50 -i ${demux} -f ${fastq} -o ${idfile}
-	"""
-	
-}
-
-process preparing_demultiplexing_fast5_seqtagger {
-
-    label (params.LABEL)
-    tag "${ idfile }"
-		
-	input:
-	tuple val(idfile), path("demux_*")
-
-	output:
-	tuple val(idfile), path("*.list")
-
-	
-	script:
-	"""
-	zcat demux_* | grep -v read_id >> dem.files
-	awk '{if (\$5>=50) { print \$1 > "bc_"\$3".list" }}' dem.files
-	"""
-}
-
-process preparing_demultiplexing_fast5_deeplexicon {
-
-    label (params.LABEL)
-    tag "${ idfile }"
-		
-	input:
-	tuple val(idfile), path("demux_*")
-
-	output:
-	tuple val(idfile), path("*.list")
-
-	
-	script:
-	"""
-	cat demux_* | grep -v ReadID >> dem.files
-	awk '{print \$2 > \$3".list" }' dem.files
-	"""
-}
-
-process extract_demultiplexed_fast5 {
-    label (params.LABEL)
-	container 'lpryszcz/deeplexicon:1.2.0'
-    tag "${ idfile } on ${ idlist }"
-    if (params.saveSpace == "YES") publishDir(params.OUTPUTF5, mode:'move', pattern: '*-*') 
-    else publishDir(params.OUTPUTF5, mode:'copy', pattern: '*-*')    
-
-    publishDir(params.OUTPUTST, mode:'copy', pattern: 'summaries/*_final_summary.stats', saveAs: { file -> "${file.split('\\/')[-1]}" })    
-
-		
-	input:
-	tuple val(idfile), path(idlist), file("*")
-
-	output:
-	path("${idfile}-*"), type: "dir", emit: dem_fast5
-	path("summaries/*_final_summary.stats"), emit: dem_summaries
-	
-	script:
-	"""
-	mkdir ${idfile}---`basename ${idlist} .list`; fast5_subset --input ./ --save_path ${idfile}---`basename ${idlist} .list`/ --read_id_list ${idlist} --batch_size 4000 -c vbz -t ${task.cpus}
-	mkdir summaries
-	for i in */filename_mapping.txt; do awk 'BEGIN{print "filename\tread_id"}{print \$2"\t"\$1}' \$i > `echo \$i | awk -F"/" '{print "summaries/"\$1"_final_summary.stats"}'`; done
-	rm */filename_mapping.txt;
-	"""
-} 
 
 process extract_demultiplexed_fast5_readucks {
 
@@ -132,34 +31,6 @@ process extract_demultiplexed_fast5_readucks {
 	  fi
 	  head -n 1 summaries_1 > final_summary.stats
 	  for i in summaries_*; do grep -v "filename" \$i | awk -F"\t" -v id=${idfile}  '{OFS="\t"; \$19 = id"---"\$21; print \$0}'  >> final_summary.stats; done
-
-	  demux_fast5 -c vbz -t ${task.cpus} --input ./ --save_path ./ --summary_file final_summary.stats 
-	  rm -fr barcode_arrangement
-    """
-}
-
-process extract_demultiplexed_fast5_guppy {
-    tag "${ idfile }"
-    label (params.LABEL)
-    if (params.saveSpace == "YES") publishDir(params.OUTPUT, mode:'move') 
-    else publishDir(params.OUTPUT, mode:'copy')    
-
-    container "quay.io/biocontainers/ont-fast5-api:4.0.0--pyhdfd78af_0"
-
-             
-	input:
-	tuple val(idfile), path("summaries_*"), file("*")
-    
-	output:
-	path("${idfile}-*")
-
-    script:
-    """
-      if [ -f "summaries_" ]; then
-	  	ln -s summaries_ summaries_1
-	  fi
-	  head -n 1 summaries_1 > final_summary.stats
-	  for i in summaries_*; do grep -v "filename" \$i | awk -F"\t" -v id=${idfile}  '{OFS="\t"; \$19 = id"---"\$19; print \$0}'  >> final_summary.stats; done
 
 	  demux_fast5 -c vbz -t ${task.cpus} --input ./ --save_path ./ --summary_file final_summary.stats 
 	  rm -fr barcode_arrangement
@@ -941,7 +812,7 @@ def parseFinalSummary(final_summary_file) {
 }
 
 // Create a channel for included ids
-def filterPerBacodes (mybarcodes, barcoded_data) {
+def filterPerBarcodes (mybarcodes, barcoded_data) {
 	reshaped_barcoded_data = barcoded_data.map {
 		def id = it[0].split("---")[0]
 		def bc_id = it[0].split("\\.")[1]
