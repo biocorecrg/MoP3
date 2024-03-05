@@ -1,7 +1,7 @@
 .. _home-page-about:
 
 *******************
-About Master of Pores
+About Master of Pores 3
 *******************
 
 .. autosummary::
