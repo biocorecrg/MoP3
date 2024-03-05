@@ -98,11 +98,11 @@ demux_models = ""
 
 switch(params.demultiplexing) { 
     case "deeplexicon": 
-		demux_models = "${projectDir}/deeplexicon/"
-	    break; 
+        demux_models = "${projectDir}/deeplexicon_models/"
+    break; 
     case "seqtagger": 
-		demux_models = "${projectDir}/seqtagger_models/"
-	    break; 
+        demux_models = "${projectDir}/seqtagger_models/"
+    break; 
 }
 
 dorado_models = "${projectDir}/dorado_models/"
@@ -125,7 +125,7 @@ if (params.ref_type == "genome") {
 outmode = "copy"
 
 include { final_message; notify_slack } from "${subworkflowsDir}/global_functions.nf"
-include { checkInput; filterPerBacodes; get_barcode_list; RNA2DNA; preparing_demultiplexing_fast5_seqtagger; preparing_demultiplexing_fast5_deeplexicon; extract_seqtagger_fastq; extract_deeplexicon_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters; homogenizeVals } from "${local_modules}" 
+include { checkInput; filterPerBarcodes; get_barcode_list; RNA2DNA; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters; homogenizeVals } from "${local_modules}" 
 
 def demulti_fast5_opt = homogenizeVals(params.demulti_fast5)
 def basecall_label = (params.GPU != 'OFF' ? 'basecall_gpus' : 'big_cpus')
@@ -226,7 +226,7 @@ workflow SEQFILTER {
     main:
     // Optional fastq filtering
     switch(params.filtering) {                      
-    	case "nanofilt": 
+        case "nanofilt": 
             bc_fastq = NANOFILT_FILTER(raw_bc_fastq)
             break; 
         case "nanoq": 
@@ -264,17 +264,17 @@ workflow MAPPING {
         switch(params.mapping) { 
             case "graphmap": 
             //GRAPHMAP cannot align RNA, WE NEED TO CONVERT
-            	dna_bc_fastq = RNA2DNA(bc_fastq)
-            	aln_reads = GRAPHMAP(dna_bc_fastq, reference)
+             dna_bc_fastq = RNA2DNA(bc_fastq)
+             aln_reads = GRAPHMAP(dna_bc_fastq, reference)
             break
             case "graphmap2": 
-            	aln_reads = GRAPHMAP2(bc_fastq, reference)
+             aln_reads = GRAPHMAP2(bc_fastq, reference)
             break
             case "minimap2": 
-            	aln_reads = MINIMAP2(bc_fastq, reference)
+             aln_reads = MINIMAP2(bc_fastq, reference)
             break
             case "bwa": 
-            	aln_reads = BWA(reference, bc_fastq)
+             aln_reads = BWA(reference, bc_fastq)
             break
             default: 
             break
@@ -375,88 +375,88 @@ workflow ASSEMBLY {
 
  workflow {
  
- 	analysis_type = checkInput(params.fast5, params.fastq)
+  analysis_type = checkInput(params.fast5, params.fastq)
  
     switch(analysis_type) { 
     case "fast5":
-     	fast5_4_analysis = getFast5(params.fast5)
-    	if (params.demultiplexing == "NO" ) {
-    		outbc = BASECALL(fast5_4_analysis)
-			//basecalled_fast5 = reshapeSamples(outbc.basecalled_fast5)
-			basecalled_fastq = outbc.basecalled_fastq
+      fast5_4_analysis = getFast5(params.fast5)
+     if (params.demultiplexing == "NO" ) {
+      outbc = BASECALL(fast5_4_analysis)
+   //basecalled_fast5 = reshapeSamples(outbc.basecalled_fast5)
+   basecalled_fastq = outbc.basecalled_fastq
 
-  		}
-    	else {
-		    switch(params.demultiplexing) {                      
-		       case "deeplexicon":
-		       case "seqtagger":
-	    	   	outbc = BASECALL(fast5_4_analysis)
-	           	demux = DEMULTIPLEX(fast5_4_analysis, outbc.basecalled_fastq)
-	           	demufq = demux.demultiplexed_fastq	           
-			   	bc_stats = reshapeSamples(demux.demultiplexed_tsv).groupTuple()			   
-	           	break;
-	           
-	           case "guppy":
-	           case "readucks":
-	           	outbc = BASECALL_DEMULTIPLEX(fast5_4_analysis)
-	           	demufq = outbc.demultiplexed_fastqs
-	           	bc_stats = reshapeSamples(outbc.basecalling_stats).groupTuple()
-	           	break;
-	       
-	           case "dorado":
-	           	break;	
-    	   }
-    	   
-		    reshapedPrefiltDemufq = demufq.transpose().map{
-				[it[1].name.replace(".fastq.gz", "").replace(".fq.gz", ""), it[1] ]
-			}
-		    
-			if (params.barcodes != "") {    
-				basecalled_fastq = filterPerBacodes(barcodes_to_include, reshapedPrefiltDemufq)				
-			} else {
-			    basecalled_fastq = reshapedPrefiltDemufq
-			}
-	
-			// DEMULTI FAST5
-		   if (demulti_fast5_opt == "ON") {
-				basecalled_fast5 = reshapeSamples(outbc.basecalled_fast5).transpose().groupTuple()
-				if (params.barcodes == "") {    
-					DEMULTI_FAST5(bc_stats, basecalled_fast5)				
-				} else {
-			   	 	DEMULTI_FAST5_FILTER(bc_stats, basecalled_fast5, barcodes_to_include)
-				}										
-			}
-		
-		}
+    }
+     else {
+      switch(params.demultiplexing) {                      
+         case "deeplexicon":
+         case "seqtagger":
+          outbc = BASECALL(fast5_4_analysis)
+             demux = DEMULTIPLEX(fast5_4_analysis, outbc.basecalled_fastq)
+             demufq = demux.demultiplexed_fastq            
+       bc_stats = reshapeSamples(demux.demultiplexed_tsv).groupTuple()      
+             break;
+            
+            case "guppy":
+            case "readucks":
+             outbc = BASECALL_DEMULTIPLEX(fast5_4_analysis)
+             demufq = outbc.demultiplexed_fastqs
+             bc_stats = reshapeSamples(outbc.basecalling_stats).groupTuple()
+             break;
+        
+            case "dorado":
+             break; 
+        }
+        
+      reshapedPrefiltDemufq = demufq.transpose().map{
+    [it[1].name.replace(".fastq.gz", "").replace(".fq.gz", ""), it[1] ]
+   }
+      
+   if (params.barcodes != "") {    
+    basecalled_fastq = filterPerBarcodes(barcodes_to_include, reshapedPrefiltDemufq)    
+   } else {
+       basecalled_fastq = reshapedPrefiltDemufq
+   }
+ 
+   // DEMULTI FAST5
+     if (demulti_fast5_opt == "ON") {
+    basecalled_fast5 = reshapeSamples(outbc.basecalled_fast5).transpose().groupTuple()
+    if (params.barcodes == "") {    
+     DEMULTI_FAST5(bc_stats, basecalled_fast5)    
+    } else {
+         DEMULTI_FAST5_FILTER(bc_stats, basecalled_fast5, barcodes_to_include)
+    }          
+   }
+  
+  }
 
         // Perform MinIONQC on basecalling stats
-		basecall_qc = MinIONQC(outbc.basecalling_stats.groupTuple()) 
-	    multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
+  basecall_qc = MinIONQC(outbc.basecalling_stats.groupTuple()) 
+     multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
 
         // SEQUENCE FILTERING
-	    bc_fastq = SEQFILTER(basecalled_fastq).out  
+     bc_fastq = SEQFILTER(basecalled_fastq).out  
 
         // SEQUENCE ALIGNMENT
         alns = MAPPING(bc_fastq).out
 
 
-	    // Concatenate fastq and BAM files differently depending on if demultiplexed or not
-	    if (params.demultiplexing == "NO" ) {
-	    	reshaped_bc_fastq = reshapeSamples(bc_fastq)
-	    	reshaped_aln_reads = reshapeSamples(alns)
-	    } else {
-		    reshaped_bc_fastq = reshapeDemuxSamples(bc_fastq)
-		    reshaped_aln_reads = reshapeDemuxSamples(alns)
-	    }
+     // Concatenate fastq and BAM files differently depending on if demultiplexed or not
+     if (params.demultiplexing == "NO" ) {
+      reshaped_bc_fastq = reshapeSamples(bc_fastq)
+      reshaped_aln_reads = reshapeSamples(alns)
+     } else {
+      reshaped_bc_fastq = reshapeDemuxSamples(bc_fastq)
+      reshaped_aln_reads = reshapeDemuxSamples(alns)
+     }
         jaln_reads = SAMTOOLS_CAT(reshaped_aln_reads.groupTuple())
-    	fastq_files = concatenateFastQFiles(reshaped_bc_fastq.groupTuple())
-    	break
+     fastq_files = concatenateFastQFiles(reshaped_bc_fastq.groupTuple())
+     break
 
     case "fastq":
-    	fastq_files = Channel.fromFilePairs( params.fastq , size: 1, checkIfExists: true)
+     fastq_files = Channel.fromFilePairs( params.fastq , size: 1, checkIfExists: true)
         jaln_reads = MAPPING(fastq_files).out
         multiqc_data = Channel.value()
-    	break
+     break
     }
 
     // Perform SORTING and INDEXING on bam files
@@ -474,7 +474,7 @@ workflow ASSEMBLY {
     stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
     
     // Perform NanoPlot on sorted bams
-    //nanoplot_qcs = NANOPLOT_QC(sorted_alns)
+    nanoplot_qcs = NANOPLOT_QC(sorted_alns)
 
     // Perform fastqc QC on fastq
     fastqc_files = FASTQC(fastq_files)
@@ -518,7 +518,7 @@ else {
     log.info "Sending the email to ${params.email}\n"
 
     workflow.onComplete {
- 	   def msg = final_message("MoP3")	
+     def msg = final_message("MoP3") 
         sendMail(to: params.email, subject: "MoP3 - preprocess execution", body: msg, attach: "${outputMultiQC}/multiqc_report.html")
     }
 }
