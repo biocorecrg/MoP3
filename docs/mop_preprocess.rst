@@ -7,66 +7,17 @@ MOP_PREPROCESS
 .. autosummary::
    :toctree: generated
 
-This module takes as input the raw fast5 reads - single or multi - and produces a number of outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module is able to perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a genome / transcriptome reference, feature counting, discovery of novel transcripts and it generates a final report of the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi sequence).
+This module takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). In theory, it can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. 
+
   
 
 Input Parameters
 ======================
 
-.. list-table:: 
-   :widths: 25 75
-   :header-rows: 1
+The input parameters are stored in yaml files like the one represented here:
 
-   * - Parameter name
-     - Description
-   * - **conffile**
-     - Configuration file produced by the Nanopore instrument. It can be omitted but in that case the user must specify either the guppy parameters "--kit" and "--flowcell" or the custom model via **[NAME_tool_opt.tsv]** file
-   * - **fast5 files**
-     - Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/\*\*/*.fast5]**. If empty it will search for fastq files and skip basecalling
-   * - **fastq files**
-     - Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling **[/Path/\*\*/*.fastq]**. 
-   * - **reference**
-     - File in fasta format. **[Reference_file.fa]**
-   * - **ref_type**
-     -  Specify if the reference is a genome or a transcriptome. **[genome / transcriptome]** 
-   * - **annotation**
-     - Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. **[Annotation_file.gtf]**. 
-   * - **pars_tools**
-     - Parameters of tools. It is ha tab separated file with custom parameters for each tool **[NAME_tool_opt.tsv]**
-   * - **barcodes**
-     - File containing a list of ids (combinations of sample names and barcode ids) to be kept after the demulitplexing.
-   * - **output**
-     - Output folder name. **[/Path/to_output_folder]**
-   * - **qualityqc**
-     - Quality threshold for QC. **[5]**
-   * - **granularity**
-     - indicates the number of input fast5 files analyzed in a single process.
-   * - **basecalling**
-     - Tool for basecalling **[guppy / NO ]**
-   * - **GPU**
-     -  Allow the pipeline to run with GPU. You can choose cuda10 for Guppy < 3.4.3 and cuda11 for higher versions. **[cuda10 / cuda11 /  OFF / ON (legacy for cuda10) ]**
-   * - **demultiplexing**
-     -  Tool for demultiplexing algorithm. **[deeplexicon / guppy / NO ]**
-   * - **demulti_fast5**
-     -  If performing demultiplexing generate demultiplexed multifast5 files too. **[YES / NO]**
-   * - **filtering**
-     -  Tool for filtering fastq files. **[nanofilt / NO]**
-   * - **mapping**
-     -  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / bwa / NO ]** 
-   * - **counting**
-     -  Tool for gene or transcripts counts **[htseq / nanocount / NO""]**
-   * - **discovery**
-     -  Tool for generating novel transcripts. **[bambu / isoquant / NO]** 
-   * - **cram_conv**
-     -  Converting bam in cram. **[YES / ""]**
-   * - **subsampling_cram**
-     -  Subsampling BAM before CRAM conversion. **[YES / ""]**
-   * - **saveSpace**
-     -  Remove intermediate files (**beta**) **[YES / ""]**
-   * - **email**
-     -  Users email for receving the final report when the pipeline is finished. **[user_email]**
-
-
+.. literalinclude:: ../mop_preprocess/params.f5.demrna.yaml
+   :language: yaml
 
 You can change them by editing the **params.config** file or using the command line - please, see next section. 
 
