@@ -102,9 +102,15 @@ or you can run the pipeline locally:
    [c8/3f5d17] Cached process > mapping (RNA081120181_1)
    ...
 
-
 .. note::
    To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, the pipeline will re-start from the beginning. 
+
+tool_opts
+====================
+
+The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  *tool_opts* folder. Here you have an example:
+
+.. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtagger_opt.tsv
 
 Results
 ====================
@@ -125,11 +131,6 @@ Several folders are created by the pipeline within the output directory specifie
 .. note::
    MOP3 will automatically detect the version of guppy and modify the parameters accordingly. You don't need to add any extra parameter as in MOP2.
    
-.. tip::
-   You can pass via parameter a custom NAME_tool_opt.tsv file with custom options for each step to customise  to disable the qscore filtering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv
-   
-   
-
 
 
 
