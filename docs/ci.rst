@@ -13,4 +13,4 @@ The following pipelines are continuously checked using GitHub actions:
 * mop_mod
 * mop_tail
 
-A  *Passing* sentence on green backgound is displayed close to the *mop2-CI* logo in the README when the automatic tests are ok.
+[![mop3-CI](https://github.com/biocorecrg/MoP3/actions/workflows/build.yml/badge.svg)](https://github.com/biocorecrg/MoP3/actions/workflows/build.yml)
