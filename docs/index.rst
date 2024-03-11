@@ -39,5 +39,6 @@ Contents:
    awsbatch
    benchmark
    changelog
+   ci
    
 

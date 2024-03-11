@@ -7,6 +7,23 @@ About Master of Pores 3
 .. autosummary::
    :toctree: generated
 
+
+.. |docker| image:: https://img.shields.io/badge/Docker-v20.10.8-blue
+.. |status| image:: https://github.com/biocorecrg/MoP3/actions/workflows/build.yml/badge.svg
+.. |license| image:: https://img.shields.io/badge/License-MIT-yellow.svg
+.. |nver| image:: https://img.shields.io/badge/Nextflow-21.04.1-brightgreen
+.. |sing| image:: https://img.shields.io/badge/Singularity-v3.2.1-green.svg
+
+.. list-table::
+   :widths: 10 10 10 10 10
+   :header-rows: 0
+
+   * - |docker|
+     - |status|
+     - |license|
+     - |nver|
+     - |sing|
+
 Master of Pores 3 is a collection of pipelines written in Nextflow DSL2 for the analysis of Nanopore data. It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.
 
 The software is composed by four pipelines:
