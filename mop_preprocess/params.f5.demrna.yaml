@@ -1,11 +1,11 @@
 # Parameters
 
-# Needed for fast5 input
+# Needed for fast5 or pod5 input. Please use this parameter also for pod5 (like *.pod5)
 fast5: "${projectDir}/../data/fast5_rna_dem/**/*.fast5"
 ## This can be empty but then you need to add specify kit and flowcell via command line inside pars_tools
 conffile: "final_summary_01.txt"
 ## Can be wither guppy or dorado
-basecalling: "guppy"
+basecalling: "dorado"
 ## Can be OFF / cuda10 / cuda11. Newer version of GUPPY may require cuda11 
 GPU: "cuda11"
 demultiplexing: "seqtagger"
