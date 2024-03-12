@@ -17,9 +17,8 @@ Version 3.0
    * Adding a `new model for direct RNA basecalling <https://www.biorxiv.org/content/10.1101/2023.11.28.568965v1>`__.
    * Added seqTagger (add reference)
    * Added support to dorado basecalling. Not yet supported the demultiplexing
-
-* mop_tail
-   * Added support to *nano3p mode* in tailfindr for R10 chemistry 
+   * Also guppy version >= 6.5.x are supported. No need for indicating different command lines for different guppy versions inside tool_opts. The pipeline will get the version and act accordingly
+   * pod5 are supported for dorado and guppy >= 6.5.x. No fast5 and stats files will be output. This will limit other pipelines. 
 
 * mop_tail
    * we upgraded tailfindR to version 1.3
