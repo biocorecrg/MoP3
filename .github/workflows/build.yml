@@ -27,7 +27,7 @@ jobs:
         run: env | sort
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
          token: ${{ github.token }}
          repository: biocorecrg/MoP3
