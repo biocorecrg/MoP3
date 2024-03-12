@@ -110,17 +110,33 @@ tool_opts
 
 The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  *tool_opts* folder. Here you have an example:
 
-.. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtagger_opt.tsv
+.. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtaggepAmps-rep2-4-train1_newdata_nanopore_UResNet20v2_model.039.h5
 
 Model libraries for specific tools
 ====================
-The following folders are available for the respective tool:
+The following folders are available the respective tools. Some models are already pre-installed-
 
 * deeplexicon_models
+   * resnet20-final.h5
+   * pAmps-final-actrun_newdata_nanopore_UResNet20v2_model.030.h5
+   * pAmps-rep2-4-train1_newdata_nanopore_UResNet20v2_model.039.h5
 * dorado_models
+   * rna002_70bps_hac@v3
 * seqtagger_models
+   * b04_RNA002
+   * b04_RNA004
 
-You need to add the dedicated parameter within the tool_opts file for the specific tool as:
+.. note::
+   You need to download the models you want to use in case they are not already available. For instance, if you need another model for dorado you need to do:
+
+.. code-block:: console
+
+   demultiplexing	seqtagger	"-k b100"
+
+   dorado download --model MODELNAME
+
+
+You also need to add the dedicated parameter within the tool_opts file for the specific tool as:
 
 .. code-block:: console
 
