@@ -99,12 +99,12 @@
 <p>The input parameters are stored in yaml files like the one represented here:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Parameters</span>
 
-<span class="c1"># Needed for fast5 input</span>
+<span class="c1"># Needed for fast5 or pod5 input. Please use this parameter also for pod5 (like *.pod5)</span>
 <span class="nt">fast5</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;${projectDir}/../data/fast5_rna_dem/**/*.fast5&quot;</span>
 <span class="c1">## This can be empty but then you need to add specify kit and flowcell via command line inside pars_tools</span>
 <span class="nt">conffile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;final_summary_01.txt&quot;</span>
 <span class="c1">## Can be wither guppy or dorado</span>
-<span class="nt">basecalling</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;guppy&quot;</span>
+<span class="nt">basecalling</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dorado&quot;</span>
 <span class="c1">## Can be OFF / cuda10 / cuda11. Newer version of GUPPY may require cuda11 </span>
 <span class="nt">GPU</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cuda11&quot;</span>
 <span class="nt">demultiplexing</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;seqtagger&quot;</span>
