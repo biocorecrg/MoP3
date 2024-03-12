@@ -21,6 +21,11 @@ The input parameters are stored in yaml files like the one represented here:
 
 You can change them by editing this file or using the command line as explained in the next section. 
 
+.. note::
+ 
+   * In case of pod5 as input files you can use them as they were fast5 with dorado or guppy >= 6.5.x. The only limitation is that you cannot obtained basecalled fast5 and so you cannot use the other pipelines that need fast5 as input files. 
+
+
 How to run the pipeline
 =============================
 
