@@ -206,33 +206,46 @@
 <section id="tool-opts">
 <h2>tool_opts<a class="headerlink" href="#tool-opts" title="Link to this heading"></a></h2>
 <p>The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  <em>tool_opts</em> folder. Here you have an example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#step	tool	extrapars</span>
-<span class="n">basecalling</span>	<span class="n">dorado</span>	<span class="s2">&quot;&quot;</span>
-<span class="n">basecalling</span>	<span class="n">guppy</span>	<span class="s2">&quot;&quot;</span>
-<span class="n">demultiplexing</span>	<span class="n">seqtagger</span>	<span class="s2">&quot;-k b100&quot;</span>
-<span class="n">demultiplexing</span>	<span class="n">deeplexicon</span>	<span class="s2">&quot;&quot;</span>
-<span class="n">demultiplexing</span>	<span class="n">guppy</span>	<span class="s2">&quot;&quot;</span>
-<span class="n">filtering</span>	<span class="n">nanofilt</span>	<span class="s2">&quot;&quot;</span>
-<span class="n">filtering</span>	<span class="n">nanoq</span>	<span class="s2">&quot;&quot;</span>	
-<span class="n">mapping</span>	<span class="n">graphmap</span>	<span class="s2">&quot;&quot;</span>
-<span class="n">mapping</span>	<span class="n">graphmap2</span>	<span class="s2">&quot;-x rnaseq&quot;</span>
-<span class="n">mapping</span>	<span class="n">minimap2</span>	<span class="s2">&quot;-uf -ax splice -k14&quot;</span>
-<span class="n">mapping</span>	<span class="n">bwa</span>	<span class="s2">&quot;&quot;</span>	
-<span class="n">counting</span>	<span class="n">htseq</span>	<span class="s2">&quot;-a 0&quot;</span>
-<span class="n">counting</span>	<span class="n">nanocount</span>	<span class="s2">&quot;&quot;</span>
-<span class="n">discovery</span>	<span class="n">bambu</span>	<span class="s2">&quot;&quot;</span>
-</pre></div>
-</div>
 </section>
 <section id="model-libraries-for-specific-tools">
 <h2>Model libraries for specific tools<a class="headerlink" href="#model-libraries-for-specific-tools" title="Link to this heading"></a></h2>
-<p>The following folders are available for the respective tool:</p>
+<p>The following folders are available the respective tools. Some models are already pre-installed-</p>
 <ul class="simple">
-<li><p>deeplexicon_models</p></li>
-<li><p>dorado_models</p></li>
-<li><p>seqtagger_models</p></li>
+<li><dl class="simple">
+<dt>deeplexicon_models</dt><dd><ul>
+<li><p>resnet20-final.h5</p></li>
+<li><p>pAmps-final-actrun_newdata_nanopore_UResNet20v2_model.030.h5</p></li>
+<li><p>pAmps-rep2-4-train1_newdata_nanopore_UResNet20v2_model.039.h5</p></li>
 </ul>
-<p>You need to add the dedicated parameter within the tool_opts file for the specific tool as:</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>dorado_models</dt><dd><ul>
+<li><p><a class="reference external" href="mailto:rna002_70bps_hac&#37;&#52;&#48;v3">rna002_70bps_hac<span>&#64;</span>v3</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>seqtagger_models</dt><dd><ul>
+<li><p>b04_RNA002</p></li>
+<li><p>b04_RNA004</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You need to download the models you want to use in case they are not already available. For instance, if you need another model for dorado you need to do:</p>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">demultiplexing       seqtagger       &quot;-k b100&quot;</span>
+
+<span class="go">dorado download --model MODELNAME</span>
+</pre></div>
+</div>
+<p>You also need to add the dedicated parameter within the tool_opts file for the specific tool as:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">basecalling dorado   &quot;rna002_70bps_hac@v3&quot;</span>
 <span class="go">demultiplexing       seqtagger   &quot;-k b100&quot;</span>
 <span class="go">demultiplexing       deeplexicon   &quot;-f multi -m resnet20-final.h5&quot;</span>
