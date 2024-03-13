@@ -20,13 +20,11 @@ jobs:
         java_version: [11]
 
     steps:
-     - name: Free Disk Space (Ubuntu)
-       uses: jlumbroso/free-disk-space@main
-       with:
-        # this might remove tools that are actually needed,
-        # when set to "true" but frees about 6 GB
-        tool-cache: true
-
+      - name: Delete huge unnecessary tools folder
+        uses: jlumbroso/free-disk-space@main
+        with:
+         tool-cache: true
+        
       - name: Environment
         run: env | sort
 
@@ -51,10 +49,8 @@ jobs:
           bash INSTALL.sh
           cd mop_preprocess
           ../nextflow run mop_preprocess.nf -params-file params.f5.yaml -with-docker -profile ci
-          rm -rf work
           cd ../mop_mod
           ../nextflow run mop_mod.nf -params-file params.yaml -with-docker -profile ci
-          rm -rf work
           cd ../mop_tail
            ../nextflow run mop_tail.nf -with-docker  -params-file params.yaml -profile ci
 
