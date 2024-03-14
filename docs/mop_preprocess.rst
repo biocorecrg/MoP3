@@ -102,9 +102,11 @@ or you can run the pipeline locally:
    ...
 
    [warm up] executor > crg
-   [e8/2e64bd] Cached process > baseCalling (RNA081120181_1)
-   [b2/21f680] Cached process > QC (RNA081120181_1)
-   [c8/3f5d17] Cached process > mapping (RNA081120181_1)
+   [9d/82eeaa] Cached process > checkRef (Checking yeast_rRNA_ref.fa.gz)
+   [33/b8d053] Submitted process > BASECALL:GUPPY_VERSION:getVersion
+   [e5/e5c990] Submitted process > BASECALL:GUPPY65_BASECALL:baseCallNew (mod---2)
+   [b5/0997da] Submitted process > BASECALL:GUPPY65_BASECALL:baseCallNew (wt---1)
+   [fb/6353d6] Submitted process > SEQFILTER:NANOQ_FILTER:filter (mod---2)
    ...
 
 .. note::
@@ -115,7 +117,7 @@ tool_opts
 
 The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  *tool_opts* folder. Here you have an example:
 
-.. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtaggepAmps-rep2-4-train1_newdata_nanopore_UResNet20v2_model.039.h5
+.. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtagger_opt.tsv
 
 Model libraries for specific tools
 ====================
