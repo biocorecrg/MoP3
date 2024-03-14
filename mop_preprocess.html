@@ -265,9 +265,7 @@
 <p class="admonition-title">Note</p>
 <p>You need to download the models you want to use in case they are not already available. For instance, if you need another model for dorado you need to do:</p>
 </div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">demultiplexing       seqtagger       &quot;-k b100&quot;</span>
-
-<span class="go">dorado download --model MODELNAME</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">dorado download --model MODELNAME</span>
 </pre></div>
 </div>
 <p>You also need to add the dedicated parameter within the tool_opts file for the specific tool as:</p>
@@ -275,6 +273,10 @@
 <span class="go">demultiplexing       seqtagger   &quot;-k b100&quot;</span>
 <span class="go">demultiplexing       deeplexicon   &quot;-f multi -m resnet20-final.h5&quot;</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You need to copy the model in the corresponding folder and indicate just the model name. You don’t need the absolute path.</p>
 </div>
 </section>
 <section id="barcodes">
