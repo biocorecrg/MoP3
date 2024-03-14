@@ -21,6 +21,8 @@ To install the pipeline you need to download the repo:
 
    git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
 
+Guppy
+============
 
 You can use **INSTALL.sh** and the version of Guppy you want to download. 
 
