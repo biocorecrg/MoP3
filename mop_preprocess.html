@@ -198,9 +198,11 @@
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">...</span>
 
 <span class="go">[warm up] executor &gt; crg</span>
-<span class="go">[e8/2e64bd] Cached process &gt; baseCalling (RNA081120181_1)</span>
-<span class="go">[b2/21f680] Cached process &gt; QC (RNA081120181_1)</span>
-<span class="go">[c8/3f5d17] Cached process &gt; mapping (RNA081120181_1)</span>
+<span class="go">[9d/82eeaa] Cached process &gt; checkRef (Checking yeast_rRNA_ref.fa.gz)</span>
+<span class="go">[33/b8d053] Submitted process &gt; BASECALL:GUPPY_VERSION:getVersion</span>
+<span class="go">[e5/e5c990] Submitted process &gt; BASECALL:GUPPY65_BASECALL:baseCallNew (mod---2)</span>
+<span class="go">[b5/0997da] Submitted process &gt; BASECALL:GUPPY65_BASECALL:baseCallNew (wt---1)</span>
+<span class="go">[fb/6353d6] Submitted process &gt; SEQFILTER:NANOQ_FILTER:filter (mod---2)</span>
 <span class="go">...</span>
 </pre></div>
 </div>
@@ -212,6 +214,23 @@
 <section id="tool-opts">
 <h2>tool_opts<a class="headerlink" href="#tool-opts" title="Link to this heading"></a></h2>
 <p>The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  <em>tool_opts</em> folder. Here you have an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#step	tool	extrapars</span>
+<span class="n">basecalling</span>	<span class="n">dorado</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">basecalling</span>	<span class="n">guppy</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">demultiplexing</span>	<span class="n">seqtagger</span>	<span class="s2">&quot;-k b100&quot;</span>
+<span class="n">demultiplexing</span>	<span class="n">deeplexicon</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">demultiplexing</span>	<span class="n">guppy</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">filtering</span>	<span class="n">nanofilt</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">filtering</span>	<span class="n">nanoq</span>	<span class="s2">&quot;&quot;</span>	
+<span class="n">mapping</span>	<span class="n">graphmap</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">mapping</span>	<span class="n">graphmap2</span>	<span class="s2">&quot;-x rnaseq&quot;</span>
+<span class="n">mapping</span>	<span class="n">minimap2</span>	<span class="s2">&quot;-uf -ax splice -k14&quot;</span>
+<span class="n">mapping</span>	<span class="n">bwa</span>	<span class="s2">&quot;&quot;</span>	
+<span class="n">counting</span>	<span class="n">htseq</span>	<span class="s2">&quot;-a 0&quot;</span>
+<span class="n">counting</span>	<span class="n">nanocount</span>	<span class="s2">&quot;&quot;</span>
+<span class="n">discovery</span>	<span class="n">bambu</span>	<span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
 </section>
 <section id="model-libraries-for-specific-tools">
 <h2>Model libraries for specific tools<a class="headerlink" href="#model-libraries-for-specific-tools" title="Link to this heading"></a></h2>
