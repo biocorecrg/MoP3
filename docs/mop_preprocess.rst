@@ -138,8 +138,6 @@ The following folders are available the respective tools. Some models are alread
 
 .. code-block:: console
 
-   demultiplexing	seqtagger	"-k b100"
-
    dorado download --model MODELNAME
 
 
@@ -150,6 +148,11 @@ You also need to add the dedicated parameter within the tool_opts file for the s
    basecalling dorado   "rna002_70bps_hac@v3"
    demultiplexing	seqtagger   "-k b100"
    demultiplexing	deeplexicon   "-f multi -m resnet20-final.h5"
+
+.. note::
+   You need to copy the model in the corresponding folder and indicate just the model name. You don't need the absolute path.
+
+
 
 Barcodes
 ===================
