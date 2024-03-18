@@ -4,8 +4,8 @@ comparison: "${projectDir}/comparison.tsv"
 reference: "${projectDir}/../anno/yeast_rRNA_ref.fa.gz"
 output: "${projectDir}/output_mod"
 pars_tools: "${projectDir}/tools_opt.tsv"
-    
-# flows 
+
+# flows
 epinano: "YES"
 nanocompore: "NO"
 tombo_lsc: "YES"

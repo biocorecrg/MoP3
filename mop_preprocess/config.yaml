@@ -9,7 +9,7 @@ custom_logo: 'logo_small.png'
 custom_logo_url: 'https://github.com/biocorecrg/MoP2'
 custom_logo_title: 'Master of Pores 3'
 
-extra_fn_clean_trim: 
+extra_fn_clean_trim:
    - '_QC'
    - '.count'
 
@@ -20,7 +20,7 @@ read_count_desc: 'thousands'
 table_columns_visible:
     FastQC:
         percent_duplicates: True
-   
+
 top_modules:
  - fastqc:
         name: 'FastQC'
@@ -30,4 +30,4 @@ top_modules:
         info: 'This section of the report shows alnQC results on aligned reads'
  - minionqc
  - RNA201120181_REP2_bc_1_stats:
-        info: 'Nanoplot stats' 
+        info: 'Nanoplot stats'

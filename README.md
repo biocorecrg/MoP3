@@ -1,4 +1,4 @@
-# MoP3 - Master of Pores 3 
+# MoP3 - Master of Pores 3
 [![Docker Build Status](https://img.shields.io/docker/automated/biocorecrg/nanopore.svg)](https://cloud.docker.com/u/biocorecrg/repository/docker/biocorecrg/nanopore/builds)
 [![mop2-CI](https://github.com/biocorecrg/MoP3/actions/workflows/build.yml/badge.svg)](https://github.com/biocorecrg/MoP3/actions/workflows/build.yml)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Nextflow version](https://img.shields.io/badge/Nextflow-21.04.1-brightgreen)](https://www.nextflow.io/)
@@ -13,7 +13,7 @@
 <img align="right" href="https://biocore.crg.eu/" src="https://raw.githubusercontent.com/CRG-CNAG/BioCoreMiscOpen/master/logo/biocore-logo_small.png" />
 
 
-Master of Pores is a pipeline written in Nextflow DSL2 for the analysis of Nanopore data. 
+Master of Pores is a pipeline written in Nextflow DSL2 for the analysis of Nanopore data.
 <br/>
 
 It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.
@@ -34,7 +34,7 @@ Then download the repo:
 git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
 ```
 
-You can use INSTALL.sh to download the version 3.4.5 of guppy or you can replace it with the version you prefer. Please consider that the support of VBZ compression of fast5 started with version 3.4.X. 
+You can use INSTALL.sh to download the version 3.4.5 of guppy or you can replace it with the version you prefer. Please consider that the support of VBZ compression of fast5 started with version 3.4.X.
 
 ```
 cd MoP3; sh INSTALL.sh
@@ -59,8 +59,8 @@ git pull --recurse-submodules
 The documentation is available at [https://biocorecrg.github.io/MoP3/](https://biocorecrg.github.io/MoP3/)
 
 ## Contact
-Please open an [issue](https://github.com/biocorecrg/MOP2/issues) if you encounter any issues/troubles. 
-However, please go over the previous issues (including closed issues) before opening a new issue, as your same exact question might have been already answered previously. Thank you! 
+Please open an [issue](https://github.com/biocorecrg/MOP2/issues) if you encounter any issues/troubles.
+However, please go over the previous issues (including closed issues) before opening a new issue, as your same exact question might have been already answered previously. Thank you!
 
 
 ## Reference
@@ -72,4 +72,3 @@ Cozzuto L, Delgado-Tejedor A, Hermoso Pulido T, Novoa EM, Ponomarenko J. *N. Met
 ["MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets"
 Luca Cozzuto, Huanle Liu, Leszek P. Pryszcz, Toni Hermoso Pulido, Anna Delgado-Tejedor, Julia Ponomarenko, Eva Maria Novoa.
 *Front. Genet., 17 March 2020.* https://doi.org/10.3389/fgene.2020.00211](https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full)
-

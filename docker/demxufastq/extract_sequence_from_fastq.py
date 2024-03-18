@@ -31,7 +31,7 @@ print(IDs)
 
 outprefix = os.path.splitext(sys.argv[2])[0]
 outext = os.path.splitext(sys.argv[2])[1]
-if (outext == '.gz'): 
+if (outext == '.gz'):
 	outprefix = os.path.splitext(outprefix)[0]
 
 fh = fopen (sys.argv[2])

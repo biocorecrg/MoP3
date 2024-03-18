@@ -2,7 +2,7 @@
 
 nextflow.enable.dsl=2
 
-/* 
+/*
  * Define the pipeline parameters
  *
  */
@@ -15,10 +15,10 @@ params.resume          = false
 
 log.info """
 
-╔╦╗╔═╗╔═╗  ╔╦╗╔═╗╦╦  
-║║║║ ║╠═╝   ║ ╠═╣║║  
+╔╦╗╔═╗╔═╗  ╔╦╗╔═╗╦╦
+║║║║ ║╠═╝   ║ ╠═╣║║
 ╩ ╩╚═╝╩     ╩ ╩ ╩╩╩═╝
-                                                                                       
+
 ====================================================
 BIOCORE@CRG Master of Pores 3. Estimating PolyA tail - N F  ~  version ${version}
 ====================================================
@@ -58,7 +58,7 @@ def flows = [:]
 flows["tailfindr"] = params.tailfindr
 flows["nanopolish"] = params.nanopolish
 
-include { getParameters; checkRef } from "${local_modules}" 
+include { getParameters; checkRef } from "${local_modules}"
 
 progPars = getParameters(params.pars_tools)
 
@@ -66,19 +66,19 @@ progPars = getParameters(params.pars_tools)
 def tailFindrCont = (params.tailfindr_mode != 'nano3p' ? 'biocorecrg/moptail:1.3' : 'biocorecrg/moptail:nano3p_5')
 
 def tailfindr_mode = "default"
-switch(params.tailfindr_mode) { 
-        case "n3ps_r9": 
+switch(params.tailfindr_mode) {
+        case "n3ps_r9":
         	tailfindr_mode = params.tailfindr_mode
     		println "tailfindr is in nano3p mode, R9 chemistry"
         break
-        case "n3ps_r10": 
+        case "n3ps_r10":
         	tailfindr_mode = params.tailfindr_mode
     		println "tailfindr is in nano3p mode, R10 chemistry"
   		break
 		default:
     		println "tailfindr is in default mode"
 		break
-}	  		
+}
 
 
 include { GET_VERSION as TAILFINDR_VER; ESTIMATE_TAIL as TAILFINDR_ESTIMATE_TAIL } from "${subworkflowsDir}/chem_modification/tailfindr" addParams(CONTAINER:tailFindrCont, LABEL: 'big_cpus_retry', EXTRAPARS: progPars["tailfindr--tailfindr"], MODE:tailfindr_mode)
@@ -86,13 +86,13 @@ include { GET_VERSION as TAILFINDR_VER; ESTIMATE_TAIL as TAILFINDR_ESTIMATE_TAIL
 
 include { GET_VERSION as SAMTOOLS_VER; INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools"
 include { POLYA_LEN as NANOPOLISH_POLYA_LEN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanopolish, EXTRAPARS: progPars["nanopolish--nanopolish"])
-include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modification/nanopolish" 
+include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modification/nanopolish"
 
-include { reshapeSamples } from "${local_modules}" 
+include { reshapeSamples } from "${local_modules}"
 include { collect_tailfindr_results} addParams(OUTPUT: outputTailFindr) from "${local_modules}"
 include { join_nanotail_results } addParams(OUTPUT: outputFinalPolyA) from "${local_modules}"
 include { filter_bam} addParams(LABEL: 'big_cpus') from "${local_modules}"
- 
+
 
 Channel.fromFilePairs("${params.input_path}/alignment/*_s.bam", size: 1).set{bams}
 Channel.fromFilePairs("${params.input_path}/alignment/*_s.bam.bai", size: 1).set{bais}
@@ -111,7 +111,7 @@ fast5_files_4_np.map{
 }.set{fast5_files_4_tf}
 
 
-workflow {	
+workflow {
 
 	if (params.tailfindr == "YES") {
 		tail_estim = TAILFINDR_ESTIMATE_TAIL(fast5_files_4_np)
@@ -123,7 +123,7 @@ workflow {
 		ref_file = checkRef(reference)
 		filt_bams = filter_bam(ref_file, bams)
 		filt_bais = SAMTOOLS_INDEX(filt_bams)
-		nanores = NANOPOLISH_POLYA_LEN(fast5_files_4_np, bams, bais, fastqs, ref_file) 
+		nanores = NANOPOLISH_POLYA_LEN(fast5_files_4_np, bams, bais, fastqs, ref_file)
 	}
 	if (params.tailfindr == "YES" && params.nanopolish == "YES") {
                 log.info "Joining results"
@@ -143,7 +143,7 @@ workflow {
 */
 workflow.onComplete {
     println "Pipeline BIOCORE@CRG Master of Pore completed!"
-    println "Started at  $workflow.start" 
+    println "Started at  $workflow.start"
     println "Finished at $workflow.complete"
     println "Time elapsed: $workflow.duration"
     println "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
@@ -153,7 +153,7 @@ workflow.onComplete {
 * Mail notification
 */
 
-if (params.email == "yourmail@yourdomain" || params.email == "") { 
+if (params.email == "yourmail@yourdomain" || params.email == "") {
     log.info 'Skipping the email\n'
 }
 else {

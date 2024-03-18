@@ -7,9 +7,9 @@ MOP_PREPROCESS
 .. autosummary::
    :toctree: generated
 
-This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). In theory, it can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. 
+This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). In theory, it can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well.
 
-  
+
 
 Input Parameters
 ======================
@@ -19,11 +19,11 @@ The input parameters are stored in yaml files like the one represented here:
 .. literalinclude:: ../mop_preprocess/params.f5.demrna.yaml
    :language: yaml
 
-You can change them by editing this file or using the command line as explained in the next section. 
+You can change them by editing this file or using the command line as explained in the next section.
 
 .. note::
- 
-   * In case of pod5 as input files you can use them as they were fast5 with dorado or guppy >= 6.5.x. The only limitation is that you cannot obtained basecalled fast5 and so you cannot use the other pipelines that need fast5 as input files. 
+
+   * In case of pod5 as input files you can use them as they were fast5 with dorado or guppy >= 6.5.x. The only limitation is that you cannot obtained basecalled fast5 and so you cannot use the other pipelines that need fast5 as input files.
 
 
 How to run the pipeline
@@ -84,12 +84,12 @@ or you can run the pipeline locally:
 
 
 .. note::
- 
-   * In case of errors you can troubleshoot by seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also go to the intermediate directory indicated in the log and check both the `.command.log` and `.command.err` files. 
+
+   * In case of errors you can troubleshoot by seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also go to the intermediate directory indicated in the log and check both the `.command.log` and `.command.err` files.
 
 .. tip::
 
-   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If a parameter is changed, only processes affected by this parameter will be re-run. 
+   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If a parameter is changed, only processes affected by this parameter will be re-run.
 
 
 .. code-block:: console
@@ -110,7 +110,7 @@ or you can run the pipeline locally:
    ...
 
 .. note::
-   To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, the pipeline will re-start from the beginning. 
+   To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, the pipeline will re-start from the beginning.
 
 tool_opts
 ====================
@@ -167,20 +167,15 @@ Results
 Several folders are created by the pipeline within the output directory specified by the **output** parameter:
 
 
-* **fast5_files**: Contains the basecalled multifast5 files. Each batch contains 4000 sequences. 
+* **fast5_files**: Contains the basecalled multifast5 files. Each batch contains 4000 sequences.
 * **fastq_files**: Contains one or, in case of demultiplexing, more fastq files.
 * **QC_files**: Contains each single QC produced by the pipeline.
 * **alignment**: Contains the bam file(s).
 * **cram_files**: Contains the cram file(s).
 * **counts**: Contains read counts per gene / transcript if counting was performed.
 * **assigned**: Contains assignment of each read to a given gene / transcript if counting was performed.
-* **report**: Contains the final multiqc report. 
+* **report**: Contains the final multiqc report.
 * **assembly**: It contains assembled transcripts.
 
 .. note::
    MOP3 will automatically detect the version of guppy and modify the parameters accordingly. You don't need to add any extra parameter as in MOP2.
-   
-
-
-
-
