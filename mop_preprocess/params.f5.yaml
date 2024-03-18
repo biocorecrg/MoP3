@@ -6,7 +6,7 @@ fast5: "${projectDir}/../data/fast5/**/*.fast5"
 conffile: "final_summary_01.txt"
 ## Can be wither guppy or dorado
 basecalling: "guppy"
-## Can be OFF / cuda10 / cuda11. Newer version of GUPPY may require cuda11 
+## Can be OFF / cuda10 / cuda11. Newer version of GUPPY may require cuda11
 GPU: "OFF"
 demultiplexing: "NO"
 demulti_fast5: "NO"
@@ -24,7 +24,7 @@ reference: "${projectDir}/../anno/yeast_rRNA_ref.fa.gz"
 ref_type: "transcriptome"
 annotation: ""
 ## command line options
-pars_tools: "${projectDir}/tool_opts/drna_tool_splice_opt.tsv" 
+pars_tools: "${projectDir}/tool_opts/drna_tool_splice_opt.tsv"
 ## Cut off quality for QC
 qualityqc: 5
 ## Can be nanoq / nanofilt

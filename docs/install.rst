@@ -24,15 +24,15 @@ To install the pipeline you need to download the repo:
 Guppy
 ============
 
-You can use **INSTALL.sh** and the version of Guppy you want to download. 
+You can use **INSTALL.sh** and the version of Guppy you want to download.
 
 .. note::
-  
-  Please consider that the support of VBZ compression of fast5 started with version 3.4.X. 
+
+  Please consider that the support of VBZ compression of fast5 started with version 3.4.X.
 
 
 .. code-block:: console
-  
+
   cd MoP3; bash INSTALL.sh 6.0.1
 
 or for installing the default 3.4.5
@@ -57,6 +57,3 @@ Testing
 .. tip::
 
   You can replace ```-with-singularity``` with ```-with-docker``` if you want to use the docker engine.
-
-
-

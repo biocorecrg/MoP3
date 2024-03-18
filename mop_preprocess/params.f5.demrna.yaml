@@ -6,7 +6,7 @@ fast5: "${projectDir}/../data/fast5_rna_dem/**/*.fast5"
 conffile: "final_summary_01.txt"
 ## Can be wither guppy or dorado
 basecalling: "dorado"
-## Can be OFF / cuda10 / cuda11. Newer version of GUPPY may require cuda11 
+## Can be OFF / cuda10 / cuda11. Newer version of GUPPY may require cuda11
 GPU: "cuda11"
 demultiplexing: "seqtagger"
 demulti_fast5: "YES"

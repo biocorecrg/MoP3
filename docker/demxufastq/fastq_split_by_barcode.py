@@ -15,7 +15,7 @@ def split_by_barcode(demux, fastq, outname, minbaseQ):
     outdir = os.path.dirname(outname)
     if outdir and not os.path.isdir(outdir):
         os.makedirs(outdir)
-    
+
     df = pd.read_csv(demux, sep="\t")
     read2bc = {r: b for r, b in df.loc[df["baseQ"]>=minbaseQ, ["read_id", "barcode"]].to_numpy()}
 
@@ -45,7 +45,7 @@ def main():
     usage   = "%(prog)s -v" #usage=usage,
     parser  = argparse.ArgumentParser(description=desc, epilog=epilog, \
                                       formatter_class=argparse.RawTextHelpFormatter)
-  
+
     parser.add_argument('--version', action='version', version='1.0a')
     parser.add_argument("-v", "--verbose", action="store_true", help="verbose")
     parser.add_argument("-i", "--demux", required=True, help="demux file name")
@@ -54,13 +54,13 @@ def main():
                         help="output basename (.bc_?.fq.gz will be added)")
     parser.add_argument("-b", "--minbaseQ", default=50, type=int,
                         help="minimum demux quality [%(default)s]")
-    
+
     o = parser.parse_args()
-    if o.verbose: 
+    if o.verbose:
         sys.stderr.write("Options: %s\n"%str(o))
 
     split_by_barcode(o.demux, o.fastq, o.outname, o.minbaseQ)
-    
+
 if __name__=='__main__':
     t0 = datetime.now()
     try:

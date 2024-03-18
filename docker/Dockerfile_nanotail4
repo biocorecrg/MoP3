@@ -39,10 +39,8 @@ RUN apt-get update && apt-get install -y wget
 RUN wget https://github.com/nanoporetech/vbz_compression/releases/download/v1.0.1/ont-vbz-hdf-plugin-1.0.1-Linux-x86_64.tar.gz; tar -zvxf ont-vbz-hdf-plugin-1.0.1-Linux-x86_64.tar.gz
 RUN mv ont-vbz-hdf-plugin-1.0.1-Linux/usr/local/hdf5/ /usr/local/
 ENV HDF5_PLUGIN_PATH "/usr/local/hdf5/lib/plugin"
-ENV LD_LIBRARY_PATH "/usr/local/hdf5/lib" 
-ENV PATH "/usr/local/hdf5/bin":${PATH} 
+ENV LD_LIBRARY_PATH "/usr/local/hdf5/lib"
+ENV PATH "/usr/local/hdf5/bin":${PATH}
 ENV HDF5_PLUGIN_PATH "/usr/local/hdf5/lib/plugin"
 ENV LC_ALL=en_US.utf8
 ENV LANG=en_US.utf8
-
-

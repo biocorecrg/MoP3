@@ -4,7 +4,7 @@ params.LABEL = ""
 params.OUTPUT = ""
 params.saveSpace = "NO"
 
-// MODULES 
+// MODULES
 // MOP_PREPROCESS
 
 
@@ -12,15 +12,15 @@ process extract_demultiplexed_fast5_readucks {
 
     tag "${ idfile }"
     label (params.LABEL)
-    if (params.saveSpace == "YES") publishDir(params.OUTPUT, mode:'move') 
-    else publishDir(params.OUTPUT, mode:'copy')    
+    if (params.saveSpace == "YES") publishDir(params.OUTPUT, mode:'move')
+    else publishDir(params.OUTPUT, mode:'copy')
 
     container "quay.io/biocontainers/ont-fast5-api:4.0.0--pyhdfd78af_0"
 
-             
+
 	input:
 	tuple val(idfile), path("summaries_*"), file("*")
-    
+
 	output:
 	path("${idfile}-*")
 
@@ -32,7 +32,7 @@ process extract_demultiplexed_fast5_readucks {
 	  head -n 1 summaries_1 > final_summary.stats
 	  for i in summaries_*; do grep -v "filename" \$i | awk -F"\t" -v id=${idfile}  '{OFS="\t"; \$19 = id"---"\$21; print \$0}'  >> final_summary.stats; done
 
-	  demux_fast5 -c vbz -t ${task.cpus} --input ./ --save_path ./ --summary_file final_summary.stats 
+	  demux_fast5 -c vbz -t ${task.cpus} --input ./ --save_path ./ --summary_file final_summary.stats
 	  rm -fr barcode_arrangement
     """
 }
@@ -44,14 +44,14 @@ process extract_demultiplexed_fast5_readucks {
 process cleanFile {
     tag "${id}"
     label (params.LABEL)
-    
+
     input:
     tuple val(id), path(file_to_remove)
     val(file_to_wait1)
 	val(extension)
 
 	when: params.saveSpace == "YES"
-    
+
     script:
     """
 		for i in *${extension}; do rm \$(readlink -f \$i); done
@@ -65,14 +65,14 @@ process cleanFile {
 process concatenateFastQFiles {
     tag "${idfile}"
     label (params.LABEL)
-    publishDir(params.OUTPUT, mode:'copy') 
+    publishDir(params.OUTPUT, mode:'copy')
 
     input:
     tuple val(idfile), path(demultifq)
 
     output:
-    tuple val(idfile), path("${idfile}.fq.gz") 
-    
+    tuple val(idfile), path("${idfile}.fq.gz")
+
 
     script:
     """
@@ -89,21 +89,21 @@ process MinIONQC {
     label (params.LABEL)
     container 'biocorecrg/mopprepr:0.7'
     errorStrategy 'ignore'
-    if (params.OUTPUT != "") publishDir(params.OUTPUT, mode:'copy', pattern: '*.stats') 
+    if (params.OUTPUT != "") publishDir(params.OUTPUT, mode:'copy', pattern: '*.stats')
 
-    
+
     input:
-    tuple val(folder_name), path("summaries_*") 
+    tuple val(folder_name), path("summaries_*")
 
     output:
-    tuple val(folder_name), path ("${folder_name}_QC"), emit: QC_folder 
-    tuple val(folder_name), path ("*_summary.stats"), emit: stats 
+    tuple val(folder_name), path ("${folder_name}_QC"), emit: QC_folder
+    tuple val(folder_name), path ("*_summary.stats"), emit: stats
 
     script:
     """
       if [ -f "summaries_" ]; then
 	  ln -s summaries_ ${folder_name}_final_summary.stats
-	  else 
+	  else
 		  head -n 1 summaries_1 > ${folder_name}_final_summary.stats
 	      for i in summaries_*; do grep -v "filename" \$i >> ${folder_name}_final_summary.stats; done
 	  fi
@@ -112,18 +112,18 @@ process MinIONQC {
 }
 
 /*
-*  Perform bam2stats QC 
+*  Perform bam2stats QC
 */
 process bam2stats {
     label (params.LABEL)
-    tag "${id}" 
-   
+    tag "${id}"
+
     input:
     tuple val(id), path(bamfile)
 
     output:
     tuple val(id), path ("${id}.stat")
-    
+
     script:
     """
     bam2stats.py ${bamfile} > ${id}.stat
@@ -136,7 +136,7 @@ process bam2stats {
 
 process AssignReads {
     tag "${id}"
-    publishDir(params.OUTPUT, mode:'copy') 
+    publishDir(params.OUTPUT, mode:'copy')
     label (params.LABEL)
 
     input:
@@ -145,7 +145,7 @@ process AssignReads {
 
     output:
     tuple val(id), path ("${id}.assigned")
-    
+
     script:
     if (tool == "nanocount")
 	    """
@@ -155,7 +155,7 @@ process AssignReads {
     	"""
 			samtools view ${input} | awk '{if (\$NF>1) {gsub(/XF:Z:/,"",\$NF); print \$1"     "\$NF} }' | awk '{if (\$0!~"__") print }' > ${id}.assigned
     	"""
-    else 
+    else
         error "Invalid alignment mode: ${tool}"
 }
 
@@ -166,13 +166,13 @@ process AssignReads {
 process countStats {
     tag "${id}"
     label (params.LABEL)
-   
+
     input:
     tuple val(id), path(input)
 
     output:
     tuple val(id), path ("${id}.count.stats")
-    
+
     script:
 	"""
 		wc -l ${input} |sed s@.assigned@@g | awk '{print \$2"\t"\$1}' > ${id}.count.stats
@@ -180,19 +180,19 @@ process countStats {
 }
 
 /*
-*  Join AlnStats 
+*  Join AlnStats
 */
 process joinAlnStats {
     label (params.LABEL)
     tag "joining aln stats"
-    shell '/bin/bash' 
+    shell '/bin/bash'
 
     input:
-    file "alnqc_*" 
+    file "alnqc_*"
 
     output:
-    path("alnQC_mqc.txt") 
-    
+    path("alnQC_mqc.txt")
+
     script:
     """
     echo '# id: alnQC
@@ -204,42 +204,42 @@ process joinAlnStats {
 }
 
 /*
-*  Join Count Stats 
+*  Join Count Stats
 */
 process joinCountStats {
     tag "joining count stats"
     label (params.LABEL)
-  
+
     input:
-    file "stats_*" 
+    file "stats_*"
 
 	output:
 	path("counts_mqc.txt")
-	
+
 	script:
 	"""
 	echo '# id: Assigned reads
 	# plot_type: \'table\'
-	# section_name: Assigned counts 
-	File name	\'Counts\' ' > counts_mqc.txt 
-		cat stats_*  >> counts_mqc.txt 
+	# section_name: Assigned counts
+	File name	\'Counts\' ' > counts_mqc.txt
+		cat stats_*  >> counts_mqc.txt
 		"""
-} 
+}
 
  process bam2Cram {
-    tag "${idfile}"  
-    
-    publishDir(params.OUTPUT, mode:'copy') 
+    tag "${idfile}"
+
+    publishDir(params.OUTPUT, mode:'copy')
     label (params.LABEL)
 
     input:
     path(reference)
     val(subsampling_val)
     tuple val(idfile), path(aln), path(index)
-    
+
     output:
-    file("*.sorted.cram*") optional true 
-    
+    file("*.sorted.cram*") optional true
+
     script:
     def downcmd = ""
     def input = aln
@@ -263,21 +263,21 @@ process joinCountStats {
 process checkRef {
     tag "Checking ${ reference }"
     label (params.LABEL)
- 
+
     input:
     path(reference)
-    
+
     output:
     path("reference.fa")
-    
+
     script:
 	"""
-	if [ `echo ${reference} | grep ".gz"` ]; then 
+	if [ `echo ${reference} | grep ".gz"` ]; then
    		zcat ${reference} > reference.fa
-	else 
+	else
         ln -s ${reference} reference.fa
 	fi
-	"""	
+	"""
 }
 
 // MOP_MOD and MOP_TAIL
@@ -311,7 +311,7 @@ process splitBams {
 
     script:
     """
-		samtools faidx ${ref_piece} 
+		samtools faidx ${ref_piece}
 		awk '{OFS="	"}{print \$1, "1", \$2}' ${ref_piece}.fai > ${ref_piece}.bed
 		samtools view -@ ${task.cpus} ${bams} -L ${ref_piece}.bed -S | samtools view -Sb -t ${ref_piece}.fai -@ ${task.cpus} -o ${combid}.bam
    		samtools sort -@ ${task.cpus} -o ${combid}_s.bam ${combid}.bam
@@ -328,10 +328,10 @@ process indexReference {
 
     input:
     path(reference)
-    
+
     output:
     tuple val("${reference.simpleName}"), path(reference), path("*.dict"), path ("*.fai")
-    
+
     script:
 	"""
 	\$PICARD CreateSequenceDictionary R=${reference} O=${reference}.dict
@@ -343,16 +343,16 @@ process joinEpinanoRes {
     label (params.LABEL)
     container 'biocorecrg/mopmod:0.6.2'
     tag "joining on ${id}"
-    publishDir(params.OUTPUT, mode:'copy') 
+    publishDir(params.OUTPUT, mode:'copy')
 
     input:
     tuple val(id), path(epinanores)
-    
-    output:
-    tuple val(id), path("*.plus_strand.per.site.csv.gz"), emit: plusepi 
-    tuple val(id), path("*.plus_strand.per.site.csv.gz"), emit: minusepi 
 
-    
+    output:
+    tuple val(id), path("*.plus_strand.per.site.csv.gz"), emit: plusepi
+    tuple val(id), path("*.plus_strand.per.site.csv.gz"), emit: minusepi
+
+
     script:
 	"""
 	if compgen -G "*.plus_strand.per.site.csv.gz" > /dev/null; then
@@ -360,13 +360,13 @@ process joinEpinanoRes {
 	fi
 	if compgen -G "*.minus_strand.per.site.csv.gz" > /dev/null; then
 		zcat *pieces*.minus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.minus_strand.per.site.csv.gz
-	fi	
+	fi
 	"""
 }
 
 
 /*
-* 
+*
 */
 
 /*
@@ -377,17 +377,17 @@ process mean_per_pos {
 
     container 'biocorecrg/mopmod:0.7'
     label (params.LABEL)
-    tag "${idsample}" 
-	
+    tag "${idsample}"
+
     input:
-    tuple val(idsample), path(event_align) 
-    
+    tuple val(idsample), path(event_align)
+
     output:
     tuple val(idsample), path("*_perpos_median.parquet")
 
 
     script:
-    
+
     """
 	mean_per_pos.py -i ${event_align} -o `basename ${event_align} .fast5_event_align.tsv.gz`
 	#gzip *_processed_perpos_median.tsv
@@ -401,11 +401,11 @@ process concat_mean_per_pos {
 
     container 'biocorecrg/mopmod:0.7'
     label (params.LABEL)
-    tag "${idsample} on ${chr_file}" 
-    	
+    tag "${idsample} on ${chr_file}"
+
     input:
     tuple val(idsample), path(event_align), path(chr_file)
-    
+
     output:
     tuple val(idsample), path("${idsample}.gz")
 
@@ -418,19 +418,19 @@ process concat_mean_per_pos {
 
 
 /*
-* CONCAT CSV FILES 
+* CONCAT CSV FILES
 */
 process concat_csv_files {
 
     container 'biocorecrg/mopmod:0.7'
     label (params.LABEL)
-    tag "${idsample}" 
-    
-    publishDir(params.OUTPUT, mode:'copy') 
-	
+    tag "${idsample}"
+
+    publishDir(params.OUTPUT, mode:'copy')
+
     input:
     tuple val(idsample), path("files_*")
-    
+
     output:
     tuple val(idsample), path("${idsample}.csv.gz")
 
@@ -446,16 +446,16 @@ process concat_csv_files {
 */
 
 process callVariants {
-    tag "${sampleID}" 
+    tag "${sampleID}"
     container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
-	
+
     input:
-    tuple val(sampleID), path(alnfile), path(reference), path(dict_index), path(faiidx) 
+    tuple val(sampleID), path(alnfile), path(reference), path(dict_index), path(faiidx)
 
     output:
     tuple val(sampleID), path("${sampleID}.tsv")
-   
+
     script:
 	"""
 	samtools view -h ${alnfile} -F 256 | \$SAM2TSV -R ${reference} | cut -f 3 --complement  > ${sampleID}.tsv
@@ -467,19 +467,19 @@ process makeEpinanoPlots {
 	container "biocorecrg/mopnanotail:0.3"
     label (params.LABEL)
 
-    tag {"${sampleIDA}--${sampleIDB} ${mode}"}  
-	
+    tag {"${sampleIDA}--${sampleIDB} ${mode}"}
+
     input:
     path(rscript)
-    tuple val(sampleIDA), val(sampleIDB), path(per_site_varA), path(per_site_varB) 
+    tuple val(sampleIDA), val(sampleIDB), path(per_site_varA), path(per_site_varB)
     val(mode)
-    
+
     output:
     path("*.pdf")
-       
+
     script:
 	"""
-	Rscript --vanilla ${rscript} ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
+	Rscript --vanilla ${rscript} ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}
 	"""
 }
 
@@ -487,19 +487,19 @@ process multiToSingleFast5 {
     container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
 
-    tag "${idsample}"  
-	
+    tag "${idsample}"
+
     input:
     tuple val(idsample), path(fast5)
-    
+
     output:
     tuple val(idsample), path("${idsample}-single")
-       
+
     script:
 	"""
     mkdir ${idsample}-single;
-    multi_to_single_fast5 -i ./ -s ./ -t ${task.cpus}; 
-    rm ./filename_mapping.txt; 
+    multi_to_single_fast5 -i ./ -s ./ -t ${task.cpus};
+    rm ./filename_mapping.txt;
     mv ./*/*.fast5 ${idsample}-single;
 	"""
 }
@@ -509,16 +509,16 @@ process multiToSingleFast5 {
 */
 process bedGraphToWig {
     container 'biocorecrg/mopmod:0.6'
-    tag "${idsample}"  
+    tag "${idsample}"
     errorStrategy 'ignore'
-	
+
     input:
     path(chromsizes)
     tuple val(idsample), path(bedgraph)
-    
+
     output:
     tuple val(idsample), path("*.bw")
-       
+
     script:
     def ofname = "${bedgraph.baseName}.wig"
 	"""
@@ -532,7 +532,7 @@ process bedGraphToWig {
 */
 process mergeTomboWigs {
     label (params.LABEL)
-    tag "${combID}"  
+    tag "${combID}"
 	publishDir params.OUTPUT, pattern: "*_Tombo_Output.tsv.gz",  mode: 'copy'
 	container "biocorecrg/mopmod:0.6"
 
@@ -541,8 +541,8 @@ process mergeTomboWigs {
     tuple val(combID), path(coverage), path(covcontrol), path(statistic)
 
 	output:
-	path("*_Tombo_Output.tsv.gz") optional true 
-	
+	path("*_Tombo_Output.tsv.gz") optional true
+
 	script:
 	"""
 	Merge_Tombo.py ${statistic} ${covcontrol} ${coverage} ${combID}.${strand}
@@ -554,14 +554,14 @@ process mergeTomboWigs {
 */
 process RNA2DNA {
     label (params.LABEL)
-    tag "${id}"  
+    tag "${id}"
 
    input:
     tuple val(id), path(rnafqfile)
 
 	output:
-	tuple val(id), path("*_RNA.fq.gz") 
-	
+	tuple val(id), path("*_RNA.fq.gz")
+
 	script:
     def ofname = "${rnafqfile.baseName}_RNA.fq"
 
@@ -576,7 +576,7 @@ process RNA2DNA {
 */
 process wigToBigWig {
     label (params.LABEL)
-    tag "${id}"  
+    tag "${id}"
 	container "biocorecrg/mopmod:0.6"
     //errorStrategy 'ignore'
 
@@ -585,8 +585,8 @@ process wigToBigWig {
     tuple val(id), path(bedgraph)
 
 	output:
-	tuple val(id), path("*.bw") optional true 
-	
+	tuple val(id), path("*.bw") optional true
+
 	script:
     def ofname = "${bedgraph.baseName}.bw"
 
@@ -606,15 +606,15 @@ process wigToBigWig {
 
 process collect_tailfindr_results {
 	publishDir params.OUTPUT, pattern: "*_findr.csv.gz",  mode: 'copy'
-	tag "${ sampleID }"  
+	tag "${ sampleID }"
     label (params.LABEL)
-	
+
 	input:
 	tuple val(sampleID), path("tailfin_*")
-	
+
 	output:
-    tuple val(sampleID), path("${sampleID}.findr.len.gz"), emit: length 
-    tuple val(sampleID), file ("*_findr.csv.gz"), emit: csv 
+    tuple val(sampleID), path("${sampleID}.findr.len.gz"), emit: length
+    tuple val(sampleID), file ("*_findr.csv.gz"), emit: csv
 
 	script:
 	"""
@@ -632,20 +632,20 @@ process join_nanotail_results {
     tag "joining nanotail results"
 
     publishDir params.OUTPUT,  mode: 'copy'
-	tag { sampleID }  
-	
+	tag { sampleID }
+
 	input:
 	tuple val(sampleID), path(nanopol), path(tailfindr), path(genes)
 	file(joinScript)
-	
+
 	output:
 	file("${sampleID}_*")
-	
+
 	script:
 	"""
 	Rscript --vanilla ${joinScript} ${tailfindr} ${nanopol} ${genes} ${sampleID}
 	"""
-	
+
 }
 
 
@@ -655,7 +655,7 @@ process join_nanotail_results {
 process filter_bam {
 	tag "${ sampleID }"
     label (params.LABEL)
-	
+
 	input:
 	file(reference)
 	tuple val(sampleID), path(alignment)
@@ -665,8 +665,8 @@ process filter_bam {
 
 	script:
 	"""
-    #to keep only mapped reads and remove secondary alignments 
-    samtools view -@ {task.cpus} -bF 260 ${alignment} > ${sampleID}_filt.bam 
+    #to keep only mapped reads and remove secondary alignments
+    samtools view -@ {task.cpus} -bF 260 ${alignment} > ${sampleID}_filt.bam
 	"""
 }
 
@@ -674,14 +674,14 @@ process filter_bam {
 process indexFasta {
     label (params.LABEL)
 
-    tag "${reference}" 
-	
+    tag "${reference}"
+
     input:
     path(reference)
-    
+
     output:
-    stdout   
-       
+    stdout
+
     script:
 	"""
 	samtools faidx ${reference}
@@ -692,15 +692,15 @@ process indexFasta {
 process getChromInfo {
     label (params.LABEL)
 
-    tag "${reference}" 
-	
+    tag "${reference}"
+
     input:
     path(reference)
-    
+
     output:
-    path("chrom.sizes"), emit: sizes   
+    path("chrom.sizes"), emit: sizes
     stdout emit: chromosomes
-       
+
     script:
 	"""
 	samtools faidx ${reference}
@@ -716,18 +716,18 @@ process nanoConsensus {
     label (params.LABEL)
     errorStrategy 'ignore'
 
-    tag "${sampleIDs} on ${chrName}"  
-	
+    tag "${sampleIDs} on ${chrName}"
+
     input:
     path(nanoConScript)
     path(nanoScripts)
     path(reference)
     val(extraparams)
     tuple val(sampleIDs), path(Epi_Sample), path(Epi_IVT), path(NP_Sample), path(NP_IVT), path(Tombo), path(Nanocomp), val(chrName), val(chrStart), val(chrEnd)
-    
+
     output:
     path("*")
-       
+
     script:
 	"""
 	Rscript --vanilla ${nanoConScript} -Epi_Sample ${Epi_Sample} \
@@ -740,7 +740,7 @@ process nanoConsensus {
 	 -ini_pos ${chrStart} -fin_pos ${chrEnd} \
 	 -output ${sampleIDs} \
 	 -fasta ${reference} \
-	 --nanocomp_stat GMM_logit_pvalue ${extraparams} 
+	 --nanocomp_stat GMM_logit_pvalue ${extraparams}
 	"""
 }
 
@@ -758,10 +758,10 @@ def checkInput(fast5_par, fastq_par) {
 		type = "fastq"
 	} else {
             println "ERROR ################################################################"
-            println "Please choose one between fast5 and fastq as input!!!" 
+            println "Please choose one between fast5 and fastq as input!!!"
             println "ERROR ################################################################"
             println "Exiting ..."
-            System.exit(0)		
+            System.exit(0)
 	}
 	return (type)
 }
@@ -778,12 +778,12 @@ def getParameters (pars_tools_file) {
 	for( line : allLines ) {
     	def list = line.split("\t")
     	if (list.length <3) {
-			 error "ERROR!!! Tool option file has to be tab separated\n" 
+			 error "ERROR!!! Tool option file has to be tab separated\n"
 		}
     	if (!(list[0] =~ /#/ )) {
 			progPars["${list[0]}--${list[1]}"] = list[2].replace("\"", "").replace('$baseDir', "${baseDir}").replace('${baseDir}', "${baseDir}")
-    	}  
-	}	
+    	}
+	}
 	return(progPars)
 }
 
@@ -800,11 +800,11 @@ def parseFinalSummary(final_summary_file) {
 				if (list[0] == "protocol") {
 					def vals = list[1].split(":")
 					outstring = "--flowcell ${vals[1]} --kit ${vals[2]}"
-				}  
-			}	
+				}
+			}
 		} else {
 			log.info '***No configuration file found!!. You must specify kit and flowcell in the parameters!!***\n'
-			} 
+			}
 		} else {
 			log.info '***No configuration file given!!. You must specify kit and flowcell in the parameters!!***\n'
 		}
@@ -819,7 +819,7 @@ def filterPerBarcodes (mybarcodes, barcoded_data) {
 		def ori_id = "${id}---${bc_id}"
 		[ori_id, it]
 	}
-	
+
 	filtered_data = reshaped_barcoded_data.combine(mybarcodes, by: 0).map {
 		it[1]
 	}
@@ -874,25 +874,25 @@ def get_barcode_list (barcodes) {
 // Create a channel for excluded ids
 def  getFast5 (fast5_string_path) {
 
-     fast5_files = Channel.fromPath( fast5_string_path, checkIfExists: true)                                             
-           
-     fast5_per_folder = fast5_files.map { 
+     fast5_files = Channel.fromPath( fast5_string_path, checkIfExists: true)
+
+     fast5_per_folder = fast5_files.map {
          def filepath = file(it)
          def file_parts = "${filepath}".tokenize("/")
          def folder_name  = filepath[-2]
          [folder_name, it]
      }.groupTuple()
-    
+
      def num = 0
      fast5_4_analysis = fast5_per_folder.map{
          def folder_name = it[0]
          def buffer_files = it[1].flatten().collate(params.granularity)
          [folder_name, buffer_files]
      }.transpose().map{
-         num++ 
+         num++
          [ "${it[0]}---${num}", it[1] ]
      }
-        
+
     return(fast5_4_analysis)
 }
 
@@ -900,13 +900,13 @@ def  getFast5 (fast5_string_path) {
 
 def checkTools(tool_names, tool_lists) {
 	println "----------------------CHECK TOOLS -----------------------------"
-	tool_names.each{ key, value -> 
+	tool_names.each{ key, value ->
 		if (value == "NO" ) {
 			println "> ${key} will be skipped"
 		} else {
 			def combid = "${key}--${value}".toString()
 			if (tool_lists.containsKey(combid)) {
-				println "${key} : ${value}"	
+				println "${key} : ${value}"
 			} else {
 				println "ERROR ################################################################"
 				println "${value} is not a valid program for ${key}"

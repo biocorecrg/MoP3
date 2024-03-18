@@ -22,7 +22,3 @@ outputTomboFlow      = "${params.output}/tombo_flow"
 outputTailFindr     = "${params.output}/tailfindr_flow"
 outputNanopolish    = "${params.output}/nanopolish_flow"
 outputFinalPolyA    = "${params.output}/polya_common"
-
-
-
-
