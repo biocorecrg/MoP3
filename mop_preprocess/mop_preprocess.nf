@@ -383,7 +383,7 @@ workflow {
         if (params.demultiplexing == "NO" ) {
             outbc = BASECALL(fast5_4_analysis)
             basecalled_fastq = outbc.basecalled_fastq
-            basecalling_stats = outbc.basecalling_stats
+            bc_stats = reshapeSamples(outbc.basecalling_stats)
         }
         else {
             switch(params.demultiplexing) {
@@ -406,7 +406,7 @@ workflow {
                 break;
             }
         
-        basecalling_stats = reshapeSamples(outbc.basecalling_stats)
+        bc_stats = reshapeSamples(outbc.basecalling_stats)
 
         reshapedPrefiltDemufq = demufq.transpose().map{
             [it[1].name.replace(".fastq.gz", "").replace(".fq.gz", ""), it[1] ]
@@ -432,7 +432,7 @@ workflow {
   
   
     // Perform MinIONQC on basecalling stats
-    basecall_qc = MinIONQC(basecalling_stats.groupTuple())
+    basecall_qc = MinIONQC(bc_stats.groupTuple())
     multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
 
     // SEQUENCE FILTERING
