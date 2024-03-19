@@ -383,6 +383,7 @@ workflow {
         if (params.demultiplexing == "NO" ) {
             outbc = BASECALL(fast5_4_analysis)
             basecalled_fastq = outbc.basecalled_fastq
+            basecalling_stats = outbc.basecalling_stats
         }
         else {
             switch(params.demultiplexing) {
@@ -404,6 +405,8 @@ workflow {
                 case "dorado":
                 break;
             }
+        
+        basecalling_stats = reshapeSamples(outbc.basecalling_stats)
 
         reshapedPrefiltDemufq = demufq.transpose().map{
             [it[1].name.replace(".fastq.gz", "").replace(".fq.gz", ""), it[1] ]
@@ -423,10 +426,7 @@ workflow {
             } else {
                 DEMULTI_FAST5_FILTER(bc_stats, basecalled_fast5, barcodes_to_include)
             }
-            basecalling_stats = reshapeSamples(outbc.basecalling_stats)
-        } else {
-            basecalling_stats = outbc.basecalling_stats
-        }
+        } 
     }
     //basecalling_stats.groupTuple().view()
   
@@ -523,3 +523,4 @@ else {
      def msg = final_message("MoP3")
         sendMail(to: params.email, subject: "MoP3 - preprocess execution", body: msg, attach: "${outputMultiQC}/multiqc_report.html")
     }
+}
