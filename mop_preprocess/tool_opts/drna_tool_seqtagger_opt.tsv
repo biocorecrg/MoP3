@@ -1,5 +1,5 @@
 #step	tool	extrapars
-basecalling	dorado	""
+basecalling	dorado	"rna002_70bps_hac@v3"
 basecalling	guppy	""
 demultiplexing	seqtagger	"-k b100"
 demultiplexing	deeplexicon	""
