@@ -102,7 +102,7 @@ process MinIONQC {
     script:
     """
       if [ -f "summaries_" ]; then
-	  ln -s summaries_ ${folder_name}_final_summary.stats
+	  cp summaries_ ${folder_name}_final_summary.stats
 	  else
 		  head -n 1 summaries_1 > ${folder_name}_final_summary.stats
 	      for i in summaries_*; do grep -v "filename" \$i >> ${folder_name}_final_summary.stats; done

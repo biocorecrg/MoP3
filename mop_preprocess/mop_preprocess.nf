@@ -132,7 +132,7 @@ def basecall_label = (params.GPU != 'OFF' ? 'basecall_gpus' : 'big_cpus')
 def deeplexi_basecall_label = (params.GPU != 'OFF' ? 'demulti_gpus' : '')
 
 def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
-def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
+//def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
 
 
 def guppypars = ""
@@ -208,7 +208,7 @@ include { ASSEMBLE as ISOQUANT_ASSEMBLE } from "${subworkflowsDir}/assembly/isoq
 
 include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report.getName()}", OUTPUT:outputMultiQC)
 include { concatenateFastQFiles} from "${local_modules}" addParams(OUTPUT:outputFastq)
-include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputMinionQC, LABEL: 'big_mem_cpus')
+include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_mem_cpus')
 include { bam2stats; countStats; joinCountStats; joinAlnStats} from "${local_modules}"
 include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as fast5CleanFile} from "${local_modules}"
 include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
