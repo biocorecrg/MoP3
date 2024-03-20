@@ -2,7 +2,7 @@
 desc="""Split FastQ by barcode
 """
 epilog="""Author: l.p.pryszcz+git@gmail.com
-Barcelona, 4/05/2023
+Modified by Luca Cozzuto for Master of Pores! :)
 """
 
 import gzip, os, sys
