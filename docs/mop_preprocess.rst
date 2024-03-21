@@ -10,6 +10,12 @@ MOP_PREPROCESS
 This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). It can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. You can restrict the number of barcodes by using the **barcodes** parameter.
 
 
+.. image:: ../img/flow_preproc.png
+  :width: 600
+  :alt: mop_preprocess graph
+
+
+
 Input Parameters
 ======================
 
