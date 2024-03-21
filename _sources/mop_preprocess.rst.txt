@@ -7,8 +7,7 @@ MOP_PREPROCESS
 .. autosummary::
    :toctree: generated
 
-This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). In theory, it can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well.
-
+This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). It can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. You can restrict the number of barcodes by using the **barcodes** parameter.
 
 
 Input Parameters
@@ -21,9 +20,11 @@ The input parameters are stored in yaml files like the one represented here:
 
 You can change them by editing this file or using the command line as explained in the next section.
 
-.. note::
+   
+.. tip::
 
-   * In case of pod5 as input files you can use them as they were fast5 with dorado or guppy >= 6.5.x. The only limitation is that you cannot obtained basecalled fast5 and so you cannot use the other pipelines that need fast5 as input files.
+   In case of pod5 as input files you can use them as they were fast5 with dorado or guppy >= 6.5.x. The only limitation is that you cannot obtained basecalled fast5 and so you cannot use the other pipelines that need fast5 as input files.
+
 
 
 How to run the pipeline
@@ -157,9 +158,22 @@ You also need to add the dedicated parameter within the tool_opts file for the s
 Barcodes
 ===================
 
-You can select the barcodes you are interested in by writing them down in a txt file as in this example. The format is *samplename---barcodeID*
+You can select the barcodes you are interested in by writing them down in a text file as in this example. The format is *samplename---barcodeID*
 
 .. literalinclude:: ../mop_preprocess/keep_barcodes.txt
+
+The sample id is given by either the folder containing the fast5 files or the basename of the fastq files. So, if your files are in a folder named **myfiles**, it will be:
+
+.. code-block:: console
+
+   myfiles---bc_1
+   myfiles---bc_2
+   myfiles---bc_3
+
+.. note::
+
+   The naming convention of the different barcodes is decided by each tool, so **seqtagger** will produce **bc_1**, **bc_2**, etc. while guppy will produce **barcode01**, **barcode02**, etc.
+
 
 Results
 ====================
