@@ -77,6 +77,11 @@ Several folders are created by the pipeline within the output directory specifie
    gene_A,2518,A,45545.0,6.49821,5.00000,5.47485,0.10802503018992206,0.10855198155670216,0.2082775277198375
    gene_A,2519,T,45557.0,6.51247,5.00000,4.81853,0.09386043857145993,0.14792457800118533,0.2033057488421099
 
+Here an example of a plot from Epinano:
+
+.. image:: ../img/epinano.png
+  :width: 350  
+
 2. **Tombo** results are stored in **tombo_flow** directory. It contains one file per comparison. It reports the p-value per position, the sum of p-values per 5-mer and coverage in both WT and KO. See example below:
 
 .. code-block:: console
