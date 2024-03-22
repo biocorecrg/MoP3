@@ -378,28 +378,32 @@ workflow {
     analysis_type = checkInput(params.fast5, params.fastq)
 
     switch(analysis_type) {
+        // INPUT IS RAW NANOPORE DATA
         case "fast5":
         fast5_4_analysis = getFast5(params.fast5)
+        // BASECALL ONLY
         if (params.demultiplexing == "NO" ) {
             outbc = BASECALL(fast5_4_analysis)
             basecalled_fastq = outbc.basecalled_fastq
             bc_stats = reshapeSamples(outbc.basecalling_stats)
         }
-        else {
+        else { // BASECALL AND DEMULTIPLEXT
             switch(params.demultiplexing) {
                 case "deeplexicon":
                 case "seqtagger":
                 outbc = BASECALL(fast5_4_analysis)
                 demux = DEMULTIPLEX(fast5_4_analysis, outbc.basecalled_fastq)
                 demufq = demux.demultiplexed_fastq
-                bc_stats = reshapeSamples(demux.demultiplexed_tsv).groupTuple()
+                bc_stats = reshapeSamples(outbc.basecalling_stats)
+                bc_demux_stats = reshapeSamples(demux.demultiplexed_tsv).groupTuple()
                 break;
         
                 case "guppy":
                 case "readucks":
                 outbc = BASECALL_DEMULTIPLEX(fast5_4_analysis)
                 demufq = outbc.demultiplexed_fastqs
-                bc_stats = reshapeSamples(outbc.basecalling_stats).groupTuple()
+                bc_stats = reshapeSamples(outbc.basecalling_stats)
+                bc_demux_stats = reshapeSamples(outbc.basecalling_stats).groupTuple()
                 break;
         
                 case "dorado":
@@ -412,7 +416,11 @@ workflow {
             [it[1].name.replace(".fastq.gz", "").replace(".fq.gz", ""), it[1] ]
         }
 
+        // FILTER BARCODES FOR FASTQ
         if (params.barcodes != "") {
+            log.info "*********************************************************************"
+            log.info "*************** Selecting only the requested barcodes ***************"
+            log.info "*********************************************************************"
             basecalled_fastq = filterPerBarcodes(barcodes_to_include, reshapedPrefiltDemufq)
         } else {
            basecalled_fastq = reshapedPrefiltDemufq
@@ -424,14 +432,13 @@ workflow {
         if (demulti_fast5_opt == "ON") {
             basecalled_fast5 = reshapeSamples(outbc.basecalled_fast5).transpose().groupTuple()
             if (params.barcodes == "") {
-                DEMULTI_FAST5(bc_stats, basecalled_fast5)
+                DEMULTI_FAST5(bc_demux_stats, basecalled_fast5)
             } else {
-                DEMULTI_FAST5_FILTER(bc_stats, basecalled_fast5, barcodes_to_include)
+                // FILTER BARCODES FOR FAST5
+                DEMULTI_FAST5_FILTER(bc_demux_stats, basecalled_fast5, barcodes_to_include)
             }
         } 
-    }
-    //basecalling_stats.groupTuple().view()
-  
+    }  
   
     // Perform MinIONQC on basecalling stats
     basecall_qc = MinIONQC(bc_stats.groupTuple())
@@ -443,24 +450,25 @@ workflow {
     // SEQUENCE ALIGNMENT
     alns = MAPPING(bc_fastq).out
 
-
-     // Concatenate fastq and BAM files differently depending on if demultiplexed or not
-     if (params.demultiplexing == "NO" ) {
-      reshaped_bc_fastq = reshapeSamples(bc_fastq)
-      reshaped_aln_reads = reshapeSamples(alns)
-     } else {
-      reshaped_bc_fastq = reshapeDemuxSamples(bc_fastq)
-      reshaped_aln_reads = reshapeDemuxSamples(alns)
-     }
-        jaln_reads = SAMTOOLS_CAT(reshaped_aln_reads.groupTuple())
-     fastq_files = concatenateFastQFiles(reshaped_bc_fastq.groupTuple())
-     break
-
+    // Concatenate fastq and BAM files differently depending on if demultiplexed or not
+    if (params.demultiplexing == "NO" ) {
+        reshaped_bc_fastq = reshapeSamples(bc_fastq)
+        reshaped_aln_reads = reshapeSamples(alns)
+    } else {
+        reshaped_bc_fastq = reshapeDemuxSamples(bc_fastq)
+        reshaped_aln_reads = reshapeDemuxSamples(alns)
+    }
+        
+    jaln_reads = SAMTOOLS_CAT(reshaped_aln_reads.groupTuple())
+    fastq_files = concatenateFastQFiles(reshaped_bc_fastq.groupTuple())
+    break
+    
+    // INPUT IS BASECALLED SEQUENCES
     case "fastq":
-     fastq_files = Channel.fromFilePairs( params.fastq , size: 1, checkIfExists: true)
+        fastq_files = Channel.fromFilePairs( params.fastq , size: 1, checkIfExists: true)
         jaln_reads = MAPPING(fastq_files).out
         multiqc_data = Channel.value()
-     break
+        break
     }
 
     // Perform SORTING and INDEXING on bam files
