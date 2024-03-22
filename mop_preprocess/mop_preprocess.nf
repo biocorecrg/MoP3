@@ -418,7 +418,7 @@ workflow {
            basecalled_fastq = reshapedPrefiltDemufq
         }
 
-        basecalled_fastq.ifEmpty{exit 1, "NO COMBINATION SAMPLE---BARCODEID WAS FOUND\PLEASE CHECK YOUR BARCODE LIST\nENDING NOW, BYE!!!"}
+        basecalled_fastq.ifEmpty{exit 1, "NO COMBINATION SAMPLE---BARCODEID WAS FOUND\nPLEASE CHECK YOUR BARCODE LIST\nENDING NOW, BYE!!!"}
         
         // DEMULTI FAST5
         if (demulti_fast5_opt == "ON") {
