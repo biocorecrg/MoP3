@@ -1,2 +1,2 @@
-mod---barcode01
-mod---barcode02
+anna---bc_104
+anna---bc_102
