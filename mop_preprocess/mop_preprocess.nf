@@ -254,11 +254,12 @@ workflow MAPPING {
 
     // Perform mapping on fastq files
     if (params.mapping == "NO") {
-        stats_aln = Channel.value()
-        sorted_alns = Channel.value()
-        nanoplot_qcs = Channel.value()
-        aln_indexes = Channel.value()
-        aln_reads = Channel.value()
+        stats_aln = Channel.empty()
+        stats_counts = Channel.empty()
+        sorted_alns = Channel.empty()
+        nanoplot_qcs = Channel.empty()
+        aln_indexes = Channel.empty()
+        aln_reads = Channel.empty()
     }
     else {
         switch(params.mapping) {
@@ -311,7 +312,7 @@ workflow COUNTING {
         stat_counts = countStats(assignments)
         stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
     } else if (params.counting == "NO") {
-        stats_counts = Channel.value()
+        stats_counts = Channel.empty()
     } else {
         println "ERROR ################################################################"
         println "${params.counting} is not compatible with ${params.ref_type}"
@@ -467,7 +468,7 @@ workflow {
     case "fastq":
         fastq_files = Channel.fromFilePairs( params.fastq , size: 1, checkIfExists: true)
         jaln_reads = MAPPING(fastq_files).out
-        multiqc_data = Channel.value()
+        multiqc_data = Channel.empty()
         break
     }
 
@@ -493,10 +494,12 @@ workflow {
     multiqc_data = multiqc_data.mix(fastqc_files.map{it[1]})
 
     stats_counts = COUNTING(sorted_alns, aln_indexes).stats_counts
+    
     multiqc_data = multiqc_data.mix(stats_counts)
+    multiqc_data.view()
 
     // REVISE THIS
-    ASSEMBLY(sorted_alns, reference, params.annotation)
+    //ASSEMBLY(sorted_alns, reference, params.annotation)
 
     // Perform MULTIQC report
     MULTIQC(multiqc_data.collect())
