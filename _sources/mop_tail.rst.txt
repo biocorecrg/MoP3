@@ -73,4 +73,5 @@ Several folders are created by the pipeline within the output directory specifie
 
 If both programs are run, an additional plot that shows the correlation of their results is generated.
 
-
+.. image:: ../img/mod_corr.png
+  :width: 400
