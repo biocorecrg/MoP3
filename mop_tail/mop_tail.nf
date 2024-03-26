@@ -36,7 +36,8 @@ email                    : ${params.email}
 ************************* Flows *******************************
 tailfindr                             	: ${params.tailfindr}
 nanopolish                              : ${params.nanopolish}
-
+***************************************************************
+tailfindr_mode                          : ${params.tailfindr_mode}
 email                                   : ${params.email}
 """
 
@@ -72,7 +73,8 @@ switch(params.tailfindr_mode) {
         	tailfindr_mode = params.tailfindr_mode
     		println "tailfindr is in nano3p mode, R10 chemistry"
   		break
-		default:
+	default:
+		tailfindr_mode = "default"
     		println "tailfindr is in default mode"
 		break
 }
@@ -123,8 +125,8 @@ workflow {
 		nanores = NANOPOLISH_POLYA_LEN(fast5_files_4_np, bams, bais, fastqs, ref_file)
 	}
 	if (params.tailfindr == "YES" && params.nanopolish == "YES") {
-                log.info "Joining results"
-				//nanores.filtered_est.view()
+                log.info "Joining results from TailfindR and NanoPolish\n\n"
+		//nanores.filtered_est.view()
 		join_nanotail_results(nanores.filtered_est.join(tailres.length).join(assigned), joinScript)
 	}
 
