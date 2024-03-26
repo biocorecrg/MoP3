@@ -68,4 +68,5 @@ Some nextflow configuration files are stored within the folder **conf** and can 
 - sge:             for being used in an HPC with Sun Grid Engine
 - cluster or crg:  for being used in the custom HPC environment at CRG
 - slurm:           for being used in an HPC with SLURM
+- awsbatch:        for being used in Amazon AWS cloud infrastructure
 
