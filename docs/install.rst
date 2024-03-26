@@ -1,7 +1,7 @@
 .. _home-page-install:
 
 **************
-How to install
+Get Started
 **************
 
 .. autosummary::
@@ -21,7 +21,7 @@ To install the pipeline you need to download the repo:
 
    git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MoP3.git
 
-Guppy
+Installing Guppy
 ============
 
 You can use **INSTALL.sh** and the version of Guppy you want to download.
@@ -57,3 +57,15 @@ Testing
 .. tip::
 
   You can replace ```-with-singularity``` with ```-with-docker``` if you want to use the docker engine.
+
+Profiles
+============
+Some nextflow configuration files are stored within the folder **conf** and can be selected using different profiles. Currently, we have:
+
+- ci:              for continuous integration testing (low resources)
+- local:           for being used in a laptop without GPU support
+- m1mac:           for running the containers in emulation for being used on M1/M2/M3 Apple processors.
+- sge:             for being used in an HPC with Sun Grid Engine
+- cluster or crg:  for being used in the custom HPC environment at CRG
+- slurm:           for being used in an HPC with SLURM
+
