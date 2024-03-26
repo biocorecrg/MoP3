@@ -71,4 +71,6 @@ Several folders are created by the pipeline within the output directory specifie
    "0154ce9c-fe6b-4ebc-bbb1-517fdc524207"	24.05	24.24	"YFL044C"
    "020cde28-970d-4710-90a5-977e4b4bbc46"	41.27	56.79	"YGL238W"
 
-If both softwares are run, an additional plot which shows the correlation of their results is generated.
+If both programs are run, an additional plot that shows the correlation of their results is generated.
+
+
