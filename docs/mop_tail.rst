@@ -7,7 +7,11 @@ MOP_TAIL
 .. autosummary::
    :toctree: generated
 
-This module takes as input the output from MOP_PREPROCESS: basecalled fast5 reads, together with their respective fastq files, alignment and assignment read ID to gene/transcript. It outputs the estimation of poly(A) tail length at read level provided by **Tailfindr**, **Nanopolish** or both. Tailfinr can be run using three modes: standard, for Nano3P-seq protocol with R9 chemistry and Nano3P-seq protocol with R10 chemistry.
+This pipeline takes as input the output from MOP_PREPROCESS: basecalled fast5 reads, together with their respective fastq files, alignment and assignment read ID to gene/transcript. It outputs the estimation of poly(A) tail length at read level provided by **Tailfindr**, **Nanopolish** or both. Tailfinr can be run using three modes: standard, for Nano3P-seq protocol with R9 chemistry and Nano3P-seq protocol with R10 chemistry.
+
+.. image:: ../img/flow_tail.png
+  :width: 600
+  :alt: mop_tail graph
 
 
 Input Parameters
