@@ -11,7 +11,7 @@ This pipeline takes as input the output from MOP_PREPROCESS: basecalled fast5 re
 
 .. image:: ../img/flow_mod.png
   :width: 600
-  :alt: mop_preprocess graph
+  :alt: mop_mod graph
 
 Input Parameters
 ======================
