@@ -374,6 +374,29 @@ workflow ASSEMBLY {
     }
 }
 
+workflow BASECALL_MOP {
+
+    take:
+        input_fast5
+
+    main:
+	if (params.basecalling != "NO" ) {
+		outbc = BASECALL(input_fast5)
+		basecalled_fastq = outbc.basecalled_fastq
+	} else {
+		basecalled_fast5 = input_fast5
+		basecalling_stats = channel.empty()
+		basecalled_fastq = channel.empty()
+	}
+
+    emit:
+	basecalled_fastq
+	basecalling_stats
+	basecalled_fast5 
+	
+}
+
+
 workflow {
 
     analysis_type = checkInput(params.fast5, params.fastq)
@@ -384,7 +407,7 @@ workflow {
         fast5_4_analysis = getFast5(params.fast5)
         // BASECALL ONLY
         if (params.demultiplexing == "NO" ) {
-            outbc = BASECALL(fast5_4_analysis)
+            outbc = BASECALL_MOP(fast5_4_analysis)
             basecalled_fastq = outbc.basecalled_fastq
             bc_stats = reshapeSamples(outbc.basecalling_stats)
         }
@@ -392,7 +415,7 @@ workflow {
             switch(params.demultiplexing) {
                 case "deeplexicon":
                 case "seqtagger":
-                outbc = BASECALL(fast5_4_analysis)
+                outbc = BASECALL_MOP(fast5_4_analysis)
                 demux = DEMULTIPLEX(fast5_4_analysis, outbc.basecalled_fastq)
                 demufq = demux.demultiplexed_fastq
                 bc_stats = reshapeSamples(outbc.basecalling_stats)
@@ -496,7 +519,6 @@ workflow {
     stats_counts = COUNTING(sorted_alns, aln_indexes).stats_counts
     
     multiqc_data = multiqc_data.mix(stats_counts)
-    multiqc_data.view()
 
     // REVISE THIS
     //ASSEMBLY(sorted_alns, reference, params.annotation)
