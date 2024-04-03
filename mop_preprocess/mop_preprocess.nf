@@ -407,7 +407,7 @@ workflow {
         fast5_4_analysis = getFast5(params.fast5)
         // BASECALL ONLY
         if (params.demultiplexing == "NO" ) {
-            outbc = BASECALL_MOP(fast5_4_analysis)
+            outbc = BASECALL(fast5_4_analysis)
             basecalled_fastq = outbc.basecalled_fastq
             bc_stats = reshapeSamples(outbc.basecalling_stats)
         }
@@ -415,7 +415,7 @@ workflow {
             switch(params.demultiplexing) {
                 case "deeplexicon":
                 case "seqtagger":
-                outbc = BASECALL_MOP(fast5_4_analysis)
+                outbc = BASECALL(fast5_4_analysis)
                 demux = DEMULTIPLEX(fast5_4_analysis, outbc.basecalled_fastq)
                 demufq = demux.demultiplexed_fastq
                 bc_stats = reshapeSamples(outbc.basecalling_stats)
