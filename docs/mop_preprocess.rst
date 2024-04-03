@@ -126,6 +126,12 @@ The command line options for each tool used in the pipeline are stored within sp
 
 .. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtagger_opt.tsv
 
+The first column indicates the processing step as **basecalling** or **demultiplexing** etc. Some tools such as Guppy can be used for more processing steps. Several pre-compiled tool_opts files are stored within the folder **tool_opts**.
+
+.. note::
+   Readucks is run after guppy demultiplexing. It refines the demultiplexing generating different fastqs
+
+
 Model libraries for specific tools
 ====================
 The following folders are available the respective tools. Some models are already pre-installed-
