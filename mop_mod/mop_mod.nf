@@ -30,8 +30,7 @@ comparison                              : ${params.comparison}
 ********** reference has to be the genome *************
 reference                               : ${params.reference}
 output                                  : ${params.output}
-
-pars_tools              : ${params.pars_tools}
+pars_tools                              : ${params.pars_tools}
 
 ************************* Flows *******************************
 epinano                                 : ${params.epinano}
@@ -163,7 +162,7 @@ workflow {
 
     if (params.modphred == "YES") {
     	//chroms.subscribe{ println "Got: ***${it}***" }
-        modphred_flow(fast5_files, ref_file, chroms, comparisons)
+        modphred_flow(fast5_files, ref_file, chroms)
     }
 
     if (params.epinano == "YES") {
@@ -232,7 +231,6 @@ workflow  modphred_flow {
     fast5_files
     ref_file
     chroms
-    comparisons
 
     main:
 	fast5_per_sample = fast5_files.groupTuple()
