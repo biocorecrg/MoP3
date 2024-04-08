@@ -161,9 +161,6 @@ checkTools(tools, progPars)
 // Create a channel for excluded ids
 barcodes_to_include = get_barcode_list(params.barcodes)
 
-// CHECK GUPPY VERSION
-include { GET_VERSION as GUPPY_VERSION } from "${subworkflowsDir}/basecalling/guppy"
-
 def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
 
 def basecaller_pars = ["guppy" : guppy_basecall_pars, "dorado" : progPars["basecalling--dorado"] ]
