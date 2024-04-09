@@ -40,3 +40,4 @@ Contents:
    benchmark
    changelog
    ci
+   troubleshooting
