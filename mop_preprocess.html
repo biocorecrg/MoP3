@@ -93,7 +93,7 @@
              
   <section id="mop-preprocess">
 <span id="home-page-moprepr"></span><h1>MOP_PREPROCESS<a class="headerlink" href="#mop-preprocess" title="Link to this heading"></a></h1>
-<p>This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). It can also support the new pod5 format but it won’t output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. You can restrict the number of barcodes by using the <strong>barcodes</strong> parameter.</p>
+<p>This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). It can also support the new pod5 format but it won’t output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. You can restrict the number of barcodes by indicating a file with barcode list using the <strong>barcodes</strong> parameter.</p>
 <a class="reference internal image-reference" href="_images/flow_preproc.png"><img alt="mop_preprocess graph" src="_images/flow_preproc.png" style="width: 600px;" /></a>
 <section id="input-parameters">
 <h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Link to this heading"></a></h2>
@@ -146,7 +146,7 @@
 <p>You can change them by editing this file or using the command line as explained in the next section.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>In case of pod5 as input files you can use them as they were fast5 with dorado or guppy &gt;= 6.5.x. The only limitation is that you cannot obtained basecalled fast5 and so you cannot use the other pipelines that need fast5 as input files.</p>
+<p>In the case of pod5 as input files, you can use them as they were fast5 with dorado or guppy &gt;= 6.5.x. The only limitation is that you cannot obtain basecalled fast5 so you cannot use the other pipelines that need fast5 as input files.</p>
 </div>
 </section>
 <section id="how-to-run-the-pipeline">
@@ -192,7 +192,7 @@
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>Once the error has been solved or if you change a specific parameter, you can resume the execution with the <strong>Netxtlow</strong> parameter <strong>- resume</strong> (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If a parameter is changed, only processes affected by this parameter will be re-run.</p>
+<p>Once the error has been solved or if you change a specific parameter, you can resume the execution with the <strong>Netxtlow</strong> parameter <strong>- resume</strong> (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If you change a parameter, only the processes affected by this parameter will be re-run.</p>
 </div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">...</span>
 
@@ -212,7 +212,7 @@
 </section>
 <section id="tool-opts">
 <h2>tool_opts<a class="headerlink" href="#tool-opts" title="Link to this heading"></a></h2>
-<p>The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  <em>tool_opts</em> folder. Here you have an example:</p>
+<p>The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  <em>tool_opts</em> folder. Here is an example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#step	tool	extrapars</span>
 <span class="n">basecalling</span>	<span class="n">dorado</span>	<span class="s2">&quot;rna002_70bps_hac@v3&quot;</span>
 <span class="n">basecalling</span>	<span class="n">guppy</span>	<span class="s2">&quot;&quot;</span>
@@ -238,7 +238,7 @@
 </section>
 <section id="model-libraries-for-specific-tools">
 <h2>Model libraries for specific tools<a class="headerlink" href="#model-libraries-for-specific-tools" title="Link to this heading"></a></h2>
-<p>The following folders are available the respective tools. Some models are already pre-installed-</p>
+<p>The following folders are available for the respective tools. Some models are already pre-installed-</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt>deeplexicon_models</dt><dd><ul>
