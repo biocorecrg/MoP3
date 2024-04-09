@@ -488,7 +488,7 @@ workflow {
     case "fastq":
         fastq_files = Channel.fromFilePairs( params.fastq , size: 1, checkIfExists: true)
         jaln_reads = MAPPING(fastq_files).out
-        multiqc_data = Channel.empty()
+        multiqc_data = multiqc_info
         break
     }
 
