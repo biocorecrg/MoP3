@@ -7,7 +7,7 @@ MOP_PREPROCESS
 .. autosummary::
    :toctree: generated
 
-This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). It can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. You can restrict the number of barcodes by using the **barcodes** parameter.
+This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). It can also support the new pod5 format but it won't output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. You can restrict the number of barcodes by indicating a file with barcode list using the **barcodes** parameter.
 
 
 .. image:: ../img/flow_preproc.png
@@ -29,7 +29,7 @@ You can change them by editing this file or using the command line as explained 
    
 .. tip::
 
-   In case of pod5 as input files you can use them as they were fast5 with dorado or guppy >= 6.5.x. The only limitation is that you cannot obtained basecalled fast5 and so you cannot use the other pipelines that need fast5 as input files.
+   In the case of pod5 as input files, you can use them as they were fast5 with dorado or guppy >= 6.5.x. The only limitation is that you cannot obtain basecalled fast5 so you cannot use the other pipelines that need fast5 as input files.
 
 
 
@@ -96,13 +96,13 @@ or you can run the pipeline locally:
 
 .. tip::
 
-   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If a parameter is changed, only processes affected by this parameter will be re-run.
+   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there is an error, the pipeline will resume from the process that had the error and proceed with the rest.  If you change a parameter, only the processes affected by this parameter will be re-run.
 
 
 .. code-block:: console
    nextflow run mop_preprocess.nf -with-singularity -params-file params.yaml -bg -resume > log_resumed.txt
 
-   To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed process are found as   *Cached*, resume worked!
+   To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed processes are found as   *Cached*, the resume worked!
 
 .. code-block:: console
 
@@ -122,7 +122,7 @@ or you can run the pipeline locally:
 tool_opts
 ====================
 
-The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  *tool_opts* folder. Here you have an example:
+The command line options for each tool used in the pipeline are stored within specialized tsv files stored within the  *tool_opts* folder. Here is an example:
 
 .. literalinclude:: ../mop_preprocess/tool_opts/drna_tool_seqtagger_opt.tsv
 
@@ -134,7 +134,7 @@ The first column indicates the processing step as **basecalling** or **demultipl
 
 Model libraries for specific tools
 ====================
-The following folders are available the respective tools. Some models are already pre-installed-
+The following folders are available for the respective tools. Some models are already pre-installed-
 
 * deeplexicon_models
    * resnet20-final.h5
