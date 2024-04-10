@@ -33,7 +33,7 @@ Check your barcode kit!. You must indicate the **--barcode_kits** in the tool_op
   demultiplexing guppy  "--flowcell FLO-MIN114 --kit SQK-LSK114 --barcode_kits SQK-NBD114-24"
 
 
-Memory failures in mop_mod (or mop_preprocess)
+Memory failures in mop_preprocess and mop_mod 
 ================================================================
 
 Sometimes FastQC, Epinano, or other tools can run out of memory because the input data contain low-quality reads. It is always a good idea to double-check it and eventually filter them per size / quality using either **nanoq** or **nanofilt**.
