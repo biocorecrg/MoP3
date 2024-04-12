@@ -82,8 +82,7 @@ config_report = file("${projectDir}/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
 logo = file("${projectDir}/../img/logo_small.png")
 
-Channel.from( config_report, logo )
-    .collect().set{multiqc_info}
+Channel.from( config_report, logo ).set{multiqc_data}
 
 outputReport   = file("${outputMultiQC}/multiqc_report.html")
 
@@ -408,7 +407,7 @@ workflow {
             basecalled_fastq = outbc.basecalled_fastq
             bc_stats = reshapeSamples(outbc.basecalling_stats)
         }
-        else { // BASECALL AND DEMULTIPLEXT
+        else { // BASECALL AND DEMULTIPLEX
             switch(params.demultiplexing) {
                 case "deeplexicon":
                 case "seqtagger":
@@ -425,6 +424,7 @@ workflow {
                 demufq = outbc.demultiplexed_fastqs
                 bc_stats = reshapeSamples(outbc.basecalling_stats)
                 bc_demux_stats = reshapeSamples(outbc.basecalling_stats).groupTuple()
+                outbc.basecalled_fast5.view()
                 break;
         
                 case "dorado":
@@ -451,6 +451,7 @@ workflow {
         
         // DEMULTI FAST5
         if (demulti_fast5_opt == "ON") {
+            outbc.basecalled_fast5.view()
             basecalled_fast5 = reshapeSamples(outbc.basecalled_fast5).transpose().groupTuple()
             if (params.barcodes == "") {
                 DEMULTI_FAST5(bc_demux_stats, basecalled_fast5)
@@ -463,7 +464,7 @@ workflow {
   
     // Perform MinIONQC on basecalling stats
     basecall_qc = MinIONQC(bc_stats.groupTuple())
-    multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
+    multiqc_data = multiqc_data.mix(basecall_qc.QC_folder.map{it[1]})
 
     // SEQUENCE FILTERING
     bc_fastq = SEQFILTER(basecalled_fastq).out
@@ -488,7 +489,6 @@ workflow {
     case "fastq":
         fastq_files = Channel.fromFilePairs( params.fastq , size: 1, checkIfExists: true)
         jaln_reads = MAPPING(fastq_files).out
-        multiqc_data = multiqc_info
         break
     }
 
@@ -513,8 +513,8 @@ workflow {
     fastqc_files = FASTQC(fastq_files)
     multiqc_data = multiqc_data.mix(fastqc_files.map{it[1]})
 
-    stats_counts = COUNTING(sorted_alns, aln_indexes).stats_counts
-    
+
+    stats_counts = COUNTING(sorted_alns, aln_indexes).stats_counts    
     multiqc_data = multiqc_data.mix(stats_counts)
 
     // REVISE THIS
