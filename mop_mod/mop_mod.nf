@@ -75,7 +75,7 @@ progPars = getParameters(params.pars_tools)
 include { calcVarFrequencies as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["epinano--epinano"])
 include { joinEpinanoRes }  from "${local_modules}" addParams(OUTPUT: outputEpinanoFlow)
 
-include { RUNBYCHROM as MODPHRED_CHR } from "${subworkflowsDir}/chem_modification/modphred.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["modphred--modphred"])
+include { RUNBYCHROM as MODPHRED_CHR } from "${subworkflowsDir}/chem_modification/modphred.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["modphred--modphred"], OUTPUT: outputModPhredFlow)
 
 
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_mem_cpus', LABELBIG: 'big_time_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
@@ -104,10 +104,13 @@ include { concat_csv_files } addParams(OUTPUT: outputNanoPolComFlow, LABEL: 'big
  * Creates the channels with comparisons
  */
 
-compfile = file(params.comparison)
-if( !compfile.exists() ) exit 1, "Missing comparison file: ${compfile}. Specify path with --comparisons"
+comparisons = channel.empty()
 
- Channel
+if (params.comparison != "") {
+   compfile = file(params.comparison)
+   if( !compfile.exists() ) exit 1, "Missing comparison file: ${compfile}. Specify path with --comparisons"
+
+   Channel
     .from(compfile.readLines())
     .map { line ->
         list = line.split("\t")
@@ -120,7 +123,7 @@ if( !compfile.exists() ) exit 1, "Missing comparison file: ${compfile}. Specify 
             [ sampleID, ctrlID ]
         }
     }.set {comparisons}
-
+}
 
 
 workflow {
@@ -150,6 +153,10 @@ workflow {
     unique_samples.map {
         [it, file("${params.input_path}/fast5_files/${it}/*.fast5")]
     }.transpose().set{fast5_files}
+    
+    all_fast5 = channel.fromPath("${params.input_path}/fast5_files/*/*.fast5").map{
+    	[it.getParent().getName(), it]
+    }
 
     ref_file = checkRef(reference)
 
@@ -162,7 +169,7 @@ workflow {
 
     if (params.modphred == "YES") {
     	//chroms.subscribe{ println "Got: ***${it}***" }
-        modphred_flow(fast5_files, ref_file, chroms)
+        modphred_flow(all_fast5, ref_file, chroms)
     }
 
     if (params.epinano == "YES") {
@@ -233,8 +240,8 @@ workflow  modphred_flow {
     chroms
 
     main:
-	fast5_per_sample = fast5_files.groupTuple()
-	MODPHRED_CHR(fast5_per_sample, ref_file, chroms)
+    fast5_per_sample = fast5_files.groupTuple()
+    MODPHRED_CHR(fast5_per_sample, ref_file, chroms)
 
 }
 
