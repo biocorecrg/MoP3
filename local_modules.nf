@@ -334,7 +334,8 @@ process indexReference {
 
     script:
 	"""
-	\$PICARD CreateSequenceDictionary R=${reference} O=${reference}.dict
+        mkdir tmp
+	\$PICARD CreateSequenceDictionary TMP_DIR=./tmp R=${reference} O=${reference}.dict
 	samtools faidx ${reference}
 	"""
 }
