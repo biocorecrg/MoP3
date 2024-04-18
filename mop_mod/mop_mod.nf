@@ -356,7 +356,7 @@ workflow epinano_flow {
     }.set{data_for_epinano}
 
     per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(data_for_epinano)
-    epi_joined_res = joinEpinanoRes(per_site_vars.groupTuple()).plusepi
+    epi_joined_res = joinEpinanoRes(per_site_vars.transpose().groupTuple()).plusepi
 
     if (params.epinano_plots == "YES") {
         epi_joined_res.combine(epi_joined_res).map {
