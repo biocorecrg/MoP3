@@ -131,6 +131,9 @@ The first column indicates the processing step as **basecalling** or **demultipl
 .. note::
    Readucks is run after guppy demultiplexing. It refines the demultiplexing generating different fastqs
 
+.. tip::
+   You don't need to specify the whole path for the models of seqtagger, just the name of the model will be enough 
+
 
 Model libraries for specific tools
 ====================
