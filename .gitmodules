@@ -1,3 +1,4 @@
 [submodule "BioNextflow"]
 	path = BioNextflow
-	url = https://github.com/biocorecrg/BioNextflow
+	url = git@github.com:biocorecrg/BioNextflow.git
+https:/i/github.com/biocorecrg/BioNextflow
