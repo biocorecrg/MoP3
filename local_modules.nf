@@ -350,9 +350,8 @@ process joinEpinanoRes {
     tuple val(id), path(epinanores)
 
     output:
-    tuple val(id), path("*.plus_strand.per.site.csv.gz"), emit: plusepi
-    tuple val(id), path("*.minus_strand.per.site.csv.gz"), emit: minusepi
-
+    tuple val(id), path("*.plus_strand.per.site.csv.gz"), optional: true, emit: plusepi
+    tuple val(id), path("*.minus_strand.per.site.csv.gz"), optional: true, emit: minusepi
 
     script:
 	"""
