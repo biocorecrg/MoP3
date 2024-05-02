@@ -72,7 +72,7 @@ include { getParameters; mapIDPairs } from "${local_modules}"
 // Create a channel for tool options
 progPars = getParameters(params.pars_tools)
 
-include { calcVarFrequencies as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["epinano--epinano"])
+include { calcVarFrequencies as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano_1.2.4.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["epinano--epinano"])
 include { joinEpinanoRes }  from "${local_modules}" addParams(OUTPUT: outputEpinanoFlow)
 
 include { RUNBYCHROM as MODPHRED_CHR } from "${subworkflowsDir}/chem_modification/modphred.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["modphred--modphred"], OUTPUT: outputModPhredFlow)
@@ -84,7 +84,7 @@ include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem
 include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["tombo_msc--tombo"], OUTPUT: outputTomboFlow)
 include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["tombo_lsc--tombo"], OUTPUT: outputTomboFlow)
 
-include { GET_VERSION as EPINANO_VER } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf"
+include { GET_VERSION as EPINANO_VER } from "${subworkflowsDir}/chem_modification/epinano_1.2.4.nf"
 include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modification/nanopolish"
 include { GET_VERSION as NANOCOMPORE_VER } from "${subworkflowsDir}/chem_modification/nanocompore"
 include { GET_VERSION as TOMBO_VER } from "${subworkflowsDir}/chem_modification/tombo.nf"
