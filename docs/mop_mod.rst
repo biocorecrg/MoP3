@@ -112,3 +112,16 @@ Here an example of a plot from Epinano:
    gene_A	5	GAAGA	1	104.25	471
 
 4. **Nanocompore** results are stored in **nanopolish-compore_flow** directory. It contains one file per comparison (**wt_1_vs_ko_1_nanocompore_results.tsv**). Default output from Nanocompore (see Nanocompore's repository for a more detailed explanation).
+
+Encoding of modification information from m6A-aware basecalled data using modPhred
+=====================================================================================
+
+Once the data has been basecalled with our m6A modification-aware basecalling model, modification information data should be encoded for its later downstream analysis. This step is performed by **modPhred**, another software included in the **mop_mod** module.
+
+To run this software, in the ``params.yaml`` file you should specify ``modphred: "YES"`` and run the code below:
+
+.. code-block:: console
+
+   cd mop_mod
+   nextflow run mop_mod.nf -params-file params.yaml -with-singularity -bg > yourlog.txt
+
