@@ -55,6 +55,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#tool-opts">tool_opts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model-libraries-for-specific-tools">Model libraries for specific tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#barcodes">Barcodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basecalling-with-the-m6a-aware-model">Basecalling with the m6A-aware model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
 </ul>
 </li>
@@ -94,7 +95,8 @@
              
   <section id="mop-preprocess">
 <span id="home-page-moprepr"></span><h1>MOP_PREPROCESS<a class="headerlink" href="#mop-preprocess" title="Link to this heading"></a></h1>
-<p>This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi-sequence). It can also support the new pod5 format but it won’t output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. You can restrict the number of barcodes by indicating a file with barcode list using the <strong>barcodes</strong> parameter.</p>
+<p>This pipeline takes as input the raw fast5 reads - single or multi - and it produces several outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing pipeline can perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a reference (either a genome or a transcriptome), feature counting, discovery of novel transcripts, and it generates a final report with the performance and results of each of the steps performed.</p>
+<p>It automatically detects the kind of input fast5 file (single or multi-sequence). It can also support the new pod5 format but it won’t output basecalled fastq useful for the other pipelines. The basecalling can be performed with guppy or dorado and the demultiplexing with either guppy, deeplexicon or seqtagger. Basecalled fastq and Fast5 files can be demultiplexed as well. You can restrict the number of barcodes by indicating a file with barcode list using the <strong>barcodes</strong> parameter.</p>
 <a class="reference internal image-reference" href="_images/flow_preproc.png"><img alt="mop_preprocess graph" src="_images/flow_preproc.png" style="width: 600px;" /></a>
 <section id="input-parameters">
 <h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Link to this heading"></a></h2>
@@ -304,6 +306,14 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The naming convention of the different barcodes is decided by each tool, so <strong>seqtagger</strong> will produce <strong>bc_1</strong>, <strong>bc_2</strong>, etc. while guppy will produce <strong>barcode01</strong>, <strong>barcode02</strong>, etc.</p>
+</div>
+</section>
+<section id="basecalling-with-the-m6a-aware-model">
+<h2>Basecalling with the m6A-aware model<a class="headerlink" href="#basecalling-with-the-m6a-aware-model" title="Link to this heading"></a></h2>
+<p>For m6A basecalling in your <code class="docutils literal notranslate"><span class="pre">params.f5.yaml</span></code> file you should specify <code class="docutils literal notranslate"><span class="pre">basecalling:</span> <span class="pre">&quot;guppy&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">pars_tools:</span> <span class="pre">&quot;tool_opts/drna_tool_m6A_splice_opt.tsv&quot;</span> <span class="pre">``</span> <span class="pre">so</span> <span class="pre">that</span> <span class="pre">guppy</span> <span class="pre">will</span> <span class="pre">use</span> <span class="pre">the</span> <span class="pre">m6A</span> <span class="pre">model.</span> <span class="pre">In</span> <span class="pre">your</span> <span class="pre">output</span> <span class="pre">folder</span> <span class="pre">you</span> <span class="pre">will</span> <span class="pre">have</span> <span class="pre">the</span> <span class="pre">``fast5_files</span></code> folder containing the m6A basecalled fast5 files for downstream analysis. Then run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd mop_preprocess</span>
+<span class="go">nextflow run mop_preprocess.nf -params-file params.f5.yaml -with-singularity -bg &gt; yourlog.txt</span>
+</pre></div>
 </div>
 </section>
 <section id="results">
