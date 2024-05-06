@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#input-parameters">Input Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-run-the-pipeline">How to run the pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#encoding-of-modification-information-from-m6a-aware-basecalled-data-using-modphred">Encoding of modification information from m6A-aware basecalled data using modPhred</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mop_consensus.html">MOP_CONSENSUS</a></li>
@@ -188,6 +189,15 @@
 <ol class="arabic simple" start="4">
 <li><p><strong>Nanocompore</strong> results are stored in <strong>nanopolish-compore_flow</strong> directory. It contains one file per comparison (<strong>wt_1_vs_ko_1_nanocompore_results.tsv</strong>). Default output from Nanocompore (see Nanocompore’s repository for a more detailed explanation).</p></li>
 </ol>
+</section>
+<section id="encoding-of-modification-information-from-m6a-aware-basecalled-data-using-modphred">
+<h2>Encoding of modification information from m6A-aware basecalled data using modPhred<a class="headerlink" href="#encoding-of-modification-information-from-m6a-aware-basecalled-data-using-modphred" title="Link to this heading"></a></h2>
+<p>Once the data has been basecalled with our m6A modification-aware basecalling model, modification information data should be encoded for its later downstream analysis. This step is performed by <strong>modPhred</strong>, another software included in the <strong>mop_mod</strong> module.</p>
+<p>To run this software, in the <code class="docutils literal notranslate"><span class="pre">params.yaml</span></code> file you should specify <code class="docutils literal notranslate"><span class="pre">modphred:</span> <span class="pre">&quot;YES&quot;</span></code> and run the code below:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd mop_mod</span>
+<span class="go">nextflow run mop_mod.nf -params-file params.yaml -with-singularity -bg &gt; yourlog.txt</span>
+</pre></div>
+</div>
 </section>
 </section>
 
