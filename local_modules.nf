@@ -350,17 +350,16 @@ process joinEpinanoRes {
     tuple val(id), path(epinanores)
 
     output:
-    tuple val(id), path("*.plus_strand.per.site.csv.gz"), emit: plusepi
-    tuple val(id), path("*.minus_strand.per.site.csv.gz"), emit: minusepi
-
+    tuple val(id), path("*.plus_strand.per.site.csv.gz"), optional: true, emit: plusepi
+    tuple val(id), path("*.minus_strand.per.site.csv.gz"), optional: true, emit: minusepi
 
     script:
 	"""
-	if compgen -G "*.plus_strand.per.site.csv.gz" > /dev/null; then
-		zcat *pieces*.plus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.plus_strand.per.site.csv.gz
+	if compgen -G "*.fwd.per.site.csv.gz" > /dev/null; then
+		zcat *pieces*.fwd.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.plus_strand.per.site.csv.gz
 	fi
-	if compgen -G "*.minus_strand.per.site.csv.gz" > /dev/null; then
-		zcat *pieces*.minus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.minus_strand.per.site.csv.gz
+	if compgen -G "*.rev.per.site.csv.gz" > /dev/null; then
+		zcat *pieces*.rev.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.minus_strand.per.site.csv.gz
 	fi
 	"""
 }
