@@ -32,8 +32,8 @@ reference                 : ${params.reference}
 annotation                : ${params.annotation}
 
 granularity               : ${params.granularity}
-
 ref_type                  : ${params.ref_type}
+
 pars_tools                : ${params.pars_tools}
 barcodes                  : ${params.barcodes}
 
@@ -130,6 +130,7 @@ def demulti_fast5_opt = homogenizeVals(params.demulti_fast5)
 def basecall_label = (params.GPU != 'OFF' ? 'basecall_gpus' : 'big_cpus')
 def deeplexi_basecall_label = (params.GPU != 'OFF' ? 'demulti_gpus' : '')
 
+
 def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
 //def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
 
@@ -189,7 +190,7 @@ include { GET_VERSION as FASTQC_VER} from "${subworkflowsDir}/qc/fastqc"
 include { SORT as SAMTOOLS_SORT } from "${subworkflowsDir}/misc/samtools" addParams(LABEL: 'big_cpus', OUTPUT:outputMapping)
 include { INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addParams(OUTPUT:outputMapping)
 include { GET_VERSION as SAMTOOLS_VERSION; CAT as SAMTOOLS_CAT } from "${subworkflowsDir}/misc/samtools"
-include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" addParams(LABEL: 'big_cpus_ignore')
+include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" addParams(LABEL: 'big_cpus_retry')
 include { GET_VERSION as NANOPLOT_VER } from "${subworkflowsDir}/qc/nanoplot"
 include { GET_VERSION as NANOCOUNT_VER } from "${subworkflowsDir}/read_count/nanocount"
 include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(LABEL: 'big_mem', EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
