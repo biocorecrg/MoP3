@@ -254,7 +254,7 @@ workflow tombo_common_flow {
 
     main:
     fast5_files.map{
-        ["${it[0]}___${it[1].simpleName}", it[1]]
+        ["${it[0]}___${it[1].baseName}", it[1]]
     }.set{fast5_reshaped}
 
     single_fast5_folders = multiToSingleFast5(fast5_reshaped)
